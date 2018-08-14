@@ -44,7 +44,6 @@
 
 - [ijkplayer开源框架](https://github.com/Bilibili/ijkplayer "ijkplayer开源框架")
 - [Hrc/hrcx歌词制作器（播放器）](https://github.com/zhangliangming/HappyPlayer-PC.git "Hrc/Hrcx歌词制作器（播放器）")
-- [Krc、Ksc、Hrc/hrcx歌词解析器](https://github.com/zhangliangming/LyricsAnalyze.git "krc、ksc、hrc/hrcx歌词解析器")
 - [浅谈动感歌词](http://zhangliangming.github.io/ "浅谈动感歌词")
 - [Kugou-api](https://github.com/ecitlm/Kugou-api "Kugou-api")
 
