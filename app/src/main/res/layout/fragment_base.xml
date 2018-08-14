@@ -1,0 +1,38 @@
+<?xml version="1.0" encoding="utf-8"?>
+<android.support.constraint.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent">
+
+    <View
+        android:id="@+id/status_bar_view"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:visibility="gone"
+        app:layout_constraintTop_toTopOf="parent" />
+
+    <ViewStub
+        android:id="@+id/viewstub_loading_container"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:layout="@layout/fragment_loading"
+        app:layout_constraintBottom_toBottomOf="@+id/status_bar_view"></ViewStub>
+
+    <ViewStub
+        android:id="@+id/viewstub_content_container"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:visibility="gone"
+        app:layout_constraintBottom_toBottomOf="@+id/status_bar_view"></ViewStub>
+
+
+    <ViewStub
+        android:id="@+id/viewstub_net_container"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:layout="@layout/fragment_nonet"
+        android:visibility="gone"
+        app:layout_constraintBottom_toBottomOf="@+id/status_bar_view"></ViewStub>
+
+</android.support.constraint.ConstraintLayout>

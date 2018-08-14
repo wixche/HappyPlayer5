@@ -1,37 +1,61 @@
 package com.zlm.hp.model;
 
-import java.io.Serializable;
+import android.os.Parcel;
+import android.os.Parcelable;
 
 /**
- * Created by zhangliangming on 2017/8/4.
- */
-public class AudioInfo implements Serializable {
-
-    public static final String KEY = "com.zlm.hp.ai.key";
-
+ * @Description: 歌曲信息
+ * @author: zhangliangming
+ * @date: 2018-07-29 17:50
+ **/
+public class AudioInfo implements Parcelable {
 
     /**
      * 状态
      */
-    public static final int FINISH = 0;
-    public static final int DOWNLOADING = 1;
-    public static final int INIT = 2;
+    public static final int STATUS_FINISH = 0;
+    public static final int STATUS_DOWNLOADING = 1;
+    public static final int STATUS_INIT = 2;
+
+    /**
+     * 状态
+     */
+    private int status = STATUS_INIT;
+
     /**
      * 类型
      */
-    public static final int LOCAL = 0;
-    public static final int DOWNLOAD = 1;
-    public static final int NET = 2;
-    //最近-本地
-    public static final int RECENT_LOCAL = 3;
-    //最近-网络
-    public static final int RECENT_NET = 4;
+    public static final int TYPE_LOCAL = 0;
+    public static final int TYPE_NET = 1;
+    /**
+     * 类型
+     */
+    private int type = TYPE_LOCAL;
 
     /**
-     * 喜欢（网络-本地）
+     * 关键字
      */
-    public static final int LIKE_LOCAL = 5;
-    public static final int LIKE_NET = 6;
+    private String keyword;
+
+    /**
+     * 图片
+     */
+    private String imageUrl;
+
+    /**
+     * 歌单id
+     */
+    private String specialId;
+
+    /**
+     * 歌手id
+     */
+    private String singerId;
+
+    /**
+     * 专辑id
+     */
+    private String albumId;
 
     /**
      * 歌曲名称
@@ -45,6 +69,10 @@ public class AudioInfo implements Serializable {
      *
      */
     private String hash;
+    /**
+     * mv hash
+     */
+    private String mvHash;
     /**
      * 歌曲后缀名
      */
@@ -65,32 +93,93 @@ public class AudioInfo implements Serializable {
     private String durationText;
 
     /**
-     * 文件下载路径
-     */
-    private String downloadUrl;
-
-    /**
      * 添加时间
      */
     private String createTime;
-    /**
-     * 状态：0是完成，1是未完成
-     */
-    private int status = FINISH;
 
-    /**
-     * 类型
-     */
-    private int type = LOCAL;
     /**
      * 分类索引
      */
     private String category;
     private String childCategory;
 
+    /**
+     * 文件下载路径
+     */
+    private String downloadUrl;
 
-    public AudioInfo() {
+    public AudioInfo(){
 
+    }
+
+    protected AudioInfo(Parcel in) {
+        if (in != null) {
+            status = in.readInt();
+            type = in.readInt();
+            keyword = in.readString();
+            imageUrl = in.readString();
+            specialId = in.readString();
+            singerId = in.readString();
+            albumId = in.readString();
+            songName = in.readString();
+            singerName = in.readString();
+            hash = in.readString();
+            mvHash = in.readString();
+            fileExt = in.readString();
+            fileSize = in.readLong();
+            fileSizeText = in.readString();
+            filePath = in.readString();
+            duration = in.readLong();
+            durationText = in.readString();
+            createTime = in.readString();
+            category = in.readString();
+            childCategory = in.readString();
+            downloadUrl = in.readString();
+        }
+    }
+
+    public static final Creator<AudioInfo> CREATOR = new Creator<AudioInfo>() {
+        @Override
+        public AudioInfo createFromParcel(Parcel in) {
+            return new AudioInfo(in);
+        }
+
+        @Override
+        public AudioInfo[] newArray(int size) {
+            return new AudioInfo[size];
+        }
+    };
+
+    public String getKeyword() {
+        return keyword;
+    }
+
+    public void setKeyword(String keyword) {
+        this.keyword = keyword;
+    }
+
+    public int getStatus() {
+        return status;
+    }
+
+    public void setStatus(int status) {
+        this.status = status;
+    }
+
+    public int getType() {
+        return type;
+    }
+
+    public void setType(int type) {
+        this.type = type;
+    }
+
+    public String getSpecialId() {
+        return specialId;
+    }
+
+    public void setSpecialId(String specialId) {
+        this.specialId = specialId;
     }
 
     public String getSongName() {
@@ -165,36 +254,12 @@ public class AudioInfo implements Serializable {
         this.durationText = durationText;
     }
 
-    public String getDownloadUrl() {
-        return downloadUrl;
-    }
-
-    public void setDownloadUrl(String downloadUrl) {
-        this.downloadUrl = downloadUrl;
-    }
-
     public String getCreateTime() {
         return createTime;
     }
 
     public void setCreateTime(String createTime) {
         this.createTime = createTime;
-    }
-
-    public int getStatus() {
-        return status;
-    }
-
-    public void setStatus(int status) {
-        this.status = status;
-    }
-
-    public int getType() {
-        return type;
-    }
-
-    public void setType(int type) {
-        this.type = type;
     }
 
     public String getCategory() {
@@ -213,24 +278,73 @@ public class AudioInfo implements Serializable {
         this.childCategory = childCategory;
     }
 
+    public String getMvHash() {
+        return mvHash;
+    }
+
+    public void setMvHash(String mvHash) {
+        this.mvHash = mvHash;
+    }
+
+    public String getImageUrl() {
+        return imageUrl;
+    }
+
+    public void setImageUrl(String imageUrl) {
+        this.imageUrl = imageUrl;
+    }
+
+    public String getSingerId() {
+        return singerId;
+    }
+
+    public void setSingerId(String singerId) {
+        this.singerId = singerId;
+    }
+
+    public String getAlbumId() {
+        return albumId;
+    }
+
+    public void setAlbumId(String albumId) {
+        this.albumId = albumId;
+    }
+
+    public String getDownloadUrl() {
+        return downloadUrl;
+    }
+
+    public void setDownloadUrl(String downloadUrl) {
+        this.downloadUrl = downloadUrl;
+    }
+
     @Override
-    public String toString() {
-        return "AudioInfo{" +
-                "songName='" + songName + '\'' +
-                ", singerName='" + singerName + '\'' +
-                ", hash='" + hash + '\'' +
-                ", fileExt='" + fileExt + '\'' +
-                ", fileSize=" + fileSize +
-                ", fileSizeText='" + fileSizeText + '\'' +
-                ", filePath='" + filePath + '\'' +
-                ", duration=" + duration +
-                ", durationText='" + durationText + '\'' +
-                ", downloadUrl='" + downloadUrl + '\'' +
-                ", createTime='" + createTime + '\'' +
-                ", status=" + status +
-                ", type=" + type +
-                ", category='" + category + '\'' +
-                ", childCategory='" + childCategory + '\'' +
-                '}';
+    public int describeContents() {
+        return 0;
+    }
+
+    @Override
+    public void writeToParcel(Parcel dest, int flags) {
+        dest.writeInt(status);
+        dest.writeInt(type);
+        dest.writeString(keyword);
+        dest.writeString(imageUrl);
+        dest.writeString(specialId);
+        dest.writeString(singerId);
+        dest.writeString(albumId);
+        dest.writeString(songName);
+        dest.writeString(singerName);
+        dest.writeString(hash);
+        dest.writeString(mvHash);
+        dest.writeString(fileExt);
+        dest.writeLong(fileSize);
+        dest.writeString(fileSizeText);
+        dest.writeString(filePath);
+        dest.writeLong(duration);
+        dest.writeString(durationText);
+        dest.writeString(createTime);
+        dest.writeString(category);
+        dest.writeString(childCategory);
+        dest.writeString(downloadUrl);
     }
 }

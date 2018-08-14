@@ -4,7 +4,9 @@
     <string name="exit_tip">程序出现异常,即将退出！</string>
 
     <string name="title_icon">&#xe8a3;</string>
+    <string name="title_menu">&#xe608;</string>
     <string name="title_user">我的</string>
+    <string name="title_last_song">新歌</string>
     <string name="title_recommend">排行</string>
     <string name="title_special">歌单</string>
     <string name="title_search">&#xe600;</string>
@@ -34,8 +36,12 @@
     <string name="tab_hello_img">&#xe8a2;</string>
     <string name="tab_control">耳机线控</string>
     <string name="tab_control_img">&#xe8a1;</string>
-    <string name="tab_close">退出程序</string>
-    <string name="tab_close_img">&#xe812;</string>
+    <string name="tab_setting">设置</string>
+    <string name="tab_setting_img">&#xe63c;</string>
+    <string name="tab_close">退出</string>
+    <string name="tab_close_img">&#xe66a;</string>
+    <string name="tab_tool">音乐工具</string>
+    <string name="tab_tool_img">&#xe61d;</string>
     <string name="lrc_converter">歌词转换器</string>
     <string name="lrc_converter_img">&#xe75b;</string>
     <string name="make_lrc">歌词制作器</string>

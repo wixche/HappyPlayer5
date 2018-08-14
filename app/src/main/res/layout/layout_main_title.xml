@@ -17,7 +17,7 @@
             android:layout_centerInParent="true"
             android:layout_centerVertical="true"
             android:gravity="center_vertical|center_horizontal"
-            android:text="@string/title_icon"
+            android:text="@string/title_menu"
             android:textColor="#FFF"
             android:textSize="@dimen/title_icon_size" />
 
@@ -49,6 +49,25 @@
         android:layout_weight="1">
 
         <com.zlm.hp.widget.IconfontIndicatorTextView
+            android:id="@+id/lastSongImageButton"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:layout_centerInParent="true"
+            android:layout_centerVertical="true"
+            android:gravity="center_vertical|center_horizontal"
+            android:text="@string/title_last_song"
+            android:textColor="#FFF"
+            android:textSize="@dimen/title_size" />
+
+
+    </RelativeLayout>
+
+    <RelativeLayout
+        android:layout_width="0dp"
+        android:layout_height="match_parent"
+        android:layout_weight="1">
+
+        <com.zlm.hp.widget.IconfontIndicatorTextView
             android:id="@+id/recommendImageButton"
             android:layout_width="match_parent"
             android:layout_height="match_parent"
@@ -67,16 +86,36 @@
         android:layout_height="match_parent"
         android:layout_weight="1">
 
+        <com.zlm.hp.widget.IconfontIndicatorTextView
+            android:id="@+id/specialImageButton"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:layout_centerInParent="true"
+            android:layout_centerVertical="true"
+            android:gravity="center_vertical|center_horizontal"
+            android:text="@string/title_special"
+            android:textColor="#FFF"
+            android:textSize="@dimen/title_size" />
+
+
+    </RelativeLayout>
+
+
+    <RelativeLayout
+        android:layout_width="0dp"
+        android:layout_height="match_parent"
+        android:layout_weight="1">
+
         <com.zlm.hp.widget.IconfontImageButtonTextView
             android:id="@+id/searchImageButton"
             android:layout_width="match_parent"
             android:layout_height="match_parent"
+            android:layout_alignParentStart="true"
+            android:layout_alignParentTop="true"
             android:gravity="center_vertical|center_horizontal"
             android:text="@string/title_search"
             android:textColor="#FFF"
-            android:textSize="@dimen/title_icon_size"
-            android:layout_alignParentTop="true"
-            android:layout_alignParentStart="true" />
+            android:textSize="@dimen/title_icon_size" />
 
 
     </RelativeLayout>

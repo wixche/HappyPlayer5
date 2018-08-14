@@ -1,13 +1,9 @@
 # Add project specific ProGuard rules here.
-# By default, the flags in this file are appended to flags specified
-# in F:\Android\Sdk/tools/proguard/proguard-android.txt
-# You can edit the include path and order by changing the proguardFiles
-# directive in build.gradle.
+# You can control the set of applied configuration files using the
+# proguardFiles setting in build.gradle.
 #
 # For more details, see
 #   http://developer.android.com/guide/developing/tools/proguard.html
-
-# Add any project specific keep options here:
 
 # If your project uses WebView with JS, uncomment the following
 # and specify the fully qualified class name to the JavaScript interface
@@ -108,52 +104,23 @@
     public void *(android.webkit.webView, jav.lang.String);
 }
 
-#4jar包
-#android-logging-log4j-1.0.3.jar
--keep class de.mindpipe.android.logging.log4j.** { *; }
-#log4j-1.2.17.jar
--dontwarn org.apache.log4j.**
--keep class org.apache.log4j.** { *; }
-
 #5complie包
-#com.belerweb:pinyin4j:2.5.0
--keep class com.hp.hpl.sparta.** { *; }
--keep class net.sourceforge.pinyin4j.** { *; }
 
-#com.squareup.okhttp3:okhttp:3.3.1
--dontwarn okio.**
--keep class okhttp3.** { *; }
--keep class okio.** { *; }
-
-#junit:junit:4.12
--keep class junit.** { *; }
--keep class org.junit.** { *; }
-
-#com.github.zhangliangming:SwipeBackLayout、com.github.zhangliangming:RotateLayout
-#com.github.zhangliangming:SeekBar
--keep class com.zlm.libs.widget.** { *; }
-
-#com.github.zhangliangming:HPLyrics
--keep class com.zlm.hp.lyrics.** { *; }
-
-#com.github.zhangliangming:HPAudio
--dontwarn javax.**
--dontwarn java.awt.**
--keep class org.jaudiotagger.** { *; }
--keep class davaguine.jmac.** { *; }
--keep class com.wavpack.** { *; }
--keep class com.zlm.hp.audio.** { *; }
-
-#com.github.zhangliangming:Register:v1.0
--keep class com.zlm.libs.register.** { *; }
-
-#6混淆项目代码
--keep class com.zlm.hp.**
--keepclassmembers class com.zlm.hp.** {
+#SwitchButton
+-keep class com.suke.widget.**
+-keepclassmembers class com.suke.widget.** {
    public *;
 }
--keep class tv.danmaku.ijk.media.player.** { *; }
+
+#bugly
+-dontwarn com.tencent.bugly.**
+-keep public class com.tencent.bugly.**{*;}
 
 #leakcanary 内存泄露
 -keep public class com.squareup.leakcanary.**{*;}
 
+#6混淆项目代码
+-keep class com.zlm.**
+-keepclassmembers class com.zlm.** {
+   public *;
+}

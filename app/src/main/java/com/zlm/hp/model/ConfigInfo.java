@@ -1,0 +1,394 @@
+package com.zlm.hp.model;
+
+
+import android.os.Parcel;
+import android.os.Parcelable;
+
+import com.zlm.hp.constants.Constants;
+import com.zlm.hp.constants.ResourceConstants;
+import com.zlm.hp.util.CodeLineUtil;
+import com.zlm.hp.util.ColorUtil;
+import com.zlm.hp.util.ContextUtil;
+import com.zlm.hp.util.FileUtil;
+import com.zlm.hp.util.ResourceUtil;
+import com.zlm.hp.util.ZLog;
+
+import java.util.List;
+
+/**
+ * @Description: 配置数据
+ * @author: zhangliangming
+ * @date: 2018-08-04 21:38
+ **/
+public class ConfigInfo implements Parcelable {
+
+    /**
+     *
+     */
+    private static byte[] lock = new byte[0];
+
+    //开关
+
+    /**
+     * 是否是在wifi环境下使用
+     */
+    private boolean isWifi;
+    /**
+     * 是否启动hello语音
+     */
+    private boolean isSayHello;
+    /**
+     * 是否启动线控
+     */
+    private boolean isWire;
+
+    /**
+     * 是否显示桌面歌词
+     */
+    private boolean isShowDesktopLrc;
+    /**
+     * 是否是显示锁屏歌词
+     */
+    private boolean isShowLockScreenLrc;
+
+    /**
+     * 最小字体大小
+     */
+    public static final int MIN_LRC_FONT_SIZE = 30;
+
+    /**
+     * 最大字体大小
+     */
+    public static final int MAX_LRC_FONT_SIZE = 50;
+
+    //歌词相关
+    /**
+     * 歌词字体大小
+     */
+    private int lrcFontSize = MIN_LRC_FONT_SIZE;
+    /**
+     * 歌词颜色索引
+     */
+    private int lrcColorIndex;
+
+
+    //桌面
+    /**
+     * 桌面歌词显示可移动
+     */
+    private boolean isDesktopLrcCanMove = true;
+    /**
+     * 桌面歌词颜色索引
+     */
+    private int desktopLrcColorIndex;
+    /**
+     * 桌面歌词字体大小
+     */
+    private int desktopLrcFontSize;
+    /**
+     * 桌面歌词y轴位置
+     */
+    private int desktopLrcY;
+
+    //歌曲相关数据
+
+    /**
+     * 当前播放歌曲的hash
+     */
+    private String playHash = "";
+    /**
+     * 当前播放模式
+     */
+    private int playModel = 0; // 0是 顺序播放 1是随机播放 2是循环播放 3是单曲播放
+
+    /**
+     * 当前播放歌曲列表
+     */
+    private List<AudioInfo> audioInfos;
+
+    /**
+     * 桌面歌词未读颜色
+     */
+    public static int DESKTOP_LRC_NOREAD_COLORS[][] = {{
+            ColorUtil.parserColor("#00348a"),
+            ColorUtil.parserColor("#0080c0"),
+            ColorUtil.parserColor("#03cafc")
+    }, {
+            ColorUtil.parserColor("#ffffff"),
+            ColorUtil.parserColor("#ffffff"),
+            ColorUtil.parserColor("#ffffff")
+    }, {
+            ColorUtil.parserColor("#ffffff"),
+            ColorUtil.parserColor("#ffffff"),
+            ColorUtil.parserColor("#ffffff")
+    }, {
+            ColorUtil.parserColor("#ffac00"),
+            ColorUtil.parserColor("#ff0000"),
+            ColorUtil.parserColor("#aa0000")
+    }, {
+            ColorUtil.parserColor("#93ff26"),
+            ColorUtil.parserColor("#46b000"),
+            ColorUtil.parserColor("#005500")
+    }};
+
+    /**
+     * 桌面歌词已读颜色
+     */
+    public static int DESKTOP_LRC_READED_COLORS[][] = {{
+            ColorUtil.parserColor("#82f7fd"),
+            ColorUtil.parserColor("#ffffff"),
+            ColorUtil.parserColor("#03e9fc")
+    }, {
+            ColorUtil.parserColor("#ffff00"),
+            ColorUtil.parserColor("#ffff00"),
+            ColorUtil.parserColor("#ffff00")
+    }, {
+            ColorUtil.parserColor("#e17db3"),
+            ColorUtil.parserColor("#e17db3"),
+            ColorUtil.parserColor("#e17db3")
+    }, {
+            ColorUtil.parserColor("#ffffa4"),
+            ColorUtil.parserColor("#ffff00"),
+            ColorUtil.parserColor("#ff641a")
+    }, {
+            ColorUtil.parserColor("#ffffff"),
+            ColorUtil.parserColor("#9aff11"),
+            ColorUtil.parserColor("#ffff00")
+    }};
+
+    /**
+     * 歌词颜色集合
+     */
+    public static String[] LRC_COLORS_STRING = {"#fada83", "#fe8db6", "#feb88e",
+            "#adfe8e", "#8dc7ff", "#e69bff"};
+
+
+    protected ConfigInfo(Parcel in) {
+        if (in != null) {
+            isWifi = in.readByte() != 0;
+            isSayHello = in.readByte() != 0;
+            isWire = in.readByte() != 0;
+            isShowDesktopLrc = in.readByte() != 0;
+            isShowLockScreenLrc = in.readByte() != 0;
+            lrcFontSize = in.readInt();
+            lrcColorIndex = in.readInt();
+            isDesktopLrcCanMove = in.readByte() != 0;
+            desktopLrcColorIndex = in.readInt();
+            desktopLrcFontSize = in.readInt();
+            desktopLrcY = in.readInt();
+            playHash = in.readString();
+            playModel = in.readInt();
+            audioInfos = in.createTypedArrayList(AudioInfo.CREATOR);
+        }
+    }
+
+    @Override
+    public void writeToParcel(Parcel dest, int flags) {
+        dest.writeByte((byte) (isWifi ? 1 : 0));
+        dest.writeByte((byte) (isSayHello ? 1 : 0));
+        dest.writeByte((byte) (isWire ? 1 : 0));
+        dest.writeByte((byte) (isShowDesktopLrc ? 1 : 0));
+        dest.writeByte((byte) (isShowLockScreenLrc ? 1 : 0));
+        dest.writeInt(lrcFontSize);
+        dest.writeInt(lrcColorIndex);
+        dest.writeByte((byte) (isDesktopLrcCanMove ? 1 : 0));
+        dest.writeInt(desktopLrcColorIndex);
+        dest.writeInt(desktopLrcFontSize);
+        dest.writeInt(desktopLrcY);
+        dest.writeString(playHash);
+        dest.writeInt(playModel);
+        dest.writeTypedList(audioInfos);
+    }
+
+    @Override
+    public int describeContents() {
+        return 0;
+    }
+
+    public static final Creator<ConfigInfo> CREATOR = new Creator<ConfigInfo>() {
+        @Override
+        public ConfigInfo createFromParcel(Parcel in) {
+            return new ConfigInfo(in);
+        }
+
+        @Override
+        public ConfigInfo[] newArray(int size) {
+            return new ConfigInfo[size];
+        }
+    };
+
+    /**
+     * 加载
+     *
+     * @return
+     */
+    public static ConfigInfo load() {
+        Parcel parcel = null;
+        synchronized (lock) {
+            String filePath = ResourceUtil.getFilePath(ContextUtil.getContext(), ResourceConstants.PATH_CONFIG, Constants.CONFIG);
+            try {
+                byte[] data = FileUtil.readFile(filePath);
+                if (data == null) {
+                    parcel = null;
+                    ZLog.i(new CodeLineUtil().getCodeLineInfo(),"ConfigInfo.load readFile => null");
+                } else {
+                    parcel = Parcel.obtain();
+                    parcel.unmarshall(data, 0, data.length);
+                    parcel.setDataPosition(0);
+                }
+            } catch (Exception e) {
+                ZLog.e(new CodeLineUtil().getCodeLineInfo(),"ConfigInfo.load Exception: ", e.getMessage());
+            }
+        }
+        //
+        _ConfigInfo = CREATOR.createFromParcel(parcel);
+        return _ConfigInfo;
+    }
+
+    /**
+     *
+     */
+    private static ConfigInfo _ConfigInfo;
+
+    /**
+     * @return
+     */
+    public static ConfigInfo obtain() {
+        if (_ConfigInfo == null) {
+            load();
+        }
+        return _ConfigInfo;
+    }
+
+
+    /**
+     * 保存
+     *
+     * @return
+     */
+    public ConfigInfo save() {
+        Parcel parcel = Parcel.obtain();
+        writeToParcel(parcel, PARCELABLE_WRITE_RETURN_VALUE);
+        synchronized (lock) {
+            try {
+                String filePath = ResourceUtil.getFilePath(ContextUtil.getContext(), ResourceConstants.PATH_CONFIG, Constants.CONFIG);
+                FileUtil.writeFile(filePath, parcel.marshall());
+            } catch (Exception e) {
+                ZLog.e(new CodeLineUtil().getCodeLineInfo(),"ConfigInfo.save Exception: ", e.getMessage());
+            }
+        }
+        return this;
+    }
+
+    public boolean isWifi() {
+        return isWifi;
+    }
+
+    public void setWifi(boolean wifi) {
+        isWifi = wifi;
+    }
+
+    public boolean isSayHello() {
+        return isSayHello;
+    }
+
+    public void setSayHello(boolean sayHello) {
+        isSayHello = sayHello;
+    }
+
+    public boolean isWire() {
+        return isWire;
+    }
+
+    public void setWire(boolean wire) {
+        isWire = wire;
+    }
+
+    public boolean isShowDesktopLrc() {
+        return isShowDesktopLrc;
+    }
+
+    public void setShowDesktopLrc(boolean showDesktopLrc) {
+        isShowDesktopLrc = showDesktopLrc;
+    }
+
+    public boolean isShowLockScreenLrc() {
+        return isShowLockScreenLrc;
+    }
+
+    public void setShowLockScreenLrc(boolean showLockScreenLrc) {
+        isShowLockScreenLrc = showLockScreenLrc;
+    }
+
+    public int getLrcFontSize() {
+        return lrcFontSize;
+    }
+
+    public void setLrcFontSize(int lrcFontSize) {
+        this.lrcFontSize = lrcFontSize;
+    }
+
+    public int getLrcColorIndex() {
+        return lrcColorIndex;
+    }
+
+    public void setLrcColorIndex(int lrcColorIndex) {
+        this.lrcColorIndex = lrcColorIndex;
+    }
+
+    public boolean isDesktopLrcCanMove() {
+        return isDesktopLrcCanMove;
+    }
+
+    public void setDesktopLrcCanMove(boolean desktopLrcCanMove) {
+        isDesktopLrcCanMove = desktopLrcCanMove;
+    }
+
+    public int getDesktopLrcColorIndex() {
+        return desktopLrcColorIndex;
+    }
+
+    public void setDesktopLrcColorIndex(int desktopLrcColorIndex) {
+        this.desktopLrcColorIndex = desktopLrcColorIndex;
+    }
+
+    public int getDesktopLrcFontSize() {
+        return desktopLrcFontSize;
+    }
+
+    public void setDesktopLrcFontSize(int desktopLrcFontSize) {
+        this.desktopLrcFontSize = desktopLrcFontSize;
+    }
+
+    public int getDesktopLrcY() {
+        return desktopLrcY;
+    }
+
+    public void setDesktopLrcY(int desktopLrcY) {
+        this.desktopLrcY = desktopLrcY;
+    }
+
+    public String getPlayHash() {
+        return playHash;
+    }
+
+    public void setPlayHash(String playHash) {
+        this.playHash = playHash;
+    }
+
+    public int getPlayModel() {
+        return playModel;
+    }
+
+    public void setPlayModel(int playModel) {
+        this.playModel = playModel;
+    }
+
+    public List<AudioInfo> getAudioInfos() {
+        return audioInfos;
+    }
+
+    public void setAudioInfos(List<AudioInfo> audioInfos) {
+        this.audioInfos = audioInfos;
+    }
+}

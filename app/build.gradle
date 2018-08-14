@@ -2,16 +2,19 @@ apply plugin: 'com.android.application'
 
 android {
     compileSdkVersion 26
-    buildToolsVersion '26.0.2'
     defaultConfig {
         applicationId "com.zlm.hp"
         minSdkVersion 19
         targetSdkVersion 22
-        versionCode 5
-        versionName "v5.0"
+        versionCode 6
+        versionName "6.0"
         /**添加多 dex分包支持*/
         multiDexEnabled true
         testInstrumentationRunner "android.support.test.runner.AndroidJUnitRunner"
+        ndk {
+            // 设置支持的SO库架构
+            abiFilters 'armeabi', 'x86', 'armeabi-v7a', 'x86_64', 'arm64-v8a'
+        }
     }
     buildTypes {
         release {
@@ -28,27 +31,23 @@ android {
     dexOptions {
         preDexLibraries = false
     }
-    productFlavors {
-    }
-
-    sourceSets {
-        main {
-            jniLibs.srcDirs = ['libs']
-        }
-    }
 }
 
 dependencies {
+    implementation fileTree(include: ['*.jar'], dir: 'libs')
     implementation 'com.android.support.constraint:constraint-layout:1.0.2'
     androidTestImplementation('com.android.support.test.espresso:espresso-core:2.2.2', {
         exclude group: 'com.android.support', module: 'support-annotations'
     })
-    compile 'com.android.support:multidex:1.0.1'
+
     implementation 'com.android.support:appcompat-v7:26.0+'
     testImplementation 'junit:junit:4.12'
-    implementation files('libs/log4j-1.2.17.jar')
-    implementation files('libs/android-logging-log4j-1.0.3.jar')
-
+    compile 'com.android.support:multidex:1.0.1'
+    //bugly
+    compile 'com.tencent.bugly:crashreport:latest.release'
+    //其中latest.release指代最新Bugly SDK版本号，也可以指定明确的版本号，例如2.1.9
+    compile 'com.tencent.bugly:nativecrashreport:latest.release'
+    //其中latest.release指代最新Bugly NDK版本号，也可以指定明确的版本号，例如3.0
 
     //内存泄露 LeakCanary
     debugImplementation 'com.squareup.leakcanary:leakcanary-android:1.6.1'
@@ -57,32 +56,20 @@ dependencies {
     debugImplementation 'com.squareup.leakcanary:leakcanary-support-fragment:1.6.1'
 
     /**
-     * ijkplayer
-     *
-     * 引用下面的so文件，不支持无损歌曲格式
-     compile 'tv.danmaku.ijk.media:ijkplayer-armv7a:0.8.4'
-     compile 'tv.danmaku.ijk.media:ijkplayer-armv5:0.8.4'
-     compile 'tv.danmaku.ijk.media:ijkplayer-arm64:0.8.4'
-     compile 'tv.danmaku.ijk.media:ijkplayer-x86:0.8.4'
-     compile 'tv.danmaku.ijk.media:ijkplayer-x86_64:0.8.4'
-     compile 'tv.danmaku.ijk.media:ijkplayer-java:0.8.4'
-     *
-     */
-    implementation 'com.android.support:recyclerview-v7:26.0+'
-    compile 'com.squareup.okhttp3:okhttp:3.3.1'
-    compile 'com.belerweb:pinyin4j:2.5.0'
-    /**
      * 右滑动关闭
      */
     implementation 'com.github.zhangliangming:SwipeBackLayout:v2.5'
+
     /**
      * 旋转界面
      */
     implementation 'com.github.zhangliangming:RotateLayout:v2.5'
+
     /**
      * 进度条
      */
     implementation 'com.github.zhangliangming:SeekBar:v3.5'
+
     /**
      * 歌词
      */
@@ -103,4 +90,13 @@ dependencies {
      */
     implementation 'com.github.zhangliangming:Player:v1.1'
 
+    /**
+     * SlidingMenuLayout
+     */
+    implementation 'com.github.zhangliangming:SlidingMenuLayout:v1.1'
+
+    /**
+     * 第三方switch-button
+     */
+    compile 'com.github.zcweng:switch-button:0.0.3@aar'
 }

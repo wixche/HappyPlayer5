@@ -5,183 +5,113 @@ import android.content.res.AssetFileDescriptor;
 import android.content.res.AssetManager;
 import android.graphics.Color;
 import android.media.MediaPlayer;
+import android.os.Message;
 import android.os.Bundle;
-import android.os.Handler;
 
-import com.zlm.hp.constants.PreferencesConstants;
-import com.zlm.hp.db.AudioInfoDB;
-import com.zlm.hp.libs.crash.CrashHandler;
-import com.zlm.hp.libs.utils.ColorUtil;
-import com.zlm.hp.libs.utils.PreferencesUtil;
-import com.zlm.hp.manager.AudioPlayerManager;
-import com.zlm.hp.model.AudioInfo;
-import com.zlm.hp.permissions.StoragePermissionUtil;
-import com.zlm.hp.utils.MediaUtil;
+import com.zlm.hp.constants.Constants;
+import com.zlm.hp.model.ConfigInfo;
+import com.zlm.hp.util.ColorUtil;
+import com.zlm.hp.util.PreferencesUtil;
 
 import java.io.IOException;
-import java.util.ArrayList;
-import java.util.List;
+
 
 /**
- * @Description: 启动页面
- * @Author: zhangliangming
- * @Date: 2017/7/15 20:04
- * @Version:
- */
+ * @Description: 启动页
+ * @author: zhangliangming
+ * @date: 2018-08-04 18:55
+ **/
 public class SplashActivity extends BaseActivity {
 
-    private Handler mAnimationHandler;
-    private Runnable mAnimationRunnable;
-    private int mDelayTime = 500;
+    /**
+     * 加载数据
+     */
+    private final int LOADTATA = 0;
+
+    /**
+     * 问候语
+     */
+    private MediaPlayer mMediaPlayer;
 
 
     @Override
+    protected void preInitStatusBar() {
+        setStatusBarViewBG(ColorUtil.parserColor(Color.BLACK, 30));
+    }
+
+    @Override
+    protected int setContentLayoutResID() {
+        return R.layout.activity_splash;
+    }
+
+    @Override
     protected void initViews(Bundle savedInstanceState) {
-        //
-        mAnimationHandler = new Handler();
-        mAnimationRunnable = new Runnable() {
-            @Override
-            public void run() {
-                goHome();
-            }
-        };
+        mWorkerHandler.sendEmptyMessage(LOADTATA);
+    }
+
+    @Override
+    protected void handleUIMessage(Message msg) {
+        goHome();
+    }
+
+    @Override
+    protected void handleWorkerMessage(Message msg) {
+        switch (msg.what) {
+            case LOADTATA:
+                loadData();
+                break;
+        }
 
     }
 
     /**
-     * 处理后台数据
+     * 初始化加载数据
      */
-    private void doSomeThing() {
-        //是否是第一次使用
-        boolean isFrist = (boolean) PreferencesUtil.getValue(getApplicationContext(), PreferencesConstants.isFrist_KEY, true);
+    private void loadData() {
+        boolean isFrist = PreferencesUtil.getBoolean(getApplicationContext(), Constants.IS_FRIST_KEY, true);
         if (isFrist) {
-            //第一次使用扫描本地歌曲
-            final List<AudioInfo> audioInfos = new ArrayList<AudioInfo>();
-            MediaUtil.scanLocalMusic(SplashActivity.this, new MediaUtil.ForeachListener() {
-                @Override
-                public void foreach(AudioInfo audioInfo) {
-                    if (audioInfo != null) {
-                        audioInfos.add(audioInfo);
-                    }
-                }
-
-                @Override
-                public boolean filter(String hash) {
-                    boolean flag = false;
-                    for (int i = 0; i < audioInfos.size(); i++) {
-                        AudioInfo audioInfo = audioInfos.get(i);
-                        if (audioInfo.getHash().equals(hash)) {
-                            flag = true;
-                            break;
-                        }
-                    }
-                    if (flag) {
-                        return true;
-                    }
-                    return AudioInfoDB.getAudioInfoDB(getApplicationContext()).isExists(hash);
-                }
-            });
-            if (audioInfos.size() > 0) {
-                AudioInfoDB.getAudioInfoDB(getApplicationContext()).add(audioInfos);
-            }
-            mHPApplication.setFrist(false);
-        } else {
-            //设置延迟时间
-            mDelayTime *= 2;
+            //1.扫描本地歌曲列表
+            PreferencesUtil.putBoolean(getApplication(), Constants.IS_FRIST_KEY, true);
         }
-
-        //注册捕捉全局异常
-        CrashHandler crashHandler = new CrashHandler();
-        crashHandler.init(mHPApplication);
-        //初始化配置数据
-        initPreferencesData();
-        loadSplashMusic();
-        mAnimationHandler.postDelayed(mAnimationRunnable, mDelayTime);
+        //2.加载基本数据
+        ConfigInfo configInfo = ConfigInfo.load();
+        if (configInfo.isSayHello()) {
+            loadSplashMusic();
+        } else {
+            if (isFrist) {
+                //第一次因为需要扫描歌曲，时间可小一点
+                mUIHandler.sendEmptyMessageDelayed(0, 1000);
+            } else {
+                mUIHandler.sendEmptyMessageDelayed(0, 5000);
+            }
+        }
     }
 
     /**
      * 加载启动页面的问候语
      */
     protected void loadSplashMusic() {
-        boolean isSayHello = (boolean) PreferencesUtil.getValue(getApplicationContext(), PreferencesConstants.isSayHello_KEY, mHPApplication.isSayHello());
-        mHPApplication.setSayHello(isSayHello);
-        if (isSayHello) {
-            AssetManager assetManager = getAssets();
-            AssetFileDescriptor fileDescriptor;
-            try {
-                fileDescriptor = assetManager.openFd("audio/hellolele.mp3");
-                MediaPlayer mediaPlayer = new MediaPlayer();
-                mediaPlayer.setDataSource(fileDescriptor.getFileDescriptor(),
-                        fileDescriptor.getStartOffset(),
-                        fileDescriptor.getLength());
-                mediaPlayer.prepare();
-                mediaPlayer.start();
-            } catch (IOException e) {
-                e.printStackTrace();
-            }
+        AssetManager assetManager = getAssets();
+        AssetFileDescriptor fileDescriptor;
+        try {
+            fileDescriptor = assetManager.openFd("audio/hellolele.mp3");
+            mMediaPlayer = new MediaPlayer();
+            mMediaPlayer.setDataSource(fileDescriptor.getFileDescriptor(),
+                    fileDescriptor.getStartOffset(),
+                    fileDescriptor.getLength());
+            mMediaPlayer.setOnCompletionListener(new MediaPlayer.OnCompletionListener() {
+                @Override
+                public void onCompletion(MediaPlayer mp) {
+                    //播放完成后跳转
+                    mUIHandler.sendEmptyMessageDelayed(0, 3000);
+                }
+            });
+            mMediaPlayer.prepare();
+            mMediaPlayer.start();
+        } catch (IOException e) {
+            e.printStackTrace();
         }
     }
-
-    /**
-     * 初始化配置数据
-     */
-    private void initPreferencesData() {
-        mHPApplication.setPlayStatus(AudioPlayerManager.STOP);
-        //桌面歌词
-        mHPApplication.setDesktopLyricsIsMove((boolean) PreferencesUtil.getValue(getApplicationContext(), PreferencesConstants.desktopLyricsIsMove_KEY, true));
-        mHPApplication.setShowDesktop((boolean) PreferencesUtil.getValue(getApplicationContext(), PreferencesConstants.isShowDesktop_KEY, false));
-        //锁屏标志
-        mHPApplication.setShowLockScreen((boolean) PreferencesUtil.getValue(getApplicationContext(), PreferencesConstants.isShowLockScreen_KEY, false));
-        //线控标志
-        mHPApplication.setWire((boolean) PreferencesUtil.getValue(getApplicationContext(), PreferencesConstants.isWire_KEY, false));
-        //wifi标志
-        mHPApplication.setWifi((boolean) PreferencesUtil.getValue(getApplicationContext(), PreferencesConstants.isWifi_KEY, true));
-        mHPApplication.setBarMenuShow((boolean) PreferencesUtil.getValue(getApplicationContext(), PreferencesConstants.isBarMenuShow_KEY, false));
-        mHPApplication.setPlayIndexHashID((String) PreferencesUtil.getValue(getApplicationContext(), PreferencesConstants.playIndexHashID_KEY, ""));
-        mHPApplication.setPlayModel((int) PreferencesUtil.getValue(getApplicationContext(), PreferencesConstants.playModel_KEY, 0));
-        mHPApplication.setLrcColorIndex((int) PreferencesUtil.getValue(getApplicationContext(), PreferencesConstants.lrcColorIndex_KEY, 0));
-        mHPApplication.setLrcFontSize((int) PreferencesUtil.getValue(getApplicationContext(), PreferencesConstants.lrcFontSize_KEY, 30));
-        mHPApplication.setManyLineLrc((boolean) PreferencesUtil.getValue(getApplicationContext(), PreferencesConstants.isManyLineLrc_KEY, true));
-    }
-
-    @Override
-    protected void loadData(boolean isRestoreInstance) {
-
-        if (!isRestoreInstance) {
-            //
-            doSomeThing();
-        }
-
-    }
-
-    //用户处理权限反馈，在这里判断用户是否授予相应的权限
-    @Override
-    public void onRequestPermissionsResult(int requestCode, String[] permissions, int[] grantResults) {
-        mStoragePermissionUtil.onRequestPermissionsResult(requestCode, permissions, grantResults, new StoragePermissionUtil.RequestPermissionsResult() {
-            @Override
-            public void acceptedCallback() {
-                doSomeThing();
-            }
-        });
-    }
-
-    @Override
-    protected boolean isAddStatusBar() {
-        return true;
-    }
-
-    @Override
-    protected int setContentViewId() {
-        //设置状态栏颜色
-        setStatusColor(ColorUtil.parserColor(Color.BLACK, 30));
-        return R.layout.activity_splash;
-    }
-
-    @Override
-    public int setStatusBarParentView() {
-        return 0;
-    }
-
 
     /**
      * 跳转到主页面
@@ -196,4 +126,14 @@ public class SplashActivity extends BaseActivity {
         finish();
     }
 
+    @Override
+    public void finish() {
+        //
+        if (mMediaPlayer != null) {
+            if (mMediaPlayer.isPlaying()) mMediaPlayer.stop();
+            mMediaPlayer.release();
+            mMediaPlayer = null;
+        }
+        super.finish();
+    }
 }

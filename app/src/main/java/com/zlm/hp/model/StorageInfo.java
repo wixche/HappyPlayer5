@@ -1,39 +1,55 @@
 package com.zlm.hp.model;
 
-import java.io.Serializable;
 
-public class StorageInfo implements Serializable {
-    /**
-     *
-     */
-    private static final long serialVersionUID = 1L;
+/**
+ * @Description: 储存卡
+ * @author: zhangliangming
+ * @date: 2018-07-29 11:59
+ **/
+public class StorageInfo {
     /**
      * 路径
      */
-    public String path;
+    private String path;
     /**
      * 挂载状态
      */
-    public String state;
+    private String state;
     /**
      * 是否移除
      */
-    public boolean isRemoveable;
+    private boolean isRemoveable;
 
     public StorageInfo(String path) {
         this.path = path;
     }
 
+
     public boolean isMounted() {
         return "mounted".equals(state);
     }
 
-    @Override
-    public String toString() {
-        return "StorageInfo{" +
-                "path='" + path + '\'' +
-                ", state='" + state + '\'' +
-                ", isRemoveable=" + isRemoveable +
-                '}';
+    public String getPath() {
+        return path;
+    }
+
+    public void setPath(String path) {
+        this.path = path;
+    }
+
+    public String getState() {
+        return state;
+    }
+
+    public void setState(String state) {
+        this.state = state;
+    }
+
+    public boolean isRemoveable() {
+        return isRemoveable;
+    }
+
+    public void setRemoveable(boolean removeable) {
+        isRemoveable = removeable;
     }
 }

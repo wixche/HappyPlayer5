@@ -9,7 +9,8 @@ import android.graphics.Shader;
 import android.util.AttributeSet;
 import android.view.View;
 
-import com.zlm.hp.libs.utils.ColorUtil;
+import com.zlm.hp.util.ColorUtil;
+
 
 /**
  * @Description: 自定义分隔线

@@ -7,8 +7,8 @@ import android.support.v7.widget.AppCompatTextView;
 import android.text.TextPaint;
 import android.util.AttributeSet;
 
-import com.zlm.hp.libs.utils.ColorUtil;
-import com.zlm.hp.utils.FontUtil;
+import com.zlm.hp.util.ColorUtil;
+import com.zlm.hp.util.FontUtil;
 
 
 /**

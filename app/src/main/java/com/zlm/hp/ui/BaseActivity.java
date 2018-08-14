@@ -1,148 +1,273 @@
 package com.zlm.hp.ui;
 
+import android.app.Activity;
 import android.content.Context;
-import android.graphics.Color;
-import android.os.AsyncTask;
-import android.os.Build;
 import android.os.Bundle;
+import android.os.Handler;
+import android.os.HandlerThread;
+import android.os.Message;
+import android.os.Process;
 import android.support.annotation.Nullable;
+import android.support.constraint.ConstraintLayout;
 import android.support.v4.content.ContextCompat;
 import android.support.v7.app.AppCompatActivity;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.view.Window;
-import android.view.WindowManager;
+import android.widget.FrameLayout;
+import android.widget.LinearLayout;
+import android.widget.RelativeLayout;
 
-import com.zlm.hp.application.HPApplication;
-import com.zlm.hp.libs.utils.ColorUtil;
-import com.zlm.hp.libs.utils.LoggerUtil;
-import com.zlm.hp.manager.ActivityManage;
-import com.zlm.hp.permissions.StoragePermissionUtil;
+import com.zlm.hp.manager.ActivityManager;
+import com.zlm.hp.util.ColorUtil;
+import com.zlm.hp.util.StatusBarUtil;
 
-import java.lang.reflect.Field;
+import java.lang.ref.WeakReference;
 
 /**
- * @Description: 所有activity都要继承该类并实现里面的方法
- * @Author: zhangliangming
- * @Date: 2017/7/15 15:44
- * @Version:
+ * Created by zhangliangming on 2018-08-04.
  */
+
 public abstract class BaseActivity extends AppCompatActivity {
 
-    public LoggerUtil logger;
+
+    /**
+     * 自定义根view
+     */
+    private ViewGroup mRootView;
 
     /**
      *
      */
-    public HPApplication mHPApplication;
+    private Context mContext;
 
     /**
-     * 默认颜色
+     * 子线程用于执行耗时任务
      */
-    private int mStatusColor = -1;
-
-    public StoragePermissionUtil mStoragePermissionUtil;
+    public Handler mWorkerHandler;
+    //创建异步HandlerThread
+    private HandlerThread mHandlerThread;
+    /**
+     * 处理ui任务
+     */
+    public Handler mUIHandler;
+    private WeakReference<Activity> mActivityWR;
+    /**
+     * 状态栏背景颜色
+     */
+    private int mStatusBarViewBG = -1;
 
     @Override
     protected void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        //
         getSupportActionBar().hide();
-        ViewGroup layout = (ViewGroup) LayoutInflater.from(this).inflate(setContentViewId(), null);
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
-            //透明状态栏
-            Window window = getWindow();
-            window.addFlags(WindowManager.LayoutParams.FLAG_TRANSLUCENT_STATUS);
-            //设置状态栏的颜色
-            window.setStatusBarColor(Color.TRANSPARENT);
-            //设置底部的颜色
-            // window.setNavigationBarColor(Color.TRANSPARENT);
+        mContext = getApplicationContext();
+        mStatusBarViewBG = ColorUtil.parserColor(ContextCompat.getColor(mContext, R.color.defColor));
 
-            //修复android7.0半透明问题
-            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N) {
-                try {
-                    Field field = getWindow().getDecorView().getClass().getDeclaredField("mSemiTransparentStatusBarColor");  //获取特定的成员变量
-                    field.setAccessible(true);   //设置对此属性的可访问性
-                    field.setInt(getWindow().getDecorView(), Color.TRANSPARENT);  //修改属性值
+        preInitStatusBar();
+        View view = LayoutInflater.from(mContext).inflate(setContentLayoutResID(), null);
+        initStatusBar(view);
 
-                } catch (Exception e) {
-                    e.printStackTrace();
-                }
-            }
-        }
-        preLoad();
-        setContentView(layout);
-        //
-        contentViewFinish(layout);
-        mHPApplication = (HPApplication) getApplication();
-        mStoragePermissionUtil = new StoragePermissionUtil(mHPApplication, this);
-
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
-            //
-            if (isAddStatusBar()) {
-                View statusBarView = new View(getApplicationContext());
-                ViewGroup.LayoutParams lp = new ViewGroup.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, getStatusBarHeight(getApplicationContext()));
-                statusBarView.setBackgroundColor(getStatusColor());
-
-                if (setStatusBarParentView() == 0) {
-                    layout.addView(statusBarView, 0, lp);
-                } else {
-                    ViewGroup newlayout = layout.findViewById(setStatusBarParentView());
-                    newlayout.addView(statusBarView, 0, lp);
-                }
-            }
+        if (mRootView != null) {
+            addChildView(mRootView, view, -1, -1);
+            super.setContentView(mRootView);
+        } else {
+            super.setContentView(view);
         }
 
-        initViews(savedInstanceState);
-
-        //1.先判断文件权限是否已经分配，如果没有分配，则直接退出应用
-        //2.如果已经分配，则执行下面操作
-        if (!mStoragePermissionUtil.verifyStoragePermissions(this)) {
-            return;
-        }
-
-        logger = LoggerUtil.getZhangLogger(getApplicationContext());
-        ActivityManage.getInstance().addActivity(this);
-
-        new AsyncTask<String, Integer, String>() {
+        //创建ui handler
+        mUIHandler = new Handler(new Handler.Callback() {
             @Override
-            protected String doInBackground(String... strings) {
-
-                loadData(false);
-
-                return null;
+            public boolean handleMessage(Message msg) {
+                if (isActivityAlive()) {
+                    handleUIMessage(msg);
+                }
+                return false;
             }
-        }.execute("");
+        });
+
+        //创建异步HandlerThread
+        mHandlerThread = new HandlerThread("loadActivityData", Process.THREAD_PRIORITY_BACKGROUND);
+        //必须先开启线程
+        mHandlerThread.start();
+        //子线程Handler
+        mWorkerHandler = new Handler(mHandlerThread.getLooper(), new Handler.Callback() {
+            @Override
+            public boolean handleMessage(Message msg) {
+                if (isActivityAlive()) {
+                    handleWorkerMessage(msg);
+                }
+                return false;
+            }
+        });
+
+        //
+        mActivityWR = new WeakReference<Activity>(this);
+        ActivityManager.getInstance().addActivity(this);
+
+        //初始化view相关数据
+        initViews(savedInstanceState);
     }
 
-    protected void preLoad() {
 
-    }
+    /**
+     * WorkerRunnable
+     */
+    public class WorkerRunnable implements Runnable {
+        @Override
+        public void run() {
+        }
 
-    protected void contentViewFinish(View contentView) {
 
-    }
 
-    @Override
-    public void onRestoreInstanceState(Bundle savedInstanceState) {
-        super.onRestoreInstanceState(savedInstanceState);
+        /**
+         * 运行到ui线程
+         *
+         * @param runnable
+         */
+        public void runOnUiThread(Runnable runnable) {
+            if (isActivityAlive()) {
+                mUIHandler.post(runnable);
+            }
 
-        loadData(true);
-    }
-
-    //用户处理权限反馈，在这里判断用户是否授予相应的权限
-    @Override
-    public void onRequestPermissionsResult(int requestCode, String[] permissions, int[] grantResults) {
-        mStoragePermissionUtil.onRequestPermissionsResult(requestCode, permissions, grantResults, null);
+        }
     }
 
     /**
-     * 设置内容视图
+     * 初始化状态栏
+     *
+     * @param view
+     */
+    private void initStatusBar(View view) {
+        boolean isAddStatusBar = StatusBarUtil.isAddStatusBar(this.getWindow());
+        //添加状态栏
+        addStatusBar(view, isAddStatusBar);
+    }
+
+    /**
+     * 添加自定义状态栏
+     *
+     * @param view
+     * @param isAddStatusBar 是否添加状态栏
+     */
+    private void addStatusBar(View view, boolean isAddStatusBar) {
+        View statusBarView = view.findViewById(R.id.status_bar_view);
+        if (statusBarView == null) return;
+        if (!isAddStatusBar) {
+            statusBarView.setVisibility(View.GONE);
+            return;
+        }
+        statusBarView.setVisibility(View.VISIBLE);
+        statusBarView.setBackgroundColor(mStatusBarViewBG);
+        if (mRootView != null) {
+            addStatusBarView(mRootView, view);
+        } else {
+            ConstraintLayout.LayoutParams lp = new ConstraintLayout.LayoutParams(ConstraintLayout.LayoutParams.MATCH_PARENT, StatusBarUtil.getStatusBarHeight(mContext));
+            statusBarView.setLayoutParams(lp);
+        }
+    }
+
+
+    /**
+     * 添加子view
+     *
+     * @param parentView 父view
+     * @param childView  子view
+     */
+    private void addStatusBarView(ViewGroup parentView, View childView) {
+        int statusBarViewHeight = StatusBarUtil.getStatusBarHeight(mContext);
+        addChildView(parentView, childView, -1, statusBarViewHeight);
+    }
+
+
+    /**
+     * 添加子view
+     *
+     * @param parentView 父view
+     * @param childView  子view
+     */
+    private void addChildView(ViewGroup parentView, View childView, int viewWidth, int viewHeight) {
+
+        if (parentView instanceof ConstraintLayout) {
+
+            ConstraintLayout.LayoutParams clp = new ConstraintLayout.LayoutParams(viewWidth, viewHeight);
+            parentView.addView(childView, clp);
+        } else if (parentView instanceof LinearLayout) {
+
+
+            LinearLayout.LayoutParams llp = new LinearLayout.LayoutParams(viewWidth, viewHeight);
+            parentView.addView(childView, llp);
+        } else if (parentView instanceof RelativeLayout) {
+
+
+            RelativeLayout.LayoutParams rlp = new RelativeLayout.LayoutParams(viewWidth, viewHeight);
+            parentView.addView(childView, rlp);
+        } else if (parentView instanceof FrameLayout) {
+
+            FrameLayout.LayoutParams flp = new FrameLayout.LayoutParams(viewWidth, viewHeight);
+            parentView.addView(childView, flp);
+
+        } else if (parentView instanceof ViewGroup) {
+
+            ViewGroup.LayoutParams vplp = new ViewGroup.LayoutParams(viewWidth, viewHeight);
+            parentView.addView(childView, vplp);
+        }
+    }
+
+    /**
+     * 是否仍活着
      *
      * @return
      */
-    protected abstract int setContentViewId();
+    private boolean isActivityAlive() {
+        Activity activity = mActivityWR.get();
+        return activity != null;
+    }
+
+
+    @Override
+    public void finish() {
+        ActivityManager.getInstance().removeActivity(this);
+
+        //移除队列任务
+        if (mUIHandler != null) {
+            mUIHandler.removeCallbacksAndMessages(null);
+        }
+
+        //移除队列任务
+        if (mWorkerHandler != null) {
+            mWorkerHandler.removeCallbacksAndMessages(null);
+        }
+
+        //关闭线程
+        if (mHandlerThread != null)
+            mHandlerThread.quit();
+
+        super.finish();
+    }
+
+    /**
+     * 设置状态栏背景颜色
+     *
+     * @param statusBarViewBG
+     */
+    public void setStatusBarViewBG(int statusBarViewBG) {
+        this.mStatusBarViewBG = statusBarViewBG;
+    }
+
+    /**
+     * 初始化view之前
+     */
+    protected void preInitStatusBar() {
+
+    }
+
+    /**
+     * 设置主界面内容视图
+     *
+     * @return
+     */
+    protected abstract int setContentLayoutResID();
 
     /**
      * 初始化view视图
@@ -152,66 +277,25 @@ public abstract class BaseActivity extends AppCompatActivity {
     protected abstract void initViews(Bundle savedInstanceState);
 
     /**
-     * 加载数据
-     */
-    protected abstract void loadData(boolean isRestoreInstance);
-
-    protected abstract boolean isAddStatusBar();
-
-    /**
-     * 设置添加状态栏的视图
+     * 处理UI
      *
-     * @return
+     * @param msg
      */
-    public abstract int setStatusBarParentView();
+    protected abstract void handleUIMessage(Message msg);
 
     /**
-     * @Description: 获取状态栏高度
-     * @Param: context
-     * @Return:
-     * @Author: zhangliangming
-     * @Date: 2017/7/15 19:30
-     * @Throws:
-     */
-    private int getStatusBarHeight(Context context) {
-        int result = 0;
-        int resourceId = context.getResources().getIdentifier("status_bar_height", "dimen", "android");
-        if (resourceId > 0) {
-            result = context.getResources().getDimensionPixelSize(resourceId);
-        }
-        return result;
-    }
-
-    /**
-     * 获取状态栏颜色
+     * 处理子线程worker
      *
-     * @return
+     * @param msg
      */
-    private int getStatusColor() {
+    protected abstract void handleWorkerMessage(Message msg);
 
-        if (mStatusColor == -1) {
-            return ColorUtil.parserColor(ContextCompat.getColor(getApplicationContext(), R.color.defColor));
-        }
-        return mStatusColor;
-    }
-
-    ///////////////////////////////////////////////
-
-
-    public void setStatusColor(int statusColor) {
-        this.mStatusColor = statusColor;
-    }
-
-
-    @Override
-    public void finish() {
-        ActivityManage.getInstance().removeActivity(this);
-        super.finish();
-    }
-
-    @Override
-    protected void onDestroy() {
-        HPApplication.getRefWatcher().watch(this);
-        super.onDestroy();
+    /**
+     * 设置 rootview
+     *
+     * @param rootView
+     */
+    protected void setRootView(ViewGroup rootView) {
+        this.mRootView = rootView;
     }
 }

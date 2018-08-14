@@ -2,13 +2,17 @@
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
     package="com.zlm.hp.ui">
 
-    <!-- 短信权限 -->
-    <uses-permission android:name="android.permission.RECEIVE_SMS" />
-    <uses-permission android:name="android.permission.READ_SMS" />
-
-    <!-- 读取电话状态权限 -->
     <uses-permission android:name="android.permission.READ_PHONE_STATE" />
-    <uses-permission android:name="android.permission.PROCESS_OUTGOING_CALLS" />
+    <uses-permission android:name="android.permission.INTERNET" />
+    <uses-permission android:name="android.permission.ACCESS_NETWORK_STATE" />
+    <uses-permission android:name="android.permission.ACCESS_WIFI_STATE" />
+    <uses-permission android:name="android.permission.READ_LOGS" />
+
+    <!-- 往sdcard中写入数据的权限 -->
+    <uses-permission android:name="android.permission.READ_EXTERNAL_STORAGE" />
+    <uses-permission android:name="android.permission.WRITE_EXTERNAL_STORAGE" />
+    <!-- 在sdcard中创建/删除文件的权限 -->
+    <uses-permission android:name="android.permission.MOUNT_UNMOUNT_FILESYSTEMS" />
 
     <!-- 显示悬浮窗口权限 -->
     <uses-permission android:name="android.permission.SYSTEM_ALERT_WINDOW" />
@@ -16,16 +20,6 @@
     <!-- 锁屏权限 -->
     <uses-permission android:name="android.permission.DISABLE_KEYGUARD" />
     <uses-permission android:name="android.permission.WAKE_LOCK" />
-
-    <!-- 往sdcard中写入数据的权限 -->
-    <uses-permission android:name="android.permission.READ_EXTERNAL_STORAGE" />
-    <uses-permission android:name="android.permission.WRITE_EXTERNAL_STORAGE" />
-    <!-- 在sdcard中创建/删除文件的权限 -->
-    <uses-permission android:name="android.permission.MOUNT_UNMOUNT_FILESYSTEMS" />
-    <!-- 网络权限 -->
-    <uses-permission android:name="android.permission.INTERNET" />
-    <!-- 网络状态 -->
-    <uses-permission android:name="android.permission.ACCESS_NETWORK_STATE" />
 
     <application
         android:name="com.zlm.hp.application.HPApplication"
@@ -44,49 +38,7 @@
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
-        <activity android:name=".MainActivity" />
-        <activity
-            android:name=".LrcActivity"
-            android:hardwareAccelerated="true" />
-        <activity android:name=".AboutActivity" />
-        <activity android:name=".ScanActivity" />
-
-        <service android:name="com.zlm.hp.service.AudioPlayerService" />
-
-        <activity android:name=".SearchLrcActivity" />
-        <activity android:name=".SearchSingerActivity" />
-
-        <receiver android:name="com.zlm.hp.receiver.PhoneReceiver">
-            <intent-filter>
-                <action android:name="android.intent.action.MEDIA_BUTTON" />
-            </intent-filter>
-        </receiver>
-
-        <activity
-            android:name=".LockActivity"
-            android:excludeFromRecents="true"
-            android:launchMode="singleInstance"
-            android:screenOrientation="portrait"
-            android:taskAffinity="com.zlm.lockscreen"
-            android:theme="@style/lockScreenTheme" />
-        <activity android:name=".LrcConverterActivity" />
-        <activity
-            android:name=".LrcImg2VideoActivity"
-            android:windowSoftInputMode="adjustPan" />
-
-        <service android:name=".LrcImg2VideoActivity$CreateLrcImageIntentService" />
-
-        <activity android:name=".LrcMakerActivity" />
-        <activity android:name=".LrcMakeSettingActivity" />
-        <activity
-            android:name=".MakeLrcActivity"
-            android:windowSoftInputMode="adjustPan" />
-        <activity android:name=".MakeTranslateLrcActivity" />
-        <activity android:name=".MakeTransliterationLrcActivity" />
-
-        <service android:name="com.zlm.hp.service.FloatService" />
-
-        <activity android:name=".FileManagerActivity"></activity>
+        <activity android:name=".MainActivity"></activity>
     </application>
 
 </manifest>
