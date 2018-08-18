@@ -23,16 +23,17 @@ public class FileUtil {
     }
 
     /**
-     * 获取文件名（不含后缀）
-     *
-     * @param s
-     * @return
+     * 获取不带后缀名的文件名
      */
-    public static String removeExt(String s) {
-        int index = s.lastIndexOf(".");
-        if (index == -1)
-            index = s.length();
-        return s.substring(0, index);
+    public static String getFileNameWithoutExt(File file) {
+        String filename = file.getName();
+        if ((filename != null) && (filename.length() > 0)) {
+            int dot = filename.lastIndexOf('.');
+            if ((dot > -1) && (dot < (filename.length()))) {
+                return filename.substring(0, dot);
+            }
+        }
+        return filename;
     }
 
     /**

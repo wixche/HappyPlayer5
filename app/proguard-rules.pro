@@ -119,6 +119,50 @@
 #leakcanary 内存泄露
 -keep public class com.squareup.leakcanary.**{*;}
 
+#greendao
+-keep class org.greenrobot.greendao.**{*;}
+-keep public interface org.greenrobot.greendao.**
+-keepclassmembers class * extends org.greenrobot.greendao.AbstractDao {
+public static java.lang.String TABLENAME;
+}
+-keep class **$Properties
+-keep class net.sqlcipher.** {*;}
+-keep class net.sqlcipher.database.** {*;}
+-dontwarn net.sqlcipher.database.**
+-dontwarn org.greenrobot.greendao.**
+
+
+#pinyin
+-keep public class com.hp.hpl.sparta.**{*;}
+-keep public class net.sourceforge.pinyin4j.**{*;}
+
+
+#ijkplayer
+-keep class com.zlm.player.**
+-keepclassmembers class com.zlm.player.** {
+   public *;
+}
+-keep class tv.danmaku.ijk.media.player.** { *; }
+
+
+#com.github.zhangliangming:SwipeBackLayout、com.github.zhangliangming:RotateLayout
+#com.github.zhangliangming:SeekBar、com.github.zhangliangming:SeekBar
+-keep class com.zlm.libs.widget.** { *; }
+
+#com.github.zhangliangming:HPLyrics
+-keep class com.zlm.hp.lyrics.** { *; }
+
+#com.github.zhangliangming:HPAudio
+-dontwarn javax.**
+-dontwarn java.awt.**
+-keep class org.jaudiotagger.** { *; }
+-keep class davaguine.jmac.** { *; }
+-keep class com.wavpack.** { *; }
+-keep class com.zlm.hp.audio.** { *; }
+
+#com.github.zhangliangming:Register:v1.0
+-keep class com.zlm.libs.register.** { *; }
+
 #6混淆项目代码
 -keep class com.zlm.**
 -keepclassmembers class com.zlm.** {

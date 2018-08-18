@@ -9,11 +9,15 @@ import android.os.Message;
 import android.os.Bundle;
 
 import com.zlm.hp.constants.Constants;
+import com.zlm.hp.db.util.AudioInfoDB;
+import com.zlm.hp.model.AudioInfo;
 import com.zlm.hp.model.ConfigInfo;
 import com.zlm.hp.util.ColorUtil;
+import com.zlm.hp.util.MediaUtil;
 import com.zlm.hp.util.PreferencesUtil;
 
 import java.io.IOException;
+import java.util.List;
 
 
 /**
@@ -70,9 +74,16 @@ public class SplashActivity extends BaseActivity {
     private void loadData() {
         boolean isFrist = PreferencesUtil.getBoolean(getApplicationContext(), Constants.IS_FRIST_KEY, true);
         if (isFrist) {
+
             //1.扫描本地歌曲列表
-            PreferencesUtil.putBoolean(getApplication(), Constants.IS_FRIST_KEY, true);
+            List<AudioInfo> audioInfos = MediaUtil.scanLocalMusic(getApplicationContext(), null);
+            if (audioInfos != null && audioInfos.size() > 0) {
+                AudioInfoDB.addAudioInfos(getApplicationContext(), audioInfos);
+            }
+
+            PreferencesUtil.putBoolean(getApplicationContext(), Constants.IS_FRIST_KEY, false);
         }
+
         //2.加载基本数据
         ConfigInfo configInfo = ConfigInfo.load();
         if (configInfo.isSayHello()) {

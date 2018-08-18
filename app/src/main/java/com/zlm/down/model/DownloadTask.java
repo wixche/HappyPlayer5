@@ -1,16 +1,28 @@
 package com.zlm.down.model;
 
 
+import android.os.Parcel;
+import android.os.Parcelable;
+
 import com.zlm.down.thread.DownloadTaskThreadManager;
 
+import org.greenrobot.greendao.annotation.Entity;
+import org.greenrobot.greendao.annotation.Transient;
+import org.greenrobot.greendao.annotation.Unique;
+
 import java.util.Date;
+import org.greenrobot.greendao.annotation.Generated;
 
 /**
  * @Description: 下载任务
  * @author: zhangliangming
  * @date: 2018-08-04 23:01
  **/
-public class DownloadTask {
+@Entity(
+        generateConstructors = false,
+        generateGettersSetters = false
+)
+public class DownloadTask implements Parcelable {
 
     /**
      * 初始化
@@ -56,6 +68,7 @@ public class DownloadTask {
     /**
      * 任务hash
      */
+    @Unique
     private String taskHash;
     /**
      * 任务临时保存路径
@@ -81,6 +94,7 @@ public class DownloadTask {
     /**
      * 线程总数
      */
+    @Unique
     private int threadNum;
     /**
      * 任务文件大小
@@ -90,7 +104,37 @@ public class DownloadTask {
     /**
      * 下载任务线程
      */
+    @Transient
     private DownloadTaskThreadManager downloadTaskThreadManager;
+
+    public DownloadTask() {
+    }
+
+    protected DownloadTask(Parcel in) {
+        taskId = in.readString();
+        taskName = in.readString();
+        taskExt = in.readString();
+        taskPath = in.readString();
+        taskHash = in.readString();
+        taskTempPath = in.readString();
+        rootPath = in.readString();
+        taskUrl = in.readString();
+        status = in.readInt();
+        threadNum = in.readInt();
+        taskFileSize = in.readLong();
+    }
+
+    public static final Creator<DownloadTask> CREATOR = new Creator<DownloadTask>() {
+        @Override
+        public DownloadTask createFromParcel(Parcel in) {
+            return new DownloadTask(in);
+        }
+
+        @Override
+        public DownloadTask[] newArray(int size) {
+            return new DownloadTask[size];
+        }
+    };
 
     public String getTaskId() {
         return taskId;
@@ -195,5 +239,25 @@ public class DownloadTask {
 
     public void setRootPath(String rootPath) {
         this.rootPath = rootPath;
+    }
+
+    @Override
+    public int describeContents() {
+        return 0;
+    }
+
+    @Override
+    public void writeToParcel(Parcel dest, int flags) {
+        dest.writeString(taskId);
+        dest.writeString(taskName);
+        dest.writeString(taskExt);
+        dest.writeString(taskPath);
+        dest.writeString(taskHash);
+        dest.writeString(taskTempPath);
+        dest.writeString(rootPath);
+        dest.writeString(taskUrl);
+        dest.writeInt(status);
+        dest.writeInt(threadNum);
+        dest.writeLong(taskFileSize);
     }
 }

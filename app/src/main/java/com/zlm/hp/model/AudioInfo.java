@@ -3,11 +3,19 @@ package com.zlm.hp.model;
 import android.os.Parcel;
 import android.os.Parcelable;
 
+import org.greenrobot.greendao.annotation.Entity;
+import org.greenrobot.greendao.annotation.Unique;
+import org.greenrobot.greendao.annotation.Generated;
+
 /**
  * @Description: 歌曲信息
  * @author: zhangliangming
  * @date: 2018-07-29 17:50
  **/
+@Entity(
+        generateConstructors = false,
+        generateGettersSetters = false
+)
 public class AudioInfo implements Parcelable {
 
     /**
@@ -68,6 +76,7 @@ public class AudioInfo implements Parcelable {
     /**
      *
      */
+    @Unique
     private String hash;
     /**
      * mv hash
@@ -108,7 +117,7 @@ public class AudioInfo implements Parcelable {
      */
     private String downloadUrl;
 
-    public AudioInfo(){
+    public AudioInfo() {
 
     }
 
@@ -317,6 +326,8 @@ public class AudioInfo implements Parcelable {
     public void setDownloadUrl(String downloadUrl) {
         this.downloadUrl = downloadUrl;
     }
+
+
 
     @Override
     public int describeContents() {

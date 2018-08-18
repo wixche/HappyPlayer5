@@ -1,15 +1,26 @@
 package com.zlm.hp.model;
 
+import android.os.Parcel;
+import android.os.Parcelable;
+
+import org.greenrobot.greendao.annotation.Entity;
+import org.greenrobot.greendao.annotation.Unique;
+import org.greenrobot.greendao.annotation.Generated;
+
 /**
  * @Description: 视频信息
  * @author: zhangliangming
  * @date: 2018-07-30 1:55
  **/
-
-public class VideoInfo {
+@Entity(
+        generateConstructors = false,
+        generateGettersSetters = false
+)
+public class VideoInfo implements Parcelable {
     /**
      *
      */
+    @Unique
     private String hash;
 
     /**
@@ -49,6 +60,35 @@ public class VideoInfo {
      * 文件下载路径
      */
     private String downloadUrl;
+
+    public VideoInfo() {
+    }
+
+    protected VideoInfo(Parcel in) {
+        hash = in.readString();
+        fileExt = in.readString();
+        fileSize = in.readLong();
+        fileSizeText = in.readString();
+        filePath = in.readString();
+        duration = in.readLong();
+        durationText = in.readString();
+        mvName = in.readString();
+        singerName = in.readString();
+        imageUrl = in.readString();
+        downloadUrl = in.readString();
+    }
+
+    public static final Creator<VideoInfo> CREATOR = new Creator<VideoInfo>() {
+        @Override
+        public VideoInfo createFromParcel(Parcel in) {
+            return new VideoInfo(in);
+        }
+
+        @Override
+        public VideoInfo[] newArray(int size) {
+            return new VideoInfo[size];
+        }
+    };
 
     public String getImageUrl() {
         return imageUrl;
@@ -136,5 +176,25 @@ public class VideoInfo {
 
     public void setDownloadUrl(String downloadUrl) {
         this.downloadUrl = downloadUrl;
+    }
+
+    @Override
+    public int describeContents() {
+        return 0;
+    }
+
+    @Override
+    public void writeToParcel(Parcel dest, int flags) {
+        dest.writeString(hash);
+        dest.writeString(fileExt);
+        dest.writeLong(fileSize);
+        dest.writeString(fileSizeText);
+        dest.writeString(filePath);
+        dest.writeLong(duration);
+        dest.writeString(durationText);
+        dest.writeString(mvName);
+        dest.writeString(singerName);
+        dest.writeString(imageUrl);
+        dest.writeString(downloadUrl);
     }
 }

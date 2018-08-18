@@ -1,5 +1,7 @@
 package com.zlm.hp.application;
 
+import android.os.Handler;
+import android.os.Looper;
 import android.support.multidex.MultiDexApplication;
 import android.text.TextUtils;
 
@@ -8,10 +10,12 @@ import com.squareup.leakcanary.RefWatcher;
 import com.tencent.bugly.crashreport.CrashReport;
 import com.zlm.hp.constants.Constants;
 import com.zlm.hp.constants.ResourceConstants;
+import com.zlm.hp.db.DBHelper;
 import com.zlm.hp.util.ApkUtil;
 import com.zlm.hp.util.CodeLineUtil;
 import com.zlm.hp.util.ContextUtil;
 import com.zlm.hp.util.ResourceUtil;
+import com.zlm.hp.util.ToastUtil;
 import com.zlm.hp.util.ZLog;
 
 import java.io.BufferedReader;
@@ -23,6 +27,8 @@ import java.io.IOException;
  */
 
 public class HPApplication extends MultiDexApplication {
+
+    private Handler mHandler;
 
     /**
      * 用来后续监控可能发生泄漏的对象
@@ -43,15 +49,24 @@ public class HPApplication extends MultiDexApplication {
             ZLog.logBuildInfo(getApplicationContext(), codeLineInfo);
             ZLog.e(codeLineInfo, "UncaughtException: ", e.getMessage());
 
-            //关闭app
-            android.os.Process.killProcess(android.os.Process.myPid());
-            System.exit(1);
+            mHandler.postDelayed(new Runnable() {
+                @Override
+                public void run() {
+
+                    ToastUtil.showTextToast(getApplicationContext(), "程序出现异常,即将退出！");
+                    //关闭app
+                    android.os.Process.killProcess(android.os.Process.myPid());
+                    System.exit(1);
+                }
+            }, 5000);
         }
     };
 
     @Override
     public void onCreate() {
         super.onCreate();
+
+        mHandler = new Handler(Looper.getMainLooper());
 
         //全局收集
         Thread.setDefaultUncaughtExceptionHandler(mErrorHandler);
@@ -71,10 +86,19 @@ public class HPApplication extends MultiDexApplication {
             //主进程
             //输出配置信息
             ZLog.logBuildInfo(getApplicationContext(), new CodeLineUtil().getCodeLineInfo());
+            //初始化数据库
+            initDB();
         }
 
         //封装全局context
         ContextUtil.init(getApplicationContext());
+    }
+
+    /**
+     * 初始化数据库
+     */
+    private void initDB() {
+        DBHelper.getInstance(getApplicationContext());
     }
 
     /**
