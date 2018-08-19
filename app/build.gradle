@@ -8,7 +8,7 @@ android {
         minSdkVersion 19
         targetSdkVersion 22
         versionCode 6
-        versionName "6.0"
+        versionName "V6.0"
         /**添加多 dex分包支持*/
         multiDexEnabled true
         testInstrumentationRunner "android.support.test.runner.AndroidJUnitRunner"
@@ -48,7 +48,9 @@ dependencies {
         exclude group: 'com.android.support', module: 'support-annotations'
     })
 
-    implementation 'com.android.support:appcompat-v7:26.0+'
+    implementation 'com.android.support:appcompat-v7:26.1.0'
+    implementation 'com.android.support:recyclerview-v7:26.1.0'
+
     testImplementation 'junit:junit:4.12'
     implementation 'com.android.support:multidex:1.0.1'
     //第三方bugly
@@ -121,4 +123,9 @@ dependencies {
      * 第三方pinyin4j
      */
     implementation 'com.belerweb:pinyin4j:2.5.1'
+
+    /**
+     * 第三方弹出窗口：jjdxm_dialogui
+     */
+    implementation 'com.github.zhangliangming:Dialog:v1.0'
 }

@@ -5,6 +5,7 @@ import android.content.Context;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.HandlerThread;
+import android.os.Looper;
 import android.os.Message;
 import android.os.Process;
 import android.support.annotation.Nullable;
@@ -76,30 +77,28 @@ public abstract class BaseActivity extends AppCompatActivity {
         }
 
         //创建ui handler
-        mUIHandler = new Handler(new Handler.Callback() {
+        mUIHandler = new Handler(Looper.getMainLooper()) {
             @Override
-            public boolean handleMessage(Message msg) {
+            public void handleMessage(Message msg) {
                 if (isActivityAlive()) {
                     handleUIMessage(msg);
                 }
-                return false;
             }
-        });
+        };
 
         //创建异步HandlerThread
         mHandlerThread = new HandlerThread("loadActivityData", Process.THREAD_PRIORITY_BACKGROUND);
         //必须先开启线程
         mHandlerThread.start();
         //子线程Handler
-        mWorkerHandler = new Handler(mHandlerThread.getLooper(), new Handler.Callback() {
+        mWorkerHandler = new Handler(mHandlerThread.getLooper()) {
             @Override
-            public boolean handleMessage(Message msg) {
+            public void handleMessage(Message msg) {
                 if (isActivityAlive()) {
                     handleWorkerMessage(msg);
                 }
-                return false;
             }
-        });
+        };
 
         //
         mActivityWR = new WeakReference<Activity>(this);
@@ -117,7 +116,6 @@ public abstract class BaseActivity extends AppCompatActivity {
         @Override
         public void run() {
         }
-
 
 
         /**
@@ -159,26 +157,26 @@ public abstract class BaseActivity extends AppCompatActivity {
         }
         statusBarView.setVisibility(View.VISIBLE);
         statusBarView.setBackgroundColor(mStatusBarViewBG);
-        if (mRootView != null) {
-            addStatusBarView(mRootView, view);
-        } else {
-            ConstraintLayout.LayoutParams lp = new ConstraintLayout.LayoutParams(ConstraintLayout.LayoutParams.MATCH_PARENT, StatusBarUtil.getStatusBarHeight(mContext));
-            statusBarView.setLayoutParams(lp);
-        }
-    }
-
-
-    /**
-     * 添加子view
-     *
-     * @param parentView 父view
-     * @param childView  子view
-     */
-    private void addStatusBarView(ViewGroup parentView, View childView) {
         int statusBarViewHeight = StatusBarUtil.getStatusBarHeight(mContext);
-        addChildView(parentView, childView, -1, statusBarViewHeight);
-    }
 
+        if (view instanceof ConstraintLayout) {
+            ConstraintLayout.LayoutParams clp = new ConstraintLayout.LayoutParams(-1, statusBarViewHeight);
+            statusBarView.setLayoutParams(clp);
+        } else if (view instanceof LinearLayout) {
+            LinearLayout.LayoutParams llp = new LinearLayout.LayoutParams(-1, statusBarViewHeight);
+            statusBarView.setLayoutParams(llp);
+        } else if (view instanceof RelativeLayout) {
+            RelativeLayout.LayoutParams rlp = new RelativeLayout.LayoutParams(-1, statusBarViewHeight);
+            statusBarView.setLayoutParams(rlp);
+        } else if (view instanceof FrameLayout) {
+            FrameLayout.LayoutParams flp = new FrameLayout.LayoutParams(-1, statusBarViewHeight);
+            statusBarView.setLayoutParams(flp);
+        } else if (view instanceof ViewGroup) {
+            ViewGroup.LayoutParams vplp = new ViewGroup.LayoutParams(-1, statusBarViewHeight);
+            statusBarView.setLayoutParams(vplp);
+        }
+
+    }
 
     /**
      * 添加子view
@@ -223,7 +221,6 @@ public abstract class BaseActivity extends AppCompatActivity {
         Activity activity = mActivityWR.get();
         return activity != null;
     }
-
 
     @Override
     public void finish() {

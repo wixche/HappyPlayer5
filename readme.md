@@ -33,8 +33,13 @@
 - [LeakCanary：日志泄露分析](https://github.com/square/leakcanary "LeakCanary")
 - [Utils-Everywhere](https://github.com/SenhLinsh/Utils-Everywhere.git "Utils-Everywhere")
 - [greenDAO：sqlite数据库框架](https://github.com/greenrobot/greenDAO "greenDAO")
+- [jjdxm_dialogui：弹出窗口框架](https://github.com/jjdxmashl/jjdxm_dialogui/ "jjdxm_dialogui")
 
 # 更新日志 #
+
+## 2018-08-19 ##
+- 添加设置和关于页面
+- 添加弹出窗口
 
 ## 2018-08-18 ##
 - HttpClient添加https支持(忽略证书)

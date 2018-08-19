@@ -5,12 +5,14 @@ import android.os.Looper;
 import android.support.multidex.MultiDexApplication;
 import android.text.TextUtils;
 
+import com.dou361.dialogui.DialogUIUtils;
 import com.squareup.leakcanary.LeakCanary;
 import com.squareup.leakcanary.RefWatcher;
 import com.tencent.bugly.crashreport.CrashReport;
 import com.zlm.hp.constants.Constants;
 import com.zlm.hp.constants.ResourceConstants;
 import com.zlm.hp.db.DBHelper;
+import com.zlm.hp.ui.R;
 import com.zlm.hp.util.ApkUtil;
 import com.zlm.hp.util.CodeLineUtil;
 import com.zlm.hp.util.ContextUtil;
@@ -53,7 +55,7 @@ public class HPApplication extends MultiDexApplication {
                 @Override
                 public void run() {
 
-                    ToastUtil.showTextToast(getApplicationContext(), "程序出现异常,即将退出！");
+                    ToastUtil.showTextToast(getApplicationContext(), getString(R.string.exit_tip));
                     //关闭app
                     android.os.Process.killProcess(android.os.Process.myPid());
                     System.exit(1);
@@ -92,6 +94,8 @@ public class HPApplication extends MultiDexApplication {
 
         //封装全局context
         ContextUtil.init(getApplicationContext());
+        //封装弹出窗口context
+        DialogUIUtils.init(getApplicationContext());
     }
 
     /**

@@ -225,19 +225,19 @@ public class ConfigInfo implements Parcelable {
     public static ConfigInfo load() {
         Parcel parcel = null;
         synchronized (lock) {
-            String filePath = ResourceUtil.getFilePath(ContextUtil.getContext(), ResourceConstants.PATH_CONFIG, Constants.CONFIG);
+            String filePath = ResourceUtil.getContextFilePath(ContextUtil.getContext(), ResourceConstants.PATH_CONFIG, Constants.CONFIG);
             try {
                 byte[] data = FileUtil.readFile(filePath);
                 if (data == null) {
                     parcel = null;
-                    ZLog.i(new CodeLineUtil().getCodeLineInfo(),"ConfigInfo.load readFile => null");
+                    ZLog.i(new CodeLineUtil().getCodeLineInfo(), "ConfigInfo.load readFile => null");
                 } else {
                     parcel = Parcel.obtain();
                     parcel.unmarshall(data, 0, data.length);
                     parcel.setDataPosition(0);
                 }
             } catch (Exception e) {
-                ZLog.e(new CodeLineUtil().getCodeLineInfo(),"ConfigInfo.load Exception: ", e.getMessage());
+                ZLog.e(new CodeLineUtil().getCodeLineInfo(), "ConfigInfo.load Exception: ", e.getMessage());
             }
         }
         //
@@ -271,10 +271,10 @@ public class ConfigInfo implements Parcelable {
         writeToParcel(parcel, PARCELABLE_WRITE_RETURN_VALUE);
         synchronized (lock) {
             try {
-                String filePath = ResourceUtil.getFilePath(ContextUtil.getContext(), ResourceConstants.PATH_CONFIG, Constants.CONFIG);
+                String filePath = ResourceUtil.getContextFilePath(ContextUtil.getContext(), ResourceConstants.PATH_CONFIG, Constants.CONFIG);
                 FileUtil.writeFile(filePath, parcel.marshall());
             } catch (Exception e) {
-                ZLog.e(new CodeLineUtil().getCodeLineInfo(),"ConfigInfo.save Exception: ", e.getMessage());
+                ZLog.e(new CodeLineUtil().getCodeLineInfo(), "ConfigInfo.save Exception: ", e.getMessage());
             }
         }
         return this;
@@ -284,111 +284,125 @@ public class ConfigInfo implements Parcelable {
         return isWifi;
     }
 
-    public void setWifi(boolean wifi) {
+    public ConfigInfo setWifi(boolean wifi) {
         isWifi = wifi;
+        return this;
     }
 
     public boolean isSayHello() {
         return isSayHello;
     }
 
-    public void setSayHello(boolean sayHello) {
+    public ConfigInfo setSayHello(boolean sayHello) {
         isSayHello = sayHello;
+        return this;
     }
 
     public boolean isWire() {
         return isWire;
     }
 
-    public void setWire(boolean wire) {
+    public ConfigInfo setWire(boolean wire) {
         isWire = wire;
+        return this;
     }
 
     public boolean isShowDesktopLrc() {
         return isShowDesktopLrc;
     }
 
-    public void setShowDesktopLrc(boolean showDesktopLrc) {
+    public ConfigInfo setShowDesktopLrc(boolean showDesktopLrc) {
         isShowDesktopLrc = showDesktopLrc;
+        return this;
     }
 
     public boolean isShowLockScreenLrc() {
         return isShowLockScreenLrc;
     }
 
-    public void setShowLockScreenLrc(boolean showLockScreenLrc) {
+    public ConfigInfo setShowLockScreenLrc(boolean showLockScreenLrc) {
         isShowLockScreenLrc = showLockScreenLrc;
+        return this;
     }
 
     public int getLrcFontSize() {
         return lrcFontSize;
     }
 
-    public void setLrcFontSize(int lrcFontSize) {
+    public ConfigInfo setLrcFontSize(int lrcFontSize) {
         this.lrcFontSize = lrcFontSize;
+        return this;
     }
 
     public int getLrcColorIndex() {
         return lrcColorIndex;
     }
 
-    public void setLrcColorIndex(int lrcColorIndex) {
+    public ConfigInfo setLrcColorIndex(int lrcColorIndex) {
         this.lrcColorIndex = lrcColorIndex;
+        return this;
     }
 
     public boolean isDesktopLrcCanMove() {
         return isDesktopLrcCanMove;
     }
 
-    public void setDesktopLrcCanMove(boolean desktopLrcCanMove) {
+    public ConfigInfo setDesktopLrcCanMove(boolean desktopLrcCanMove) {
         isDesktopLrcCanMove = desktopLrcCanMove;
+        return this;
     }
 
     public int getDesktopLrcColorIndex() {
         return desktopLrcColorIndex;
     }
 
-    public void setDesktopLrcColorIndex(int desktopLrcColorIndex) {
+    public ConfigInfo setDesktopLrcColorIndex(int desktopLrcColorIndex) {
         this.desktopLrcColorIndex = desktopLrcColorIndex;
+        return this;
     }
 
     public int getDesktopLrcFontSize() {
         return desktopLrcFontSize;
     }
 
-    public void setDesktopLrcFontSize(int desktopLrcFontSize) {
+    public ConfigInfo setDesktopLrcFontSize(int desktopLrcFontSize) {
         this.desktopLrcFontSize = desktopLrcFontSize;
+        return this;
     }
 
     public int getDesktopLrcY() {
         return desktopLrcY;
     }
 
-    public void setDesktopLrcY(int desktopLrcY) {
+    public ConfigInfo setDesktopLrcY(int desktopLrcY) {
         this.desktopLrcY = desktopLrcY;
+        return this;
     }
 
     public String getPlayHash() {
         return playHash;
     }
 
-    public void setPlayHash(String playHash) {
+    public ConfigInfo setPlayHash(String playHash) {
         this.playHash = playHash;
+        return this;
     }
 
     public int getPlayModel() {
         return playModel;
     }
 
-    public void setPlayModel(int playModel) {
+    public ConfigInfo setPlayModel(int playModel) {
         this.playModel = playModel;
+        return this;
     }
 
     public List<AudioInfo> getAudioInfos() {
         return audioInfos;
     }
 
-    public void setAudioInfos(List<AudioInfo> audioInfos) {
+    public ConfigInfo setAudioInfos(List<AudioInfo> audioInfos) {
         this.audioInfos = audioInfos;
+        return this;
     }
 }

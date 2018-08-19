@@ -5,6 +5,7 @@ import android.content.Context;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.HandlerThread;
+import android.os.Looper;
 import android.os.Message;
 import android.os.Process;
 import android.support.annotation.Nullable;
@@ -18,6 +19,9 @@ import android.view.ViewStub;
 import android.view.animation.Animation;
 import android.view.animation.AnimationUtils;
 import android.view.animation.LinearInterpolator;
+import android.widget.FrameLayout;
+import android.widget.LinearLayout;
+import android.widget.RelativeLayout;
 
 import com.zlm.hp.ui.R;
 import com.zlm.hp.util.ColorUtil;
@@ -114,9 +118,9 @@ public abstract class BaseFragment extends Fragment {
 
 
         //创建ui handler
-        mUIHandler = new Handler(new Handler.Callback() {
+        mUIHandler = new Handler(Looper.getMainLooper()) {
             @Override
-            public boolean handleMessage(Message msg) {
+            public void handleMessage(Message msg) {
                 if (isFragmentAlive()) {
                     switch (msg.what) {
                         case SHOWCONTENTVIEW:
@@ -133,24 +137,22 @@ public abstract class BaseFragment extends Fragment {
                             break;
                     }
                 }
-                return false;
             }
-        });
+        };
 
         //创建异步HandlerThread
         mHandlerThread = new HandlerThread("loadFragmentData", Process.THREAD_PRIORITY_BACKGROUND);
         //必须先开启线程
         mHandlerThread.start();
         //子线程Handler
-        mWorkerHandler = new Handler(mHandlerThread.getLooper(), new Handler.Callback() {
+        mWorkerHandler = new Handler(mHandlerThread.getLooper()) {
             @Override
-            public boolean handleMessage(Message msg) {
+            public void handleMessage(Message msg) {
                 if (isFragmentAlive()) {
                     handleWorkerMessage(msg);
                 }
-                return false;
             }
-        });
+        };
 
         //添加主布局
         mContentContainer = mMainView.findViewById(R.id.viewstub_content_container);
@@ -220,8 +222,24 @@ public abstract class BaseFragment extends Fragment {
         statusBarView.setVisibility(View.VISIBLE);
         statusBarView.setBackgroundColor(mStatusBarViewBG);
 
-        ConstraintLayout.LayoutParams lp = new ConstraintLayout.LayoutParams(ConstraintLayout.LayoutParams.MATCH_PARENT, StatusBarUtil.getStatusBarHeight(mContext));
-        statusBarView.setLayoutParams(lp);
+        int statusBarViewHeight = StatusBarUtil.getStatusBarHeight(mContext);
+
+        if (mMainView instanceof ConstraintLayout) {
+            ConstraintLayout.LayoutParams clp = new ConstraintLayout.LayoutParams(-1, statusBarViewHeight);
+            statusBarView.setLayoutParams(clp);
+        } else if (mMainView instanceof LinearLayout) {
+            LinearLayout.LayoutParams llp = new LinearLayout.LayoutParams(-1, statusBarViewHeight);
+            statusBarView.setLayoutParams(llp);
+        } else if (mMainView instanceof RelativeLayout) {
+            RelativeLayout.LayoutParams rlp = new RelativeLayout.LayoutParams(-1, statusBarViewHeight);
+            statusBarView.setLayoutParams(rlp);
+        } else if (mMainView instanceof FrameLayout) {
+            FrameLayout.LayoutParams flp = new FrameLayout.LayoutParams(-1, statusBarViewHeight);
+            statusBarView.setLayoutParams(flp);
+        } else if (mMainView instanceof ViewGroup) {
+            ViewGroup.LayoutParams vplp = new ViewGroup.LayoutParams(-1, statusBarViewHeight);
+            statusBarView.setLayoutParams(vplp);
+        }
 
     }
 
@@ -344,6 +362,7 @@ public abstract class BaseFragment extends Fragment {
 
     /**
      * 设置状态栏背景颜色
+     *
      * @param statusBarViewBG
      */
     public void setStatusBarViewBG(int statusBarViewBG) {

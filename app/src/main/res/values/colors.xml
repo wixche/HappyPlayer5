@@ -5,6 +5,7 @@
     <color name="colorAccent">#FF4081</color>
 
     <color name="defColor">#0288d1</color>
+    <color name="textColor">#555555</color>
     <color name="def_bar_title_color">#555555</color>
     <color name="transparent">#00000000</color>
 </resources>

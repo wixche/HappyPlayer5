@@ -14,12 +14,15 @@
     <string name="def_text">乐乐音乐 就是任性</string>
     <string name="def_artist">乐乐音乐</string>
     <string name="def_songName">就是任性</string>
-    <string name="copyright">copyright ©2015-2018 zhangliangming All Rights Reserved.</string>
+    <string name="copyright">Copyright ©2015-2019 zhangliangming All Rights Reserved</string>
 
     <string name="loadmore">点击加载更多</string>
     <string name="loading">正在加载...</string>
     <string name="nomore">已经到底了</string>
     <string name="nodata">数据为空</string>
+    <string name="about_app">关于乐乐</string>
+    <string name="desktoplrc_tip">1.进入设置>更多应用>乐乐音乐>权限管理>显示悬浮窗\n\n2.开启允许</string>
+    <string name="exit_app_tip">是否退出应用？</string>
 
     <!-- tab my -->
     <string name="tab_localmusic">本地音乐</string>

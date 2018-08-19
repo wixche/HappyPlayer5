@@ -40,7 +40,7 @@
                 android:layout_toRightOf="@+id/icon"
                 android:text="@string/app_name"
                 android:textColor="#FFF"
-                android:textSize="@dimen/title_setting_icon_size" />
+                android:textSize="@dimen/title_icon_size" />
 
         </RelativeLayout>
 
@@ -68,7 +68,6 @@
                     android:id="@+id/timer_power_off_ll"
                     android:layout_width="match_parent"
                     android:layout_height="@dimen/title_setting_height"
-                    android:layout_marginTop="5dp"
                     android:clickable="true"
                     android:orientation="horizontal">
 
@@ -96,7 +95,6 @@
                     android:id="@+id/tool_ll"
                     android:layout_width="match_parent"
                     android:layout_height="@dimen/title_setting_height"
-                    android:layout_marginTop="5dp"
                     android:clickable="true"
                     android:orientation="horizontal">
 
@@ -127,10 +125,8 @@
                     android:background="#50ffffff"></View>
 
                 <RelativeLayout
-                    android:id="@+id/wifi_ll"
                     android:layout_width="match_parent"
-                    android:layout_height="@dimen/title_setting_height"
-                    android:layout_marginTop="5dp">
+                    android:layout_height="@dimen/title_setting_height">
 
                     <com.zlm.hp.widget.IconfontTextView
                         android:id="@+id/tab_wifi_img"
@@ -165,12 +161,8 @@
                 </RelativeLayout>
 
                 <RelativeLayout
-                    android:id="@+id/desktoplrc_ll"
                     android:layout_width="match_parent"
-                    android:layout_height="@dimen/title_setting_height"
-                    android:layout_marginTop="5dp"
-                    android:clickable="true"
-                    android:orientation="horizontal">
+                    android:layout_height="@dimen/title_setting_height">
 
                     <com.zlm.hp.widget.IconfontTextView
                         android:id="@+id/tab_desktoplrc_img"
@@ -204,12 +196,8 @@
                 </RelativeLayout>
 
                 <RelativeLayout
-                    android:id="@+id/locklrc_ll"
                     android:layout_width="match_parent"
-                    android:layout_height="@dimen/title_setting_height"
-                    android:layout_marginTop="5dp"
-                    android:clickable="true"
-                    android:orientation="horizontal">
+                    android:layout_height="@dimen/title_setting_height">
 
                     <com.zlm.hp.widget.IconfontTextView
                         android:id="@+id/tab_locklrc_img"
@@ -243,45 +231,6 @@
 
                 </RelativeLayout>
 
-                <RelativeLayout
-                    android:id="@+id/control_ll"
-                    android:layout_width="match_parent"
-                    android:layout_height="@dimen/title_setting_height"
-                    android:layout_marginTop="5dp"
-                    android:clickable="true"
-                    android:orientation="horizontal">
-
-                    <com.zlm.hp.widget.IconfontTextView
-                        android:id="@+id/tab_control_img"
-                        android:layout_width="wrap_content"
-                        android:layout_height="match_parent"
-                        android:layout_marginLeft="10dp"
-                        android:gravity="center_vertical|center_horizontal"
-                        android:text="@string/tab_control_img"
-                        android:textColor="#FFF"
-                        android:textSize="@dimen/title_icon_size" />
-
-                    <com.zlm.hp.widget.IconfontTextView
-                        android:layout_width="wrap_content"
-                        android:layout_height="match_parent"
-                        android:layout_marginLeft="5dp"
-                        android:layout_toRightOf="@+id/tab_control_img"
-                        android:gravity="center_vertical|center_horizontal"
-                        android:text="@string/tab_control"
-                        android:textColor="#FFF"
-                        android:textSize="@dimen/title_setting_icon_size" />
-
-
-                    <com.suke.widget.SwitchButton
-                        android:id="@+id/control_switch"
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:layout_alignParentRight="true"
-                        android:layout_centerVertical="true"
-                        android:layout_marginRight="5dp"
-                        app:sb_checked_color="@color/defColor" />
-
-                </RelativeLayout>
 
             </LinearLayout>
         </ScrollView>

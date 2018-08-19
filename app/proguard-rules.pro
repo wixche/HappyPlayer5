@@ -163,6 +163,9 @@ public static java.lang.String TABLENAME;
 #com.github.zhangliangming:Register:v1.0
 -keep class com.zlm.libs.register.** { *; }
 
+#第三方弹出窗口：
+-keep class com.dou361.dialogui.** { *; }
+
 #6混淆项目代码
 -keep class com.zlm.**
 -keepclassmembers class com.zlm.** {

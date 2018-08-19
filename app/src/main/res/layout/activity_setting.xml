@@ -1,0 +1,124 @@
+<?xml version="1.0" encoding="utf-8"?>
+<com.zlm.libs.widget.SwipeBackLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:id="@+id/swipeback_layout"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    tools:context="com.zlm.hp.ui.SettingActivity">
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:background="#fff"
+        android:orientation="vertical">
+
+        <View
+            android:id="@+id/status_bar_view"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:visibility="gone" />
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:orientation="vertical">
+
+            <include
+                layout="@layout/layout_title"
+                android:layout_width="match_parent"
+                android:layout_height="@dimen/title_height" />
+
+            <ScrollView
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:fillViewport="true"
+                android:scrollbars="none">
+
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="match_parent"
+                    android:orientation="vertical">
+
+                    <RelativeLayout
+                        android:layout_width="match_parent"
+                        android:layout_height="@dimen/title_setting_height">
+
+                        <TextView
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:layout_centerVertical="true"
+                            android:layout_marginLeft="10dp"
+                            android:text="@string/tab_hello"
+                            android:textColor="@color/textColor"
+                            android:textSize="@dimen/title_size" />
+
+                        <com.suke.widget.SwitchButton
+                            android:id="@+id/hello_switch"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:layout_alignParentRight="true"
+                            android:layout_centerVertical="true"
+                            android:layout_marginRight="5dp"
+                            app:sb_checked_color="@color/defColor" />
+
+                    </RelativeLayout>
+
+                    <com.zlm.hp.widget.DividerView
+                        android:layout_width="match_parent"
+                        android:layout_height="1dp" />
+
+                    <RelativeLayout
+                        android:layout_width="match_parent"
+                        android:layout_height="@dimen/title_setting_height">
+
+                        <TextView
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:layout_centerVertical="true"
+                            android:layout_marginLeft="10dp"
+                            android:text="@string/tab_control"
+                            android:textColor="@color/textColor"
+                            android:textSize="@dimen/title_size" />
+
+
+                        <com.suke.widget.SwitchButton
+                            android:id="@+id/control_switch"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:layout_alignParentRight="true"
+                            android:layout_centerVertical="true"
+                            android:layout_marginRight="5dp"
+                            app:sb_checked_color="@color/defColor" />
+
+                    </RelativeLayout>
+
+                    <com.zlm.hp.widget.DividerView
+                        android:layout_width="match_parent"
+                        android:layout_height="1dp" />
+
+                    <com.zlm.hp.widget.ListItemRelativeLayout
+                        android:id="@+id/about_lr"
+                        android:layout_width="match_parent"
+                        android:layout_height="@dimen/title_setting_height"
+                        android:clickable="true">
+
+                        <TextView
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:layout_centerVertical="true"
+                            android:layout_marginLeft="10dp"
+                            android:text="@string/about_app"
+                            android:textColor="@color/textColor"
+                            android:textSize="@dimen/title_size" />
+                    </com.zlm.hp.widget.ListItemRelativeLayout>
+
+                    <com.zlm.hp.widget.DividerView
+                        android:layout_width="match_parent"
+                        android:layout_height="1dp" />
+                </LinearLayout>
+            </ScrollView>
+        </LinearLayout>
+    </LinearLayout>
+
+</com.zlm.libs.widget.SwipeBackLayout>

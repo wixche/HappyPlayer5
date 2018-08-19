@@ -31,6 +31,28 @@ public class ResourceUtil {
         return getFilePath(context, baseFilePath, null);
     }
 
+    /**
+     * 获取app内存存储路径
+     *
+     * @param context
+     * @param baseFilePath
+     * @return
+     */
+    public static String getContextFilePath(Context context, String baseFilePath) {
+        return getFilePath(context.getFilesDir().getAbsolutePath(), baseFilePath, null);
+    }
+
+    /**
+     * 获取app内存存储路径
+     *
+     * @param context
+     * @param baseFilePath
+     * @param fileName
+     * @return
+     */
+    public static String getContextFilePath(Context context, String baseFilePath, String fileName) {
+        return getFilePath(context.getFilesDir().getAbsolutePath(), baseFilePath, fileName);
+    }
 
     /**
      * 获取资源文件的完整路径
@@ -50,16 +72,26 @@ public class ResourceUtil {
                 }
             }
         }
+        return getFilePath(mStorageFilePath, baseFilePath, fileName);
+    }
+
+    /**
+     * @param rootFilePath
+     * @param baseFilePath
+     * @param fileName
+     * @return
+     */
+    private static String getFilePath(String rootFilePath, String baseFilePath, String fileName) {
         String filePath = null;
         //文件名是否为空
         if (!TextUtils.isEmpty(fileName)) {
-            filePath = mStorageFilePath + File.separator + baseFilePath + File.separator + fileName;
+            filePath = rootFilePath + File.separator + baseFilePath + File.separator + fileName;
             File file = new File(filePath);
             if (!file.getParentFile().exists()) {
                 file.getParentFile().mkdirs();
             }
         } else {
-            filePath = mStorageFilePath + File.separator + baseFilePath;
+            filePath = rootFilePath + File.separator + baseFilePath;
             File file = new File(filePath);
             if (!file.exists()) {
                 file.mkdirs();

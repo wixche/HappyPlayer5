@@ -15,14 +15,21 @@ import android.view.WindowManager;
 import android.widget.FrameLayout;
 import android.widget.LinearLayout;
 
+import com.dou361.dialogui.DialogUIUtils;
+import com.dou361.dialogui.listener.DialogUIListener;
+import com.suke.widget.SwitchButton;
 import com.zlm.hp.adapter.TabFragmentAdapter;
 import com.zlm.hp.async.AsyncHandlerTask;
 import com.zlm.hp.fragment.LastSongFragment;
 import com.zlm.hp.fragment.MeFragment;
 import com.zlm.hp.fragment.RecommendFragment;
 import com.zlm.hp.fragment.SpecialFragment;
+import com.zlm.hp.manager.ActivityManager;
+import com.zlm.hp.model.ConfigInfo;
+import com.zlm.hp.util.AppOpsUtils;
 import com.zlm.hp.util.CodeLineUtil;
 import com.zlm.hp.util.ColorUtil;
+import com.zlm.hp.util.IntentUtils;
 import com.zlm.hp.util.StatusBarUtil;
 import com.zlm.hp.util.ToastUtil;
 import com.zlm.hp.util.ZLog;
@@ -82,6 +89,29 @@ public class MainActivity extends BaseActivity {
      */
     private LinearLayout mExitLL;
 
+    /**
+     * wifi开关
+     */
+    private SwitchButton mWifiSwitchButton;
+
+    /**
+     * 桌面歌词开关
+     */
+    private SwitchButton mDesktoplrcSwitchButton;
+    /**
+     * 锁屏歌词开关
+     */
+    private SwitchButton mLocklrcSwitchButton;
+
+    /**
+     * 基本数据
+     */
+    private ConfigInfo mConfigInfo;
+    /**
+     * 加载基本数据
+     */
+    private final int LOAD_CONFIG_DATA = 1;
+
     @Override
     protected int setContentLayoutResID() {
         return R.layout.activity_main;
@@ -93,16 +123,43 @@ public class MainActivity extends BaseActivity {
         initTitleViews();
         initViewPage();
         initMenu();
+        loadData();
+    }
+
+    /**
+     * 加载数据
+     */
+    private void loadData() {
+        //加载数据
+        mWorkerHandler.sendEmptyMessage(LOAD_CONFIG_DATA);
     }
 
     @Override
     protected void handleUIMessage(Message msg) {
+        switch (msg.what) {
+            case LOAD_CONFIG_DATA:
+                resetMenuPageData();
+                break;
+        }
+    }
 
+    /**
+     * 重新设置menu页面的数据
+     */
+    private void resetMenuPageData() {
+        mWifiSwitchButton.setChecked(mConfigInfo.isWifi());
+        mDesktoplrcSwitchButton.setChecked(mConfigInfo.isShowDesktopLrc());
+        mLocklrcSwitchButton.setChecked(mConfigInfo.isShowLockScreenLrc());
     }
 
     @Override
     protected void handleWorkerMessage(Message msg) {
-
+        switch (msg.what) {
+            case LOAD_CONFIG_DATA:
+                mConfigInfo = ConfigInfo.obtain();
+                mUIHandler.sendEmptyMessage(LOAD_CONFIG_DATA);
+                break;
+        }
     }
 
     /**
@@ -304,7 +361,7 @@ public class MainActivity extends BaseActivity {
             @Override
             public void runOnUiThread() {
                 String ee = "";
-                ZLog.e(new CodeLineUtil().getCodeLineInfo(),ee);
+                ZLog.e(new CodeLineUtil().getCodeLineInfo(), ee);
             }
         });
     }
@@ -319,6 +376,10 @@ public class MainActivity extends BaseActivity {
             @Override
             public void onClick(View v) {
 
+                Intent intent = new Intent(MainActivity.this, SettingActivity.class);
+                startActivity(intent);
+                //去掉动画
+                overridePendingTransition(0, 0);
             }
         });
 
@@ -327,7 +388,70 @@ public class MainActivity extends BaseActivity {
         mExitLL.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
+                String tipMsg = getString(R.string.exit_app_tip);
+                DialogUIUtils.showMdAlert(MainActivity.this, null, tipMsg, new DialogUIListener() {
+                    @Override
+                    public void onPositive() {
+                        ActivityManager.getInstance().exit();
+                    }
 
+                    @Override
+                    public void onNegative() {
+
+                    }
+                }).setCancelable(true, false).show();
+            }
+        });
+
+        //wifi开关
+        mWifiSwitchButton = findViewById(R.id.wifi_switch);
+        mWifiSwitchButton.setOnCheckedChangeListener(new SwitchButton.OnCheckedChangeListener() {
+            @Override
+            public void onCheckedChanged(SwitchButton view, boolean isChecked) {
+                mConfigInfo.setWifi(isChecked).save();
+            }
+        });
+
+        //桌面歌词开关
+        mDesktoplrcSwitchButton = findViewById(R.id.desktoplrc_switch);
+        mDesktoplrcSwitchButton.setOnCheckedChangeListener(new SwitchButton.OnCheckedChangeListener() {
+            @Override
+            public void onCheckedChanged(SwitchButton view, boolean isChecked) {
+                if (isChecked) {
+                    if (!AppOpsUtils.allowFloatWindow(getApplication())) {
+
+                        String tipMsg = getString(R.string.desktoplrc_tip);
+                        DialogUIUtils.showMdAlert(MainActivity.this, null, tipMsg, new DialogUIListener() {
+                            @Override
+                            public void onPositive() {
+                                //跳转权限设置页面
+                                IntentUtils.gotoPermissionSetting(MainActivity.this);
+                                mDesktoplrcSwitchButton.setChecked(false);
+                            }
+
+                            @Override
+                            public void onNegative() {
+                                mDesktoplrcSwitchButton.setChecked(false);
+                            }
+
+                            @Override
+                            public void onCancle() {
+                                mDesktoplrcSwitchButton.setChecked(false);
+                            }
+                        }).setCancelable(true, false).show();
+                        return;
+                    }
+                }
+                mConfigInfo.setShowDesktopLrc(isChecked).save();
+            }
+        });
+
+        //锁屏歌词开关
+        mLocklrcSwitchButton = findViewById(R.id.locklrc_switch);
+        mLocklrcSwitchButton.setOnCheckedChangeListener(new SwitchButton.OnCheckedChangeListener() {
+            @Override
+            public void onCheckedChanged(SwitchButton view, boolean isChecked) {
+                mConfigInfo.setShowLockScreenLrc(isChecked).save();
             }
         });
     }
