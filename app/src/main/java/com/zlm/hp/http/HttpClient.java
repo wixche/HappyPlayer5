@@ -263,12 +263,7 @@ public class HttpClient {
             //添加头参数
             if (headParams != null && !headParams.isEmpty()) {
                 for (String key : headParams.keySet()) {
-
-                    try {
-                        conn.setRequestProperty(key, URLEncoder.encode(headParams.get(key) + "", "utf-8"));
-                    } catch (UnsupportedEncodingException e) {
-                        e.printStackTrace();
-                    }
+                    conn.setRequestProperty(key, headParams.get(key));
                 }
             }
 
@@ -351,12 +346,7 @@ public class HttpClient {
             //添加头参数
             if (headParams != null && !headParams.isEmpty()) {
                 for (String key : headParams.keySet()) {
-
-                    try {
-                        conn.setRequestProperty(key, URLEncoder.encode(headParams.get(key) + "", "utf-8"));
-                    } catch (UnsupportedEncodingException e) {
-                        e.printStackTrace();
-                    }
+                    conn.setRequestProperty(key, headParams.get(key));
                 }
             }
 
