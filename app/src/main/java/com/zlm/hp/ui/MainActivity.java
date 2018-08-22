@@ -20,12 +20,12 @@ import com.dou361.dialogui.listener.DialogUIListener;
 import com.suke.widget.SwitchButton;
 import com.zlm.hp.adapter.TabFragmentAdapter;
 import com.zlm.hp.async.AsyncHandlerTask;
+import com.zlm.hp.constants.ConfigInfo;
 import com.zlm.hp.fragment.LastSongFragment;
 import com.zlm.hp.fragment.MeFragment;
 import com.zlm.hp.fragment.RecommendFragment;
 import com.zlm.hp.fragment.SpecialFragment;
 import com.zlm.hp.manager.ActivityManager;
-import com.zlm.hp.model.ConfigInfo;
 import com.zlm.hp.util.AppOpsUtils;
 import com.zlm.hp.util.CodeLineUtil;
 import com.zlm.hp.util.ColorUtil;
@@ -197,6 +197,7 @@ public class MainActivity extends BaseActivity {
         }
         //
         mSlidingMenuLayout.setFragmentPaintFade(true);
+        mSlidingMenuLayout.setAllowScale(false);
         mSlidingMenuLayout.onAttachView(menuLayoutParams, menuView, mainLayoutParams, mainView);
         mSlidingMenuOnListener = new SlidingMenuLayout.SlidingMenuOnListener() {
             @Override

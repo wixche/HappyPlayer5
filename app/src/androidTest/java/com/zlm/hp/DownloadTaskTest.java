@@ -7,7 +7,7 @@ import android.util.Log;
 
 import com.zlm.down.interfaces.IDownloadTaskEvent;
 import com.zlm.down.manager.DownloadTaskManager;
-import com.zlm.down.model.DownloadTask;
+import com.zlm.down.entity.DownloadTask;
 import com.zlm.hp.constants.ResourceConstants;
 import com.zlm.hp.util.ResourceUtil;
 

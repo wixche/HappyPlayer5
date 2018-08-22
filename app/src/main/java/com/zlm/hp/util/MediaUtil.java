@@ -6,8 +6,8 @@ import android.text.TextUtils;
 import com.zlm.hp.audio.AudioFileReader;
 import com.zlm.hp.audio.TrackInfo;
 import com.zlm.hp.audio.utils.AudioUtil;
-import com.zlm.hp.model.AudioInfo;
-import com.zlm.hp.model.StorageInfo;
+import com.zlm.hp.entity.AudioInfo;
+import com.zlm.hp.entity.StorageInfo;
 
 import java.io.File;
 import java.util.ArrayList;

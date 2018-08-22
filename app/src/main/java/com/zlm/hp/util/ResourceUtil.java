@@ -3,7 +3,7 @@ package com.zlm.hp.util;
 import android.content.Context;
 import android.text.TextUtils;
 
-import com.zlm.hp.model.StorageInfo;
+import com.zlm.hp.entity.StorageInfo;
 
 import java.io.File;
 import java.util.List;

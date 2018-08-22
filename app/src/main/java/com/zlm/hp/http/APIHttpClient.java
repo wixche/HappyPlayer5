@@ -2,8 +2,8 @@ package com.zlm.hp.http;
 
 import android.content.Context;
 
-import com.zlm.hp.model.AudioInfo;
-import com.zlm.hp.model.VideoInfo;
+import com.zlm.hp.entity.AudioInfo;
+import com.zlm.hp.entity.VideoInfo;
 import com.zlm.hp.util.NetUtil;
 
 

@@ -3,7 +3,7 @@ package com.zlm.down.thread;
 import android.content.Context;
 
 import com.zlm.down.interfaces.IDownloadThreadEvent;
-import com.zlm.down.model.DownloadTask;
+import com.zlm.down.entity.DownloadTask;
 import com.zlm.hp.http.HttpReturnResult;
 import com.zlm.hp.util.HttpUtil;
 import com.zlm.hp.util.NetUtil;

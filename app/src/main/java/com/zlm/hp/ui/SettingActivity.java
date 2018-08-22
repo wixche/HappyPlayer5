@@ -8,7 +8,7 @@ import android.widget.ImageView;
 import android.widget.TextView;
 
 import com.suke.widget.SwitchButton;
-import com.zlm.hp.model.ConfigInfo;
+import com.zlm.hp.constants.ConfigInfo;
 import com.zlm.hp.widget.ListItemRelativeLayout;
 import com.zlm.libs.widget.SwipeBackLayout;
 

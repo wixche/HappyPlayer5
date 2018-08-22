@@ -1,4 +1,4 @@
-package com.zlm.down.model;
+package com.zlm.down.entity;
 
 
 import android.os.Parcel;

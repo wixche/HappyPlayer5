@@ -1,4 +1,4 @@
-package com.zlm.hp.model;
+package com.zlm.hp.entity;
 
 /**
  * @Description: 歌词信息类

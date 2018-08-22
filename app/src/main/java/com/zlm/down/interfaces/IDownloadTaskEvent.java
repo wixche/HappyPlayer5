@@ -1,6 +1,6 @@
 package com.zlm.down.interfaces;
 
-import com.zlm.down.model.DownloadTask;
+import com.zlm.down.entity.DownloadTask;
 
 /**
  * @Description: 下载事件接口

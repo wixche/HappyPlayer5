@@ -1,11 +1,10 @@
-package com.zlm.hp.model;
+package com.zlm.hp.constants;
 
 
 import android.os.Parcel;
 import android.os.Parcelable;
 
-import com.zlm.hp.constants.Constants;
-import com.zlm.hp.constants.ResourceConstants;
+import com.zlm.hp.entity.AudioInfo;
 import com.zlm.hp.util.CodeLineUtil;
 import com.zlm.hp.util.ColorUtil;
 import com.zlm.hp.util.ContextUtil;

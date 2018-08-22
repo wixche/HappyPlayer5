@@ -6,7 +6,7 @@ import android.text.TextUtils;
 
 import com.zlm.down.interfaces.IDownloadTaskEvent;
 import com.zlm.down.interfaces.IDownloadThreadEvent;
-import com.zlm.down.model.DownloadTask;
+import com.zlm.down.entity.DownloadTask;
 import com.zlm.hp.http.HttpReturnResult;
 import com.zlm.hp.util.FileUtil;
 import com.zlm.hp.util.HttpUtil;

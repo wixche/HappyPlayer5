@@ -5,7 +5,7 @@ import android.database.Cursor;
 
 import com.zlm.hp.db.DBHelper;
 import com.zlm.hp.db.dao.AudioInfoDao;
-import com.zlm.hp.model.AudioInfo;
+import com.zlm.hp.entity.AudioInfo;
 
 import org.greenrobot.greendao.query.WhereCondition;
 

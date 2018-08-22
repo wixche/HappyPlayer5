@@ -8,10 +8,10 @@ import android.media.MediaPlayer;
 import android.os.Message;
 import android.os.Bundle;
 
+import com.zlm.hp.constants.ConfigInfo;
 import com.zlm.hp.constants.Constants;
 import com.zlm.hp.db.util.AudioInfoDB;
-import com.zlm.hp.model.AudioInfo;
-import com.zlm.hp.model.ConfigInfo;
+import com.zlm.hp.entity.AudioInfo;
 import com.zlm.hp.util.ColorUtil;
 import com.zlm.hp.util.MediaUtil;
 import com.zlm.hp.util.PreferencesUtil;

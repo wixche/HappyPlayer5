@@ -8,10 +8,10 @@ import org.greenrobot.greendao.database.Database;
 import org.greenrobot.greendao.identityscope.IdentityScopeType;
 import org.greenrobot.greendao.internal.DaoConfig;
 
-import com.zlm.down.model.DownloadTask;
-import com.zlm.hp.model.AudioInfo;
-import com.zlm.hp.model.SingerInfo;
-import com.zlm.hp.model.VideoInfo;
+import com.zlm.down.entity.DownloadTask;
+import com.zlm.hp.entity.AudioInfo;
+import com.zlm.hp.entity.SingerInfo;
+import com.zlm.hp.entity.VideoInfo;
 
 import com.zlm.hp.db.dao.DownloadTaskDao;
 import com.zlm.hp.db.dao.AudioInfoDao;
