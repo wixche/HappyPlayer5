@@ -1,6 +1,5 @@
 package com.zlm.hp.ui;
 
-import android.app.Activity;
 import android.content.Context;
 import android.os.Bundle;
 import android.os.Handler;
@@ -19,11 +18,11 @@ import android.widget.FrameLayout;
 import android.widget.LinearLayout;
 import android.widget.RelativeLayout;
 
+import com.zlm.hp.handler.WeakRefHandler;
 import com.zlm.hp.manager.ActivityManager;
 import com.zlm.hp.util.ColorUtil;
 import com.zlm.hp.util.StatusBarUtil;
 
-import java.lang.ref.WeakReference;
 
 /**
  * Created by zhangliangming on 2018-08-04.
@@ -33,26 +32,23 @@ public abstract class BaseActivity extends AppCompatActivity {
 
 
     /**
+     * 子线程用于执行耗时任务
+     */
+    public WeakRefHandler mWorkerHandler;
+    /**
+     * 处理ui任务
+     */
+    public WeakRefHandler mUIHandler;
+    /**
      * 自定义根view
      */
     private ViewGroup mRootView;
-
     /**
      *
      */
     private Context mContext;
-
-    /**
-     * 子线程用于执行耗时任务
-     */
-    public Handler mWorkerHandler;
     //创建异步HandlerThread
     private HandlerThread mHandlerThread;
-    /**
-     * 处理ui任务
-     */
-    public Handler mUIHandler;
-    private WeakReference<Activity> mActivityWR;
     /**
      * 状态栏背景颜色
      */
@@ -77,58 +73,30 @@ public abstract class BaseActivity extends AppCompatActivity {
         }
 
         //创建ui handler
-        mUIHandler = new Handler(Looper.getMainLooper()) {
+        mUIHandler = new WeakRefHandler(Looper.getMainLooper(), this, new Handler.Callback() {
             @Override
-            public void handleMessage(Message msg) {
-                if (isActivityAlive()) {
-                    handleUIMessage(msg);
-                }
+            public boolean handleMessage(Message msg) {
+                handleUIMessage(msg);
+                return true;
             }
-        };
+        });
 
         //创建异步HandlerThread
         mHandlerThread = new HandlerThread("loadActivityData", Process.THREAD_PRIORITY_BACKGROUND);
         //必须先开启线程
         mHandlerThread.start();
         //子线程Handler
-        mWorkerHandler = new Handler(mHandlerThread.getLooper()) {
+        mWorkerHandler = new WeakRefHandler(mHandlerThread.getLooper(), this, new Handler.Callback() {
             @Override
-            public void handleMessage(Message msg) {
-                if (isActivityAlive()) {
-                    handleWorkerMessage(msg);
-                }
+            public boolean handleMessage(Message msg) {
+                handleWorkerMessage(msg);
+                return true;
             }
-        };
-
-        //
-        mActivityWR = new WeakReference<Activity>(this);
+        });
         ActivityManager.getInstance().addActivity(this);
 
         //初始化view相关数据
         initViews(savedInstanceState);
-    }
-
-
-    /**
-     * WorkerRunnable
-     */
-    public class WorkerRunnable implements Runnable {
-        @Override
-        public void run() {
-        }
-
-
-        /**
-         * 运行到ui线程
-         *
-         * @param runnable
-         */
-        public void runOnUiThread(Runnable runnable) {
-            if (isActivityAlive()) {
-                mUIHandler.post(runnable);
-            }
-
-        }
     }
 
     /**
@@ -212,16 +180,6 @@ public abstract class BaseActivity extends AppCompatActivity {
         }
     }
 
-    /**
-     * 是否仍活着
-     *
-     * @return
-     */
-    private boolean isActivityAlive() {
-        Activity activity = mActivityWR.get();
-        return activity != null;
-    }
-
     @Override
     public void finish() {
         ActivityManager.getInstance().removeActivity(this);
@@ -295,4 +253,5 @@ public abstract class BaseActivity extends AppCompatActivity {
     protected void setRootView(ViewGroup rootView) {
         this.mRootView = rootView;
     }
+
 }

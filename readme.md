@@ -36,6 +36,8 @@
 - [jjdxm_dialogui：弹出窗口框架](https://github.com/jjdxmashl/jjdxm_dialogui/ "jjdxm_dialogui")
 
 # 更新日志 #
+## 2018-08-24 ##
+- 代码优化
 
 ## 2018-08-19 ##
 - 添加设置和关于页面

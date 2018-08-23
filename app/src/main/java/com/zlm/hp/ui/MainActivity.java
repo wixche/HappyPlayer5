@@ -350,19 +350,17 @@ public class MainActivity extends BaseActivity {
         mSearchButton.setConvert(true);
         mSearchButton.setPressed(false);
 
-        new AsyncHandlerTask(getApplicationContext()).execute(mUIHandler, mWorkerHandler, new AsyncHandlerTask.WorkerRunnable() {
+        new AsyncHandlerTask(mUIHandler, mWorkerHandler).execute(new AsyncHandlerTask.Task() {
             @Override
-            public void run() {
+            protected Object doInBackground() {
                 String ee = "";
                 ZLog.e(new CodeLineUtil().getCodeLineInfo(), ee);
-                //通知执行回调任务
-                runCallBackTask();
+                return "success";
             }
-        }, new AsyncHandlerTask.Callback() {
+
             @Override
-            public void runOnUiThread() {
-                String ee = "";
-                ZLog.e(new CodeLineUtil().getCodeLineInfo(), ee);
+            protected void onPostExecute(Object result) {
+                ZLog.e(new CodeLineUtil().getCodeLineInfo(), result.toString());
             }
         });
     }

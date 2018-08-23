@@ -23,12 +23,12 @@ import android.widget.FrameLayout;
 import android.widget.LinearLayout;
 import android.widget.RelativeLayout;
 
+import com.zlm.hp.handler.WeakRefHandler;
 import com.zlm.hp.ui.R;
 import com.zlm.hp.util.ColorUtil;
 import com.zlm.hp.util.StatusBarUtil;
 import com.zlm.hp.widget.IconfontTextView;
 
-import java.lang.ref.WeakReference;
 
 /**
  * Created by zhangliangming on 2018-08-11.
@@ -49,14 +49,13 @@ public abstract class BaseFragment extends Fragment {
     /**
      * 子线程用于执行耗时任务
      */
-    public Handler mWorkerHandler;
+    public WeakRefHandler mWorkerHandler;
     //创建异步HandlerThread
     private HandlerThread mHandlerThread;
     /**
      * 处理ui任务
      */
-    public Handler mUIHandler;
-    private WeakReference<Fragment> mFragmentWR;
+    public WeakRefHandler mUIHandler;
     /**
      * 状态栏背景颜色
      */
@@ -118,49 +117,45 @@ public abstract class BaseFragment extends Fragment {
 
 
         //创建ui handler
-        mUIHandler = new Handler(Looper.getMainLooper()) {
+        mUIHandler = new WeakRefHandler(Looper.getMainLooper(), this, new Handler.Callback() {
             @Override
-            public void handleMessage(Message msg) {
-                if (isFragmentAlive()) {
-                    switch (msg.what) {
-                        case SHOWCONTENTVIEW:
-                            showContentViewHandler();
-                            break;
-                        case SHOWLOADINGVIEW:
-                            showLoadingViewHandler();
-                            break;
-                        case SHOWNONETVIEW:
-                            showNoNetViewHandler();
-                            break;
-                        default:
-                            handleUIMessage(msg);
-                            break;
-                    }
+            public boolean handleMessage(Message msg) {
+                switch (msg.what) {
+                    case SHOWCONTENTVIEW:
+                        showContentViewHandler();
+                        break;
+                    case SHOWLOADINGVIEW:
+                        showLoadingViewHandler();
+                        break;
+                    case SHOWNONETVIEW:
+                        showNoNetViewHandler();
+                        break;
+                    default:
+                        handleUIMessage(msg);
+                        break;
                 }
+                return true;
             }
-        };
+        });
 
         //创建异步HandlerThread
         mHandlerThread = new HandlerThread("loadFragmentData", Process.THREAD_PRIORITY_BACKGROUND);
         //必须先开启线程
         mHandlerThread.start();
         //子线程Handler
-        mWorkerHandler = new Handler(mHandlerThread.getLooper()) {
+        mWorkerHandler = new WeakRefHandler(mHandlerThread.getLooper(), this, new Handler.Callback() {
             @Override
-            public void handleMessage(Message msg) {
-                if (isFragmentAlive()) {
-                    handleWorkerMessage(msg);
-                }
+            public boolean handleMessage(Message msg) {
+                handleWorkerMessage(msg);
+                return true;
             }
-        };
+        });
 
         //添加主布局
         mContentContainer = mMainView.findViewById(R.id.viewstub_content_container);
         mContentContainer.setLayoutResource(setContentLayoutResID());
         mContentContainer.inflate();
 
-        //
-        mFragmentWR = new WeakReference<Fragment>(this);
         //初始化view相关数据
         initViews(savedInstanceState);
 
@@ -348,16 +343,6 @@ public abstract class BaseFragment extends Fragment {
         }
         if (mNetContainer != null)
             mNetContainer.setVisibility(View.GONE);
-    }
-
-    /**
-     * 是否仍活着
-     *
-     * @return
-     */
-    private boolean isFragmentAlive() {
-        Fragment fragment = mFragmentWR.get();
-        return fragment != null;
     }
 
     /**

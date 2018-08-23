@@ -1,96 +1,86 @@
 package com.zlm.hp.async;
 
-import android.content.Context;
-import android.os.Handler;
+import com.zlm.hp.handler.WeakRefHandler;
 
-import java.lang.ref.WeakReference;
 
 /**
+ * 异步handler任务
  * Created by zhangliangming on 2018-08-12.
  */
 
 public class AsyncHandlerTask {
-    private static WeakReference<Context> mContextWR;
 
-    public AsyncHandlerTask(Context context) {
-        mContextWR = new WeakReference<Context>(context);
+    private WeakRefHandler mUIHandler;
+    private WeakRefHandler mWorkerHandler;
+
+    public AsyncHandlerTask(WeakRefHandler uiHandler, WeakRefHandler workerHandler) {
+        this.mUIHandler = uiHandler;
+        this.mWorkerHandler = workerHandler;
     }
 
     /**
-     * 执行任务
+     * 执行后台任务
+     *
+     * @param task 任务
+     */
+    public void execute(Task task) {
+        execute(mUIHandler, mWorkerHandler, task);
+    }
+
+
+    /**
+     * 执行后台任务，子线程返回或者主线程返回
      *
      * @param uiHandler
      * @param workerHandler
-     * @param workerRunnable
-     * @param callback
+     * @param task
      */
-    public void execute(Handler uiHandler, Handler workerHandler, WorkerRunnable workerRunnable, final Callback callback) {
-        if (isContextAlive() && workerHandler != null && workerRunnable != null) {
-            if (callback != null && uiHandler != null) {
-                workerRunnable.setUiHandler(uiHandler);
-                workerRunnable.setCallback(callback);
-            }
-            workerHandler.post(workerRunnable);
+    private void execute(final WeakRefHandler uiHandler, final WeakRefHandler workerHandler, final Task task) {
+        if (workerHandler != null) {
+            workerHandler.post(new Runnable() {
+                @Override
+                public void run() {
+                    Object result = null;
+                    if (workerHandler.isAlive()) {
+                        if (task != null) {
+                            result = task.doInBackground();
+                        }
+                    }
+                    if (uiHandler != null) {
+                        final Object finalResult = result;
+                        uiHandler.post(new Runnable() {
+                            @Override
+                            public void run() {
+                                if (uiHandler.isAlive()) {
+                                    if (task != null) {
+                                        task.onPostExecute(finalResult);
+                                    }
+                                }
+                            }
+                        });
+                    }
+                }
+            });
         }
     }
 
     /**
-     * 执行任务
-     *
-     * @param workerHandler
-     * @param workerRunnable
+     * 工作任务
      */
-    public void execute(Handler workerHandler, WorkerRunnable workerRunnable) {
-        execute(null, workerHandler, workerRunnable, null);
-    }
-
-    /**
-     * WorkerRunnable
-     */
-    public static class WorkerRunnable implements Runnable {
-        private Handler uiHandler;
-        private Callback callback;
-
-        @Override
-        public void run() {
-
-        }
+    public static abstract class Task {
+        /**
+         * 后台执行
+         *
+         * @return
+         */
+        protected abstract Object doInBackground();
 
         /**
+         * 主线程回调
          *
+         * @param result
          */
-        public void runCallBackTask() {
-            if (isContextAlive() && callback != null && uiHandler != null) {
-                uiHandler.post(new Runnable() {
-                    @Override
-                    public void run() {
-                        callback.runOnUiThread();
-                    }
-                });
-            }
+        protected void onPostExecute(Object result) {
         }
-
-        public void setUiHandler(Handler uiHandler) {
-            this.uiHandler = uiHandler;
-        }
-
-        public void setCallback(Callback callback) {
-            this.callback = callback;
-        }
-    }
-
-    /**
-     * @return
-     */
-    private static boolean isContextAlive() {
-        Context context = mContextWR.get();
-        return context != null;
-    }
-
-    /**
-     *
-     */
-    public interface Callback {
-        void runOnUiThread();
     }
 }
