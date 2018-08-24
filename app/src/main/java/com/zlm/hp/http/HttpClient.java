@@ -452,6 +452,7 @@ public class HttpClient {
         }
         if (conn != null)
             conn.disconnect();
+        result.jumpCount = i;
         return result;
 
     }

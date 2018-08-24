@@ -92,7 +92,7 @@ public class AboutActivity extends BaseActivity {
      * 加载版本号数据
      */
     private void loadVersionData() {
-        String versionInfo = getString(R.string.app_name) + ApkUtil.getVersionName(getApplicationContext());
+        String versionInfo = getString(R.string.app_name) + " " + ApkUtil.getVersionName(getApplicationContext());
         Message msg = Message.obtain();
         msg.what = LOAD_VERSION;
         msg.obj = versionInfo;
