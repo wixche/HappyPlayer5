@@ -276,7 +276,9 @@ public class ConfigInfo implements Parcelable {
                 ZLog.e(new CodeLineUtil().getCodeLineInfo(), "ConfigInfo.save Exception: ", e.getMessage());
             }
         }
-        return this;
+        //
+        _ConfigInfo = CREATOR.createFromParcel(parcel);
+        return _ConfigInfo;
     }
 
     public boolean isWifi() {
