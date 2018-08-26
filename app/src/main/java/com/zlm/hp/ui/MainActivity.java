@@ -173,7 +173,7 @@ public class MainActivity extends BaseActivity {
         DisplayMetrics displayMetrics = new DisplayMetrics();
         display.getMetrics(displayMetrics);
         int screensWidth = displayMetrics.widthPixels;
-        int menuViewWidth = screensWidth / 5 * 4;
+        int menuViewWidth = screensWidth / 4 * 3;
 
         LinearLayout.LayoutParams lp = new LinearLayout.LayoutParams(LinearLayout.LayoutParams.MATCH_PARENT, StatusBarUtil.getStatusBarHeight(getApplicationContext()));
         //菜单界面
@@ -420,7 +420,7 @@ public class MainActivity extends BaseActivity {
                     if (!AppOpsUtils.allowFloatWindow(getApplication())) {
 
                         String tipMsg = getString(R.string.desktoplrc_tip);
-                        DialogUIUtils.showMdAlert(MainActivity.this, null, tipMsg, new DialogUIListener() {
+                        DialogUIUtils.showMdAlert(MainActivity.this, getString(R.string.tip_title), tipMsg, new DialogUIListener() {
                             @Override
                             public void onPositive() {
                                 //跳转权限设置页面

@@ -214,8 +214,7 @@ public abstract class BaseFragment extends Fragment {
             statusBarView.setVisibility(View.GONE);
             return;
         }
-        statusBarView.setVisibility(View.VISIBLE);
-        statusBarView.setBackgroundColor(mStatusBarViewBG);
+
 
         int statusBarViewHeight = StatusBarUtil.getStatusBarHeight(mContext);
 
@@ -236,6 +235,8 @@ public abstract class BaseFragment extends Fragment {
             statusBarView.setLayoutParams(vplp);
         }
 
+        statusBarView.setVisibility(View.VISIBLE);
+        statusBarView.setBackgroundColor(mStatusBarViewBG);
     }
 
     /**

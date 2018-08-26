@@ -97,6 +97,7 @@ public abstract class BaseActivity extends AppCompatActivity {
 
         //初始化view相关数据
         initViews(savedInstanceState);
+
     }
 
     /**
@@ -123,10 +124,7 @@ public abstract class BaseActivity extends AppCompatActivity {
             statusBarView.setVisibility(View.GONE);
             return;
         }
-        statusBarView.setVisibility(View.VISIBLE);
-        statusBarView.setBackgroundColor(mStatusBarViewBG);
         int statusBarViewHeight = StatusBarUtil.getStatusBarHeight(mContext);
-
         if (view instanceof ConstraintLayout) {
             ConstraintLayout.LayoutParams clp = new ConstraintLayout.LayoutParams(-1, statusBarViewHeight);
             statusBarView.setLayoutParams(clp);
@@ -143,6 +141,8 @@ public abstract class BaseActivity extends AppCompatActivity {
             ViewGroup.LayoutParams vplp = new ViewGroup.LayoutParams(-1, statusBarViewHeight);
             statusBarView.setLayoutParams(vplp);
         }
+        statusBarView.setVisibility(View.VISIBLE);
+        statusBarView.setBackgroundColor(mStatusBarViewBG);
 
     }
 

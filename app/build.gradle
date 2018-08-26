@@ -2,7 +2,7 @@ apply plugin: 'com.android.application'
 apply plugin: 'org.greenrobot.greendao'
 
 android {
-    compileSdkVersion 26
+    compileSdkVersion 28
     defaultConfig {
         applicationId "com.zlm.hp"
         minSdkVersion 19
@@ -27,18 +27,17 @@ android {
             proguardFiles getDefaultProguardFile('proguard-android.txt'), 'proguard-rules.pro'
         }
     }
-
     // 保证其他的lib没有被preDex
     dexOptions {
         preDexLibraries = false
     }
-
     //greendao设置相关参数
     greendao {
         schemaVersion 1
         daoPackage 'com.zlm.hp.db.dao'
         targetGenDir 'src/main/java'
     }
+    buildToolsVersion '28.0.2'
 }
 
 dependencies {
@@ -47,10 +46,8 @@ dependencies {
     androidTestImplementation('com.android.support.test.espresso:espresso-core:2.2.2', {
         exclude group: 'com.android.support', module: 'support-annotations'
     })
-
-    implementation 'com.android.support:appcompat-v7:26.1.0'
-    implementation 'com.android.support:recyclerview-v7:26.1.0'
-
+    implementation 'com.android.support:appcompat-v7:28.+'
+    implementation 'com.android.support:recyclerview-v7:28.+'
     testImplementation 'junit:junit:4.12'
     implementation 'com.android.support:multidex:1.0.1'
     //第三方bugly
@@ -58,53 +55,43 @@ dependencies {
     //其中latest.release指代最新Bugly SDK版本号，也可以指定明确的版本号，例如2.1.9
     implementation 'com.tencent.bugly:nativecrashreport:latest.release'
     //其中latest.release指代最新Bugly NDK版本号，也可以指定明确的版本号，例如3.0
-
     //第三方内存泄露 LeakCanary
     debugImplementation 'com.squareup.leakcanary:leakcanary-android:1.6.1'
     releaseImplementation 'com.squareup.leakcanary:leakcanary-android-no-op:1.6.1'
     // Optional, if you use support library fragments:
     debugImplementation 'com.squareup.leakcanary:leakcanary-support-fragment:1.6.1'
-
     /**
      * 右滑动关闭
      */
     implementation 'com.github.zhangliangming:SwipeBackLayout:v2.5'
-
     /**
      * 旋转界面
      */
     implementation 'com.github.zhangliangming:RotateLayout:v2.5'
-
     /**
      * 进度条
      */
     implementation 'com.github.zhangliangming:SeekBar:v3.5'
-
     /**
      * 歌词
      */
     implementation 'com.github.zhangliangming:HPLyrics:v1.44'
-
     /**
      * 音频
      */
     implementation 'com.github.zhangliangming:HPAudio:v2.4'
-
     /**
      * 注册码
      */
     implementation 'com.github.zhangliangming:Register:v1.0'
-
     /**
      * ijkplayer
      */
     implementation 'com.github.zhangliangming:Player:v1.1'
-
     /**
      * SlidingMenuLayout
      */
     implementation 'com.github.zhangliangming:SlidingMenuLayout:v1.1'
-
     /**
      * 第三方switch-button
      */
@@ -113,17 +100,14 @@ dependencies {
      * 第三方greendao
      */
     implementation 'org.greenrobot:greendao:3.2.2'
-
     /**
      * greendao 加密
      */
     implementation 'net.zetetic:android-database-sqlcipher:3.5.7'
-
     /**
      * 第三方pinyin4j
      */
     implementation 'com.belerweb:pinyin4j:2.5.1'
-
     /**
      * 第三方弹出窗口：jjdxm_dialogui
      */

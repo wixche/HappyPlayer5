@@ -171,3 +171,4 @@ public static java.lang.String TABLENAME;
 -keepclassmembers class com.zlm.** {
    public *;
 }
+-ignorewarnings

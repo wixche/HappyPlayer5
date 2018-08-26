@@ -40,7 +40,7 @@ public class SplashActivity extends BaseActivity {
 
     @Override
     protected void preInitStatusBar() {
-        setStatusBarViewBG(ColorUtil.parserColor(Color.BLACK, 30));
+        setStatusBarViewBG(ColorUtil.parserColor(Color.BLACK, 0));
     }
 
     @Override

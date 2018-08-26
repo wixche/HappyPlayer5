@@ -3,10 +3,10 @@ package com.zlm.hp.util;
 import android.content.Context;
 import android.graphics.Color;
 import android.os.Build;
+import android.view.View;
 import android.view.Window;
 import android.view.WindowManager;
 
-import java.lang.reflect.Field;
 
 /**
  * 状态栏处理类
@@ -38,22 +38,16 @@ public class StatusBarUtil {
         boolean isAddStatusBar = false;
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
             isAddStatusBar = true;
-            //透明状态栏
-            window.addFlags(WindowManager.LayoutParams.FLAG_TRANSLUCENT_STATUS);
-            //设置状态栏的颜色
+
+
+            //使得布局延伸到状态栏和导航栏区域
+            View decorView = window.getDecorView();
+            int systemUiVisibility = decorView.getSystemUiVisibility();
+            decorView.setSystemUiVisibility(systemUiVisibility | View.SYSTEM_UI_FLAG_LAYOUT_FULLSCREEN);
+
+            //透明状态栏/导航栏
             window.setStatusBarColor(Color.TRANSPARENT);
 
-            //修复android7.0半透明问题
-            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N) {
-                try {
-                    Field field = window.getDecorView().getClass().getDeclaredField("mSemiTransparentStatusBarColor");  //获取特定的成员变量
-                    field.setAccessible(true);   //设置对此属性的可访问性
-                    field.setInt(window.getDecorView(), Color.TRANSPARENT);  //修改属性值
-
-                } catch (Exception e) {
-                    e.printStackTrace();
-                }
-            }
         }
         return isAddStatusBar;
     }

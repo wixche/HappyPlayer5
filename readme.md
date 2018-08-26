@@ -2,8 +2,8 @@
 乐乐音乐6.0主要是基于ijkplayer框架开发的Android音乐播放器，它支持多种音频格式和动感歌词，界面高仿酷狗。
 
 # 开发环境 #
-- android studio 3.0（正式版）
-- gradle-4.1-all
+- android studio 3.1.4（正式版）
+- gradle-4.4
 - 小米2s手机
 - android 5.0系统
 
@@ -36,6 +36,11 @@
 - [jjdxm_dialogui：弹出窗口框架](https://github.com/jjdxmashl/jjdxm_dialogui/ "jjdxm_dialogui")
 
 # 更新日志 #
+
+## 2018-08-27 ##
+- 修复状态栏半透明的问题
+- 修复全面屏的问题
+
 ## 2018-08-24 ##
 - 代码优化
 

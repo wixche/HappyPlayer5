@@ -22,6 +22,7 @@
     <uses-permission android:name="android.permission.WAKE_LOCK" />
 
     <application
+
         android:name="com.zlm.hp.application.HPApplication"
         android:allowBackup="true"
         android:hardwareAccelerated="false"
@@ -31,6 +32,11 @@
         android:screenOrientation="portrait"
         android:supportsRtl="true"
         android:theme="@style/AppTheme">
+
+        <!-- 支持全面屏 -->
+        <meta-data android:name="android.max_aspect"
+            android:value="2.1"/>
+
         <activity android:name=".SplashActivity">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
