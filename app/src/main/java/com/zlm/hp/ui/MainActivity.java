@@ -388,7 +388,7 @@ public class MainActivity extends BaseActivity {
             @Override
             public void onClick(View v) {
                 String tipMsg = getString(R.string.exit_app_tip);
-                DialogUIUtils.showMdAlert(MainActivity.this, null, tipMsg, new DialogUIListener() {
+                DialogUIUtils.showMdAlert(MainActivity.this, getString(R.string.tip_title), tipMsg, new DialogUIListener() {
                     @Override
                     public void onPositive() {
                         ActivityManager.getInstance().exit();
