@@ -36,11 +36,6 @@ public class SplashActivity extends BaseActivity {
     private final int LOADTATA = 0;
 
     /**
-     * 开始动画
-     */
-    private final int STATE_ANI = 1;
-
-    /**
      * 跳转到home
      */
     private final int GOHOME = 2;
@@ -76,8 +71,9 @@ public class SplashActivity extends BaseActivity {
 
         mIconImg = findViewById(R.id.icon_img);
         mAnimation = AnimationUtils.loadAnimation(getApplicationContext(),R.anim. balloonscale);
+        mIconImg.setAnimation(mAnimation );
+        mAnimation.start();
 
-        mUIHandler.sendEmptyMessage(STATE_ANI);
         mWorkerHandler.sendEmptyMessage(LOADTATA);
     }
 
@@ -85,14 +81,10 @@ public class SplashActivity extends BaseActivity {
     protected void handleUIMessage(Message msg) {
         switch (msg.what) {
             case GOHOME:
-                mIconImg.clearAnimation();
+
                 goHome();
                 break;
 
-            case STATE_ANI:
-                mIconImg.setAnimation(mAnimation );
-                mAnimation.start();
-                break;
         }
     }
 
