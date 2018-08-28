@@ -7,6 +7,8 @@ import android.graphics.Color;
 import android.media.MediaPlayer;
 import android.os.Message;
 import android.os.Bundle;
+import android.view.animation.Animation;
+import android.view.animation.AnimationUtils;
 
 import com.zlm.hp.constants.ConfigInfo;
 import com.zlm.hp.constants.Constants;
@@ -15,6 +17,7 @@ import com.zlm.hp.entity.AudioInfo;
 import com.zlm.hp.util.ColorUtil;
 import com.zlm.hp.util.MediaUtil;
 import com.zlm.hp.util.PreferencesUtil;
+import com.zlm.hp.widget.IconfontTextView;
 
 import java.io.IOException;
 import java.util.List;
@@ -33,9 +36,29 @@ public class SplashActivity extends BaseActivity {
     private final int LOADTATA = 0;
 
     /**
+     * 开始动画
+     */
+    private final int STATE_ANI = 1;
+
+    /**
+     * 跳转到home
+     */
+    private final int GOHOME = 2;
+
+    /**
      * 问候语
      */
     private MediaPlayer mMediaPlayer;
+
+    /**
+     * 图标图片
+     */
+    private IconfontTextView mIconImg;
+
+    /**
+     * 动画
+     */
+    private Animation mAnimation = null ;
 
 
     @Override
@@ -50,12 +73,27 @@ public class SplashActivity extends BaseActivity {
 
     @Override
     protected void initViews(Bundle savedInstanceState) {
+
+        mIconImg = findViewById(R.id.icon_img);
+        mAnimation = AnimationUtils.loadAnimation(getApplicationContext(),R.anim. balloonscale);
+
+        mUIHandler.sendEmptyMessage(STATE_ANI);
         mWorkerHandler.sendEmptyMessage(LOADTATA);
     }
 
     @Override
     protected void handleUIMessage(Message msg) {
-        goHome();
+        switch (msg.what) {
+            case GOHOME:
+                mIconImg.clearAnimation();
+                goHome();
+                break;
+
+            case STATE_ANI:
+                mIconImg.setAnimation(mAnimation );
+                mAnimation.start();
+                break;
+        }
     }
 
     @Override
@@ -91,9 +129,9 @@ public class SplashActivity extends BaseActivity {
         } else {
             if (isFrist) {
                 //第一次因为需要扫描歌曲，时间可小一点
-                mUIHandler.sendEmptyMessageDelayed(0, 1000);
+                mUIHandler.sendEmptyMessageDelayed(GOHOME, 1000);
             } else {
-                mUIHandler.sendEmptyMessageDelayed(0, 5000);
+                mUIHandler.sendEmptyMessageDelayed(GOHOME, 5000);
             }
         }
     }
@@ -114,7 +152,7 @@ public class SplashActivity extends BaseActivity {
                 @Override
                 public void onCompletion(MediaPlayer mp) {
                     //播放完成后跳转
-                    mUIHandler.sendEmptyMessageDelayed(0, 3000);
+                    mUIHandler.sendEmptyMessageDelayed(GOHOME, 3000);
                 }
             });
             mMediaPlayer.prepare();

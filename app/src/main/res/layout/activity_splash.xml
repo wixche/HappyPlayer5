@@ -8,6 +8,7 @@
     tools:context="com.zlm.hp.ui.SplashActivity">
 
     <com.zlm.hp.widget.IconfontTextView
+        android:id="@+id/icon_img"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:text="@string/title_icon"
