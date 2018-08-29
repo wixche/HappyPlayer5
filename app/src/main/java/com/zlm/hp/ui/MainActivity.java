@@ -30,7 +30,7 @@ import com.zlm.hp.util.AppOpsUtils;
 import com.zlm.hp.util.CodeLineUtil;
 import com.zlm.hp.util.ColorUtil;
 import com.zlm.hp.util.IntentUtils;
-import com.zlm.hp.util.StatusBarUtil;
+import com.zlm.hp.util.AppBarUtil;
 import com.zlm.hp.util.ToastUtil;
 import com.zlm.hp.util.ZLog;
 import com.zlm.hp.widget.IconfontImageButtonTextView;
@@ -55,6 +55,11 @@ public class MainActivity extends BaseActivity {
      * 中间视图
      */
     private ViewPager mViewPager;
+
+    /**
+     *
+     */
+    private LinearLayout mPlayerBarLL;
 
     /**
      * 图标按钮
@@ -120,11 +125,12 @@ public class MainActivity extends BaseActivity {
     @Override
     protected void initViews(Bundle savedInstanceState) {
         initSlidingMenu();
-        initTitleViews();
         initViewPage();
+        initTitleViews();
         initMenu();
         loadData();
     }
+
 
     /**
      * 加载数据
@@ -175,11 +181,11 @@ public class MainActivity extends BaseActivity {
         int screensWidth = displayMetrics.widthPixels;
         int menuViewWidth = screensWidth / 4 * 3;
 
-        LinearLayout.LayoutParams lp = new LinearLayout.LayoutParams(LinearLayout.LayoutParams.MATCH_PARENT, StatusBarUtil.getStatusBarHeight(getApplicationContext()));
+        LinearLayout.LayoutParams lp = new LinearLayout.LayoutParams(LinearLayout.LayoutParams.MATCH_PARENT, AppBarUtil.getStatusBarHeight(getApplicationContext()));
         //菜单界面
         LinearLayout menuView = (LinearLayout) LayoutInflater.from(getApplicationContext()).inflate(R.layout.layout_menu, null);
         FrameLayout.LayoutParams menuLayoutParams = new FrameLayout.LayoutParams(menuViewWidth, FrameLayout.LayoutParams.MATCH_PARENT);
-        boolean isAddStatusBar = StatusBarUtil.isAddStatusBar();
+        boolean isAddStatusBar = AppBarUtil.isAddStatusBar();
         if (isAddStatusBar) {
             View menuStatusBarView = menuView.findViewById(R.id.status_bar_view);
             menuStatusBarView.setVisibility(View.VISIBLE);
@@ -189,12 +195,17 @@ public class MainActivity extends BaseActivity {
         //主界面
         LinearLayout mainView = (LinearLayout) LayoutInflater.from(getApplicationContext()).inflate(R.layout.layout_main, null);
         FrameLayout.LayoutParams mainLayoutParams = new FrameLayout.LayoutParams(FrameLayout.LayoutParams.MATCH_PARENT, FrameLayout.LayoutParams.MATCH_PARENT);
+        mPlayerBarLL = mainView.findViewById(R.id.playerBar);
+        mViewPager = mainView.findViewById(R.id.viewpage);
+
+        //添加状态栏
         if (isAddStatusBar) {
             View mainStatusBarView = mainView.findViewById(R.id.status_bar_view);
             mainStatusBarView.setBackgroundColor(ColorUtil.parserColor(ContextCompat.getColor(getApplicationContext(), R.color.defColor)));
             mainStatusBarView.setVisibility(View.VISIBLE);
             mainStatusBarView.setLayoutParams(lp);
         }
+
         //
         mSlidingMenuLayout.setFragmentPaintFade(true);
         mSlidingMenuLayout.setAllowScale(false);
@@ -216,9 +227,7 @@ public class MainActivity extends BaseActivity {
      * 初始化viewpage
      */
     private void initViewPage() {
-        mViewPager = findViewById(R.id.viewpage);
 
-        //
         ArrayList<Fragment> fragments = new ArrayList<Fragment>();
         MeFragment meFragment = new MeFragment(this);
         LastSongFragment lastSongFragment = new LastSongFragment(this);

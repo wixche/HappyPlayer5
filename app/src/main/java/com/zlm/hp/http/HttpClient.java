@@ -98,7 +98,10 @@ public class HttpClient {
         }
 
         public byte[] getData() {
-            return data;
+            if (data != null && data.length > 0) {
+                return data;
+            }
+            return new byte[0];
         }
 
         public int getHttpCode() {
@@ -213,6 +216,9 @@ public class HttpClient {
      * @date 2018/7/6 0006
      */
     public Result post(String url, byte[] data, int jump) {
+        if (data == null) {
+            data = "".getBytes();
+        }
         return doQuery(url, null, data, jump);
     }
 
@@ -225,6 +231,9 @@ public class HttpClient {
      * @date 2018/7/6 0006
      */
     public Result post(String url, byte[] data) {
+        if (data == null) {
+            data = "".getBytes();
+        }
         return doQuery(url, null, data, MAX_JUMP);
     }
 
@@ -238,6 +247,9 @@ public class HttpClient {
      */
     public Result post(String url, Map<String, String> headParams, byte[] data,
                        int jump) {
+        if (data == null) {
+            data = "".getBytes();
+        }
         return doQuery(url, headParams, data, jump);
     }
 
@@ -250,6 +262,9 @@ public class HttpClient {
      * @date 2018/7/6 0006
      */
     public Result post(String url, Map<String, String> headParams, byte[] data) {
+        if (data == null) {
+            data = "".getBytes();
+        }
         return doQuery(url, headParams, data, MAX_JUMP);
     }
 
@@ -390,7 +405,7 @@ public class HttpClient {
                 }
 
                 // 判断post请求或者get请求
-                if (data != null && data.length > 0) {
+                if (data != null) {
                     conn.setRequestMethod("POST");
                     conn.setDoOutput(true);
 
@@ -496,7 +511,7 @@ public class HttpClient {
                 }
 
                 // 判断post请求或者get请求
-                if (data != null && data.length > 0) {
+                if (data != null) {
                     conn.setRequestMethod("POST");
                     conn.setDoOutput(true);
 

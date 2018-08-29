@@ -21,7 +21,7 @@ import android.widget.RelativeLayout;
 import com.zlm.hp.handler.WeakRefHandler;
 import com.zlm.hp.manager.ActivityManager;
 import com.zlm.hp.util.ColorUtil;
-import com.zlm.hp.util.StatusBarUtil;
+import com.zlm.hp.util.AppBarUtil;
 
 
 /**
@@ -106,7 +106,8 @@ public abstract class BaseActivity extends AppCompatActivity {
      * @param view
      */
     private void initStatusBar(View view) {
-        boolean isAddStatusBar = StatusBarUtil.isAddStatusBar(this.getWindow());
+        AppBarUtil.initBar(this.getWindow());
+        boolean isAddStatusBar = AppBarUtil.isAddStatusBar();
         //添加状态栏
         addStatusBar(view, isAddStatusBar);
     }
@@ -124,7 +125,7 @@ public abstract class BaseActivity extends AppCompatActivity {
             statusBarView.setVisibility(View.GONE);
             return;
         }
-        int statusBarViewHeight = StatusBarUtil.getStatusBarHeight(mContext);
+        int statusBarViewHeight = AppBarUtil.getStatusBarHeight(mContext);
         if (view instanceof ConstraintLayout) {
             ConstraintLayout.LayoutParams clp = new ConstraintLayout.LayoutParams(-1, statusBarViewHeight);
             statusBarView.setLayoutParams(clp);

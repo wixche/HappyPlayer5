@@ -26,7 +26,7 @@ import android.widget.RelativeLayout;
 import com.zlm.hp.handler.WeakRefHandler;
 import com.zlm.hp.ui.R;
 import com.zlm.hp.util.ColorUtil;
-import com.zlm.hp.util.StatusBarUtil;
+import com.zlm.hp.util.AppBarUtil;
 import com.zlm.hp.widget.IconfontTextView;
 
 
@@ -197,7 +197,7 @@ public abstract class BaseFragment extends Fragment {
      * @param
      */
     private void initStatusBar() {
-        boolean isAddStatusBar = StatusBarUtil.isAddStatusBar();
+        boolean isAddStatusBar = AppBarUtil.isAddStatusBar();
         //添加状态栏
         addStatusBar(isAddStatusBar);
     }
@@ -216,7 +216,7 @@ public abstract class BaseFragment extends Fragment {
         }
 
 
-        int statusBarViewHeight = StatusBarUtil.getStatusBarHeight(mContext);
+        int statusBarViewHeight = AppBarUtil.getStatusBarHeight(mContext);
 
         if (mMainView instanceof ConstraintLayout) {
             ConstraintLayout.LayoutParams clp = new ConstraintLayout.LayoutParams(-1, statusBarViewHeight);
