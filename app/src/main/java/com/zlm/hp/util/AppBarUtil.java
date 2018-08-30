@@ -8,7 +8,6 @@ import android.view.View;
 import android.view.Window;
 import android.view.WindowManager;
 
-import java.lang.reflect.Method;
 
 
 /**
@@ -50,7 +49,7 @@ public class AppBarUtil {
             //透明状态栏/导航栏
             window.setStatusBarColor(Color.TRANSPARENT);
             //window.setNavigationBarColor(Color.TRANSPARENT);
-
+            window.setNavigationBarColor(Color.BLACK);
         }
 
     }
@@ -87,33 +86,4 @@ public class AppBarUtil {
         return height;
     }
 
-    /**
-     * @throws
-     * @Description: 获取设备是否存在NavigationBar
-     * @param:
-     * @return:
-     * @author: zhangliangming
-     * @date: 2018-08-29 21:47
-     */
-    public static boolean isAddNavigationBar(Context context) {
-        boolean hasNavigationBar = false;
-        Resources rs = context.getResources();
-        int id = rs.getIdentifier("config_showNavigationBar", "bool", "android");
-        if (id > 0) {
-            hasNavigationBar = rs.getBoolean(id);
-        }
-        try {
-            Class systemPropertiesClass = Class.forName("android.os.SystemProperties");
-            Method m = systemPropertiesClass.getMethod("get", String.class);
-            String navBarOverride = (String) m.invoke(systemPropertiesClass, "qemu.hw.mainkeys");
-            if ("1".equals(navBarOverride)) {
-                hasNavigationBar = false;
-            } else if ("0".equals(navBarOverride)) {
-                hasNavigationBar = true;
-            }
-        } catch (Exception e) {
-            e.printStackTrace();
-        }
-        return hasNavigationBar;
-    }
 }

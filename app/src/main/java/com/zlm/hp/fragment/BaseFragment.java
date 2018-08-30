@@ -1,6 +1,5 @@
 package com.zlm.hp.fragment;
 
-import android.app.Activity;
 import android.content.Context;
 import android.os.Bundle;
 import android.os.Handler;
@@ -27,6 +26,7 @@ import com.zlm.hp.handler.WeakRefHandler;
 import com.zlm.hp.ui.R;
 import com.zlm.hp.util.ColorUtil;
 import com.zlm.hp.util.AppBarUtil;
+import com.zlm.hp.util.ContextUtil;
 import com.zlm.hp.widget.IconfontTextView;
 
 
@@ -35,16 +35,11 @@ import com.zlm.hp.widget.IconfontTextView;
  */
 
 public abstract class BaseFragment extends Fragment {
-    public Activity mActivity;
-    /**
-     *
-     */
-    private Context mContext;
 
     /**
      *
      */
-    private ViewGroup mMainView;
+    private Context mContext;
 
     /**
      * 子线程用于执行耗时任务
@@ -97,24 +92,13 @@ public abstract class BaseFragment extends Fragment {
 
     private RefreshListener mRefreshListener;
 
-
-    public BaseFragment(Activity activity) {
-        this.mActivity = activity;
-        this.mContext = mActivity.getApplicationContext();
+    public BaseFragment() {
+        this.mContext = ContextUtil.getContext();
     }
 
     @Override
     public void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-
-        mStatusBarViewBG = ColorUtil.parserColor(ContextCompat.getColor(mContext, R.color.defColor));
-
-        preInitStatusBar();
-
-        LayoutInflater inflater = mActivity.getLayoutInflater();
-        mMainView = (ViewGroup) inflater.inflate(R.layout.fragment_base, null, false);
-        initStatusBar();
-
 
         //创建ui handler
         mUIHandler = new WeakRefHandler(Looper.getMainLooper(), this, new Handler.Callback() {
@@ -150,25 +134,27 @@ public abstract class BaseFragment extends Fragment {
                 return true;
             }
         });
-
-        //添加主布局
-        mContentContainer = mMainView.findViewById(R.id.viewstub_content_container);
-        mContentContainer.setLayoutResource(setContentLayoutResID());
-        mContentContainer.inflate();
-
-        //初始化view相关数据
-        initViews(savedInstanceState);
-
     }
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
-        ViewGroup viewGroup = (ViewGroup) mMainView.getParent();
-        if (viewGroup != null) {
-            viewGroup.removeAllViewsInLayout();
-        }
-        return mMainView;
+        mStatusBarViewBG = ColorUtil.parserColor(ContextCompat.getColor(mContext, R.color.defColor));
+        preInitStatusBar();
+        View mainView = inflater.inflate(R.layout.fragment_base, container, false);
+        initStatusBar(mainView);
+
+        //添加主布局
+        mContentContainer = mainView.findViewById(R.id.viewstub_content_container);
+        mContentContainer.setLayoutResource(setContentLayoutResID());
+        mContentContainer.inflate();
+
+        initLoadingView(mainView);
+        initNoNetView(mainView);
+
+        //初始化view相关数据
+        initViews(mainView, savedInstanceState);
+        return mainView;
     }
 
     @Override
@@ -196,10 +182,10 @@ public abstract class BaseFragment extends Fragment {
      *
      * @param
      */
-    private void initStatusBar() {
+    private void initStatusBar(View mainView) {
         boolean isAddStatusBar = AppBarUtil.isAddStatusBar();
         //添加状态栏
-        addStatusBar(isAddStatusBar);
+        addStatusBar(mainView, isAddStatusBar);
     }
 
     /**
@@ -207,8 +193,8 @@ public abstract class BaseFragment extends Fragment {
      *
      * @param isAddStatusBar
      */
-    private void addStatusBar(boolean isAddStatusBar) {
-        View statusBarView = mMainView.findViewById(R.id.status_bar_view);
+    private void addStatusBar(View mainView, boolean isAddStatusBar) {
+        View statusBarView = mainView.findViewById(R.id.status_bar_view);
         if (statusBarView == null) return;
         if (!isAddStatusBar) {
             statusBarView.setVisibility(View.GONE);
@@ -218,19 +204,19 @@ public abstract class BaseFragment extends Fragment {
 
         int statusBarViewHeight = AppBarUtil.getStatusBarHeight(mContext);
 
-        if (mMainView instanceof ConstraintLayout) {
+        if (mainView instanceof ConstraintLayout) {
             ConstraintLayout.LayoutParams clp = new ConstraintLayout.LayoutParams(-1, statusBarViewHeight);
             statusBarView.setLayoutParams(clp);
-        } else if (mMainView instanceof LinearLayout) {
+        } else if (mainView instanceof LinearLayout) {
             LinearLayout.LayoutParams llp = new LinearLayout.LayoutParams(-1, statusBarViewHeight);
             statusBarView.setLayoutParams(llp);
-        } else if (mMainView instanceof RelativeLayout) {
+        } else if (mainView instanceof RelativeLayout) {
             RelativeLayout.LayoutParams rlp = new RelativeLayout.LayoutParams(-1, statusBarViewHeight);
             statusBarView.setLayoutParams(rlp);
-        } else if (mMainView instanceof FrameLayout) {
+        } else if (mainView instanceof FrameLayout) {
             FrameLayout.LayoutParams flp = new FrameLayout.LayoutParams(-1, statusBarViewHeight);
             statusBarView.setLayoutParams(flp);
-        } else if (mMainView instanceof ViewGroup) {
+        } else if (mainView instanceof ViewGroup) {
             ViewGroup.LayoutParams vplp = new ViewGroup.LayoutParams(-1, statusBarViewHeight);
             statusBarView.setLayoutParams(vplp);
         }
@@ -249,10 +235,10 @@ public abstract class BaseFragment extends Fragment {
     /**
      * 初始化加载界面
      */
-    private void initLoadingView() {
-        mLoadingContainer = mMainView.findViewById(R.id.viewstub_loading_container);
+    private void initLoadingView(View mainView) {
+        mLoadingContainer = mainView.findViewById(R.id.viewstub_loading_container);
         mLoadingContainer.inflate();
-        mLoadImgView = mMainView.findViewById(R.id.load_img);
+        mLoadImgView = mainView.findViewById(R.id.load_img);
         rotateAnimation = AnimationUtils.loadAnimation(getContext(),
                 R.anim.anim_rotate);
         rotateAnimation.setInterpolator(new LinearInterpolator());// 匀速
@@ -264,9 +250,6 @@ public abstract class BaseFragment extends Fragment {
      * 显示加载窗口
      */
     public void showLoadingView() {
-        if (mLoadingContainer == null) {
-            initLoadingView();
-        }
         mUIHandler.sendEmptyMessage(SHOWLOADINGVIEW);
     }
 
@@ -287,11 +270,11 @@ public abstract class BaseFragment extends Fragment {
     /**
      * 初始化没网络界面
      */
-    private void initNoNetView() {
+    private void initNoNetView(View mainView) {
         //
-        mNetContainer = mMainView.findViewById(R.id.viewstub_net_container);
+        mNetContainer = mainView.findViewById(R.id.viewstub_net_container);
         mNetContainer.inflate();
-        mNetBGLayout = mMainView.findViewById(R.id.net_layout);
+        mNetBGLayout = mainView.findViewById(R.id.net_layout);
         mNetBGLayout.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
@@ -306,9 +289,6 @@ public abstract class BaseFragment extends Fragment {
      * 显示无网络界面
      */
     public void showNoNetView() {
-        if (mNetContainer == null) {
-            initNoNetView();
-        }
         mUIHandler.sendEmptyMessage(SHOWNONETVIEW);
     }
 
@@ -367,7 +347,7 @@ public abstract class BaseFragment extends Fragment {
      *
      * @param savedInstanceState
      */
-    protected abstract void initViews(Bundle savedInstanceState);
+    protected abstract void initViews(View mainView, Bundle savedInstanceState);
 
     /**
      * 处理UI

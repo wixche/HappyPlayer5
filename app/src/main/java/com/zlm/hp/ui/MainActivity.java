@@ -229,10 +229,10 @@ public class MainActivity extends BaseActivity {
     private void initViewPage() {
 
         ArrayList<Fragment> fragments = new ArrayList<Fragment>();
-        MeFragment meFragment = new MeFragment(this);
-        LastSongFragment lastSongFragment = new LastSongFragment(this);
-        RecommendFragment recommendFragment = new RecommendFragment(this);
-        SpecialFragment specialFragment = new SpecialFragment(this);
+        MeFragment meFragment = MeFragment.newInstance();
+        LastSongFragment lastSongFragment = LastSongFragment.newInstance();
+        RecommendFragment recommendFragment = RecommendFragment.newInstance();
+        SpecialFragment specialFragment = SpecialFragment.newInstance();
 
         //
         fragments.add(meFragment);

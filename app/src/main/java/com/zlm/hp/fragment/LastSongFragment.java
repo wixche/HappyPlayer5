@@ -1,10 +1,10 @@
 package com.zlm.hp.fragment;
 
 import android.annotation.SuppressLint;
-import android.app.Activity;
 import android.graphics.Color;
 import android.os.Bundle;
 import android.os.Message;
+import android.view.View;
 
 import com.zlm.hp.ui.R;
 
@@ -16,8 +16,17 @@ import com.zlm.hp.ui.R;
 public class LastSongFragment extends BaseFragment {
     private boolean isFristVisibleToUser = false;
 
-    public LastSongFragment(Activity activity) {
-        super(activity);
+    public LastSongFragment() {
+
+    }
+
+    /**
+     * @return
+     */
+    public static LastSongFragment newInstance() {
+        LastSongFragment fragment = new LastSongFragment();
+        return fragment;
+
     }
 
     @Override
@@ -31,7 +40,7 @@ public class LastSongFragment extends BaseFragment {
     }
 
     @Override
-    protected void initViews(Bundle savedInstanceState) {
+    protected void initViews(View mainView, Bundle savedInstanceState) {
         showContentView();
     }
 

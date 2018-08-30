@@ -1,10 +1,10 @@
 package com.zlm.hp.fragment;
 
 import android.annotation.SuppressLint;
-import android.app.Activity;
 import android.graphics.Color;
 import android.os.Bundle;
 import android.os.Message;
+import android.view.View;
 
 import com.zlm.hp.ui.R;
 
@@ -15,8 +15,17 @@ import com.zlm.hp.ui.R;
 @SuppressLint("ValidFragment")
 public class MeFragment extends BaseFragment {
 
-    public MeFragment(Activity activity) {
-        super(activity);
+    public MeFragment() {
+
+    }
+
+    /**
+     * @return
+     */
+    public static MeFragment newInstance() {
+        MeFragment fragment = new MeFragment();
+        return fragment;
+
     }
 
     @Override
@@ -30,7 +39,7 @@ public class MeFragment extends BaseFragment {
     }
 
     @Override
-    protected void initViews(Bundle savedInstanceState) {
+    protected void initViews(View mainView, Bundle savedInstanceState) {
         showContentView();
     }
 

@@ -2,6 +2,7 @@ apply plugin: 'com.android.application'
 apply plugin: 'org.greenrobot.greendao'
 
 android {
+    buildToolsVersion '28.0.2'
     compileSdkVersion 28
     defaultConfig {
         applicationId "com.zlm.hp"
@@ -37,7 +38,7 @@ android {
         daoPackage 'com.zlm.hp.db.dao'
         targetGenDir 'src/main/java'
     }
-    buildToolsVersion '28.0.2'
+
 }
 
 dependencies {

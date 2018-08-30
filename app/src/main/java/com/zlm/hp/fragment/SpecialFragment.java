@@ -1,10 +1,10 @@
 package com.zlm.hp.fragment;
 
 import android.annotation.SuppressLint;
-import android.app.Activity;
 import android.graphics.Color;
 import android.os.Bundle;
 import android.os.Message;
+import android.view.View;
 
 import com.zlm.hp.ui.R;
 
@@ -17,8 +17,17 @@ public class SpecialFragment extends BaseFragment {
 
     private boolean isFristVisibleToUser = false;
 
-    public SpecialFragment(Activity activity) {
-        super(activity);
+    public SpecialFragment() {
+
+    }
+
+    /**
+     * @return
+     */
+    public static SpecialFragment newInstance() {
+        SpecialFragment fragment = new SpecialFragment();
+        return fragment;
+
     }
 
     @Override
@@ -32,7 +41,7 @@ public class SpecialFragment extends BaseFragment {
     }
 
     @Override
-    protected void initViews(Bundle savedInstanceState) {
+    protected void initViews(View mainView, Bundle savedInstanceState) {
         showContentView();
     }
 
