@@ -65,7 +65,7 @@ public class HttpClient {
         private int jumpCount = 0;
 
         public boolean isFailCode() {
-            return httpCode == 0 && !isSuccessful();
+            return httpCode == 0 || !isSuccessful();
         }
 
         public boolean isSuccessful() {

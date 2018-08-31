@@ -39,7 +39,7 @@ public abstract class BaseFragment extends Fragment {
     /**
      *
      */
-    private Context mContext;
+    public Context mContext;
 
     /**
      * 子线程用于执行耗时任务
