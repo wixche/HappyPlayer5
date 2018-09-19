@@ -4,9 +4,10 @@ import android.content.Context;
 import android.os.Handler;
 import android.text.TextUtils;
 
+import com.zlm.down.entity.DownloadTask;
 import com.zlm.down.interfaces.IDownloadTaskEvent;
 import com.zlm.down.interfaces.IDownloadThreadEvent;
-import com.zlm.down.entity.DownloadTask;
+import com.zlm.hp.http.HttpClient;
 import com.zlm.hp.http.HttpReturnResult;
 import com.zlm.hp.util.FileUtil;
 import com.zlm.hp.util.HttpUtil;
@@ -18,8 +19,16 @@ import java.io.InputStream;
 import java.io.RandomAccessFile;
 import java.net.HttpURLConnection;
 import java.net.URL;
+import java.security.SecureRandom;
 import java.util.ArrayList;
 import java.util.List;
+
+import javax.net.ssl.HostnameVerifier;
+import javax.net.ssl.HttpsURLConnection;
+import javax.net.ssl.SSLContext;
+import javax.net.ssl.SSLSession;
+import javax.net.ssl.SSLSocketFactory;
+import javax.net.ssl.TrustManager;
 
 /**
  * @Description: 下载任务线程管理
@@ -254,6 +263,57 @@ public class DownloadTaskThreadManager implements Runnable {
      * @date 2017年7月8日
      */
     private int getFileLength(String downloadUrl) {
+        if (downloadUrl.startsWith("https://")) {
+            return getHttpsFileLength(downloadUrl);
+        }
+        return getHttpFileLength(downloadUrl);
+    }
+
+    /**
+     * 获取https文件长度
+     *
+     * @param downloadUrl
+     * @return
+     */
+    private int getHttpsFileLength(String downloadUrl) {
+        int length = 0;
+        try {
+            URL url = new URL(downloadUrl);
+            // 创建SSLContext
+            SSLContext sslContext = SSLContext.getInstance("SSL");
+            TrustManager[] tm = {new HttpClient.IgnoreSSLTrustManager()};
+            // 初始化
+            sslContext.init(null, tm, new SecureRandom());
+            // 获取SSLSocketFactory对象
+            SSLSocketFactory ssf = sslContext.getSocketFactory();
+            HttpsURLConnection conn = (HttpsURLConnection) url.openConnection();
+            HttpUtil.seURLConnectiontHeader(conn);
+            // https忽略证书
+            conn.setHostnameVerifier(new HostnameVerifier() {
+                @Override
+                public boolean verify(String hostname, SSLSession session) {
+                    // 强行返回true 即验证成功
+                    return true;
+                }
+            });
+            conn.setSSLSocketFactory(ssf);
+
+            length = conn.getContentLength();
+            conn.disconnect();
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+
+        return length;
+    }
+
+    /**
+     * 获取http文件长度
+     *
+     * @param downloadUrl
+     * @return
+     */
+    private int getHttpFileLength(String downloadUrl) {
         int length = 0;
         try {
             URL url = new URL(downloadUrl);

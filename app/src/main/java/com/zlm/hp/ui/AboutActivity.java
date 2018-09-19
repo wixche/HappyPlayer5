@@ -1,7 +1,7 @@
 package com.zlm.hp.ui;
 
-import android.os.Message;
 import android.os.Bundle;
+import android.os.Message;
 import android.view.View;
 import android.widget.ImageView;
 import android.widget.TextView;

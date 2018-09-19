@@ -5,8 +5,8 @@ import android.content.res.AssetFileDescriptor;
 import android.content.res.AssetManager;
 import android.graphics.Color;
 import android.media.MediaPlayer;
-import android.os.Message;
 import android.os.Bundle;
+import android.os.Message;
 import android.view.animation.Animation;
 import android.view.animation.AnimationUtils;
 

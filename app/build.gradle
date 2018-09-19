@@ -64,11 +64,11 @@ dependencies {
     /**
      * 右滑动关闭
      */
-    implementation 'com.github.zhangliangming:SwipeBackLayout:v2.5'
+    implementation 'com.github.zhangliangming:SwipeBackLayout:v2.6'
     /**
      * 旋转界面
      */
-    implementation 'com.github.zhangliangming:RotateLayout:v2.5'
+    implementation 'com.github.zhangliangming:RotateLayout:v2.6'
     /**
      * 进度条
      */
@@ -92,7 +92,7 @@ dependencies {
     /**
      * SlidingMenuLayout
      */
-    implementation 'com.github.zhangliangming:SlidingMenuLayout:v1.1'
+    implementation 'com.github.zhangliangming:SlidingMenuLayout:v1.4'
     /**
      * 第三方switch-button
      */

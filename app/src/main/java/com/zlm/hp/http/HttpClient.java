@@ -1,5 +1,9 @@
 package com.zlm.hp.http;
 
+import android.text.TextUtils;
+
+import com.zlm.hp.util.ZLog;
+
 import java.io.ByteArrayOutputStream;
 import java.io.InputStream;
 import java.io.OutputStream;
@@ -8,7 +12,6 @@ import java.net.HttpURLConnection;
 import java.net.URL;
 import java.net.URLEncoder;
 import java.security.SecureRandom;
-import java.security.cert.CertificateException;
 import java.security.cert.X509Certificate;
 import java.util.Map;
 
@@ -19,10 +22,6 @@ import javax.net.ssl.SSLSession;
 import javax.net.ssl.SSLSocketFactory;
 import javax.net.ssl.TrustManager;
 import javax.net.ssl.X509TrustManager;
-
-import android.text.TextUtils;
-
-import com.zlm.hp.util.ZLog;
 
 /**
  * Created by zhangliangming on 2018/6/21 0021.
@@ -598,17 +597,15 @@ public class HttpClient {
      *
      * @author zhangliangming
      */
-    private class IgnoreSSLTrustManager implements X509TrustManager {
+    public static class IgnoreSSLTrustManager implements X509TrustManager {
 
         @Override
-        public void checkClientTrusted(X509Certificate[] chain, String authType)
-                throws CertificateException {
+        public void checkClientTrusted(X509Certificate[] chain, String authType) {
 
         }
 
         @Override
-        public void checkServerTrusted(X509Certificate[] chain, String authType)
-                throws CertificateException {
+        public void checkServerTrusted(X509Certificate[] chain, String authType) {
 
         }
 

@@ -5,8 +5,8 @@ import android.os.Handler;
 import android.os.HandlerThread;
 import android.os.Process;
 
-import com.zlm.down.interfaces.IDownloadTaskEvent;
 import com.zlm.down.entity.DownloadTask;
+import com.zlm.down.interfaces.IDownloadTaskEvent;
 import com.zlm.down.thread.DownloadTaskThreadManager;
 
 import java.util.ArrayList;

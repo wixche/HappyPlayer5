@@ -24,8 +24,8 @@ import android.widget.RelativeLayout;
 
 import com.zlm.hp.handler.WeakRefHandler;
 import com.zlm.hp.ui.R;
-import com.zlm.hp.util.ColorUtil;
 import com.zlm.hp.util.AppBarUtil;
+import com.zlm.hp.util.ColorUtil;
 import com.zlm.hp.util.ContextUtil;
 import com.zlm.hp.widget.IconfontTextView;
 

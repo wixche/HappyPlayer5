@@ -26,11 +26,11 @@ import com.zlm.hp.fragment.MeFragment;
 import com.zlm.hp.fragment.RecommendFragment;
 import com.zlm.hp.fragment.SpecialFragment;
 import com.zlm.hp.manager.ActivityManager;
+import com.zlm.hp.util.AppBarUtil;
 import com.zlm.hp.util.AppOpsUtils;
 import com.zlm.hp.util.CodeLineUtil;
 import com.zlm.hp.util.ColorUtil;
 import com.zlm.hp.util.IntentUtils;
-import com.zlm.hp.util.AppBarUtil;
 import com.zlm.hp.util.ToastUtil;
 import com.zlm.hp.util.ZLog;
 import com.zlm.hp.widget.IconfontImageButtonTextView;
@@ -196,6 +196,8 @@ public class MainActivity extends BaseActivity {
         LinearLayout mainView = (LinearLayout) LayoutInflater.from(getApplicationContext()).inflate(R.layout.layout_main, null);
         FrameLayout.LayoutParams mainLayoutParams = new FrameLayout.LayoutParams(FrameLayout.LayoutParams.MATCH_PARENT, FrameLayout.LayoutParams.MATCH_PARENT);
         mPlayerBarLL = mainView.findViewById(R.id.playerBar);
+        mSlidingMenuLayout.addIgnoreHorizontalView(mPlayerBarLL);
+
         mViewPager = mainView.findViewById(R.id.viewpage);
 
         //添加状态栏

@@ -2,8 +2,9 @@ package com.zlm.down.thread;
 
 import android.content.Context;
 
-import com.zlm.down.interfaces.IDownloadThreadEvent;
 import com.zlm.down.entity.DownloadTask;
+import com.zlm.down.interfaces.IDownloadThreadEvent;
+import com.zlm.hp.http.HttpClient;
 import com.zlm.hp.http.HttpReturnResult;
 import com.zlm.hp.util.HttpUtil;
 import com.zlm.hp.util.NetUtil;
@@ -13,6 +14,14 @@ import java.io.InputStream;
 import java.io.RandomAccessFile;
 import java.net.HttpURLConnection;
 import java.net.URL;
+import java.security.SecureRandom;
+
+import javax.net.ssl.HostnameVerifier;
+import javax.net.ssl.HttpsURLConnection;
+import javax.net.ssl.SSLContext;
+import javax.net.ssl.SSLSession;
+import javax.net.ssl.SSLSocketFactory;
+import javax.net.ssl.TrustManager;
 
 /**
  * @Description: 下载任务线程
@@ -135,17 +144,8 @@ public class DownloadTaskThread extends Thread {
             try {
 
                 URL url = new URL(mDownloadTask.getTaskUrl());
-                HttpURLConnection conn = (HttpURLConnection) url
-                        .openConnection();
-                // 设置连接超时时间
-                conn.setConnectTimeout(CONNECTTIME);
-                // 设置读取数据超时时间
-                conn.setReadTimeout(READTIME);
-                HttpUtil.seURLConnectiontHeader(conn);
-                conn.setRequestProperty("Range", "bytes=" + mNewStartPos + "-"
-                        + mEndPos);
                 // 获取文件输入流，读取文件内容
-                InputStream is = conn.getInputStream();
+                InputStream is = getUrlInputStream(mDownloadTask.getTaskUrl(), url);
 
                 //
                 mItemFile = new RandomAccessFile(mDownloadTask.getTaskTempPath(), "rw");
@@ -211,6 +211,75 @@ public class DownloadTaskThread extends Thread {
                 mIDownloadThreadEvent.taskThreadFinish(mDownloadTask, mThreadId,
                         getDownloadedSize());
         }
+    }
+
+    /**
+     * @param taskUrl
+     * @param url
+     * @return
+     */
+    private InputStream getUrlInputStream(String taskUrl, URL url) throws Exception {
+        if (taskUrl.startsWith("https://")) {
+            HttpsURLConnection conn = getHttpsConnection(url);
+            // 设置连接超时时间
+            conn.setConnectTimeout(CONNECTTIME);
+            // 设置读取数据超时时间
+            conn.setReadTimeout(READTIME);
+            HttpUtil.seURLConnectiontHeader(conn);
+            conn.setRequestProperty("Range", "bytes=" + mNewStartPos + "-"
+                    + mEndPos);
+            return conn.getInputStream();
+
+        } else {
+            HttpURLConnection conn = getHttpConnection(url);
+            // 设置连接超时时间
+            conn.setConnectTimeout(CONNECTTIME);
+            // 设置读取数据超时时间
+            conn.setReadTimeout(READTIME);
+            HttpUtil.seURLConnectiontHeader(conn);
+            conn.setRequestProperty("Range", "bytes=" + mNewStartPos + "-"
+                    + mEndPos);
+            return conn.getInputStream();
+        }
+    }
+
+    /**
+     * @param url
+     * @return
+     */
+    private HttpsURLConnection getHttpsConnection(URL url) throws Exception {
+
+        // 创建SSLContext
+        SSLContext sslContext = SSLContext.getInstance("SSL");
+        TrustManager[] tm = {new HttpClient.IgnoreSSLTrustManager()};
+        // 初始化
+        sslContext.init(null, tm, new SecureRandom());
+        // 获取SSLSocketFactory对象
+        SSLSocketFactory ssf = sslContext.getSocketFactory();
+        HttpsURLConnection conn = (HttpsURLConnection) url.openConnection();
+        HttpUtil.seURLConnectiontHeader(conn);
+        // https忽略证书
+        conn.setHostnameVerifier(new HostnameVerifier() {
+            @Override
+            public boolean verify(String hostname, SSLSession session) {
+                // 强行返回true 即验证成功
+                return true;
+            }
+        });
+        conn.setSSLSocketFactory(ssf);
+
+        return conn;
+
+    }
+
+    /**
+     * @param url
+     * @return
+     * @throws Exception
+     */
+    private HttpURLConnection getHttpConnection(URL url) throws Exception {
+        HttpURLConnection conn = (HttpURLConnection) url.openConnection();
+        return conn;
     }
 
     /***

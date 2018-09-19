@@ -12,6 +12,7 @@ import com.tencent.bugly.crashreport.CrashReport;
 import com.zlm.hp.constants.Constants;
 import com.zlm.hp.constants.ResourceConstants;
 import com.zlm.hp.db.DBHelper;
+import com.zlm.hp.manager.ActivityManager;
 import com.zlm.hp.ui.R;
 import com.zlm.hp.util.ApkUtil;
 import com.zlm.hp.util.CodeLineUtil;
@@ -57,8 +58,7 @@ public class HPApplication extends MultiDexApplication {
 
                     ToastUtil.showTextToast(getApplicationContext(), getString(R.string.exit_tip));
                     //关闭app
-                    android.os.Process.killProcess(android.os.Process.myPid());
-                    System.exit(1);
+                    ActivityManager.getInstance().exit();
                 }
             }, 5000);
         }

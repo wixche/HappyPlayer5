@@ -3,7 +3,6 @@ package com.zlm.hp.db;
 import android.content.Context;
 import android.database.sqlite.SQLiteDatabase;
 
-import com.zlm.hp.db.dao.AudioInfoDao;
 import com.zlm.hp.db.dao.DaoMaster;
 
 import org.greenrobot.greendao.database.Database;

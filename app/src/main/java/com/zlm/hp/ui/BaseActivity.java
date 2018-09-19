@@ -20,8 +20,8 @@ import android.widget.RelativeLayout;
 
 import com.zlm.hp.handler.WeakRefHandler;
 import com.zlm.hp.manager.ActivityManager;
-import com.zlm.hp.util.ColorUtil;
 import com.zlm.hp.util.AppBarUtil;
+import com.zlm.hp.util.ColorUtil;
 
 
 /**
