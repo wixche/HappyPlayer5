@@ -175,8 +175,7 @@ public abstract class APIHttpClient {
      * @param singerName
      * @return
      */
-    public abstract HttpReturnResult getSingerPicList(Context context, String singerName, String width,
-                                                      String height, boolean askWifi);
+    public abstract HttpReturnResult getSingerPicList(Context context, String singerName,boolean askWifi);
 
     /**
      * 搜索-歌词

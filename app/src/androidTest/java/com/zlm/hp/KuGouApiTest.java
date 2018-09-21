@@ -262,7 +262,7 @@ public class KuGouApiTest {
     public void KuGouApiGetSingerPicList() {
         Context appContext = InstrumentationRegistry.getTargetContext();
         APIHttpClient apiHttpClient = HttpUtil.getHttpClient();
-        apiHttpClient.getSingerPicList(appContext, "周杰伦", "720", "1080", true);
+        apiHttpClient.getSingerPicList(appContext, "周杰伦", true);
     }
 
     /**

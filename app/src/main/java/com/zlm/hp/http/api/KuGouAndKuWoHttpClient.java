@@ -1124,7 +1124,7 @@ public class KuGouAndKuWoHttpClient extends APIHttpClient {
      * @return
      */
     @Override
-    public HttpReturnResult getSingerPicList(Context context, String singerName, String width, String height, boolean askWifi) {
+    public HttpReturnResult getSingerPicList(Context context, String singerName, boolean askWifi) {
         HttpReturnResult httpReturnResult = checkNetWork(context, askWifi);
         if (httpReturnResult != null) return httpReturnResult;
         httpReturnResult = new HttpReturnResult();
@@ -1141,8 +1141,8 @@ public class KuGouAndKuWoHttpClient extends APIHttpClient {
         params.put("from", fromType);
         params.put("json", "1");
         params.put("version", "1");
-        params.put("width", width);
-        params.put("height", height);
+        params.put("width", "720");
+        params.put("height", "1080");
 
         HttpClient.Result result = new HttpClient().get(url, null, params);
         httpReturnResult.setStatus(result.getHttpCode());

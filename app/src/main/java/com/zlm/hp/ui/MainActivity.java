@@ -30,7 +30,7 @@ import com.zlm.hp.util.AppBarUtil;
 import com.zlm.hp.util.AppOpsUtils;
 import com.zlm.hp.util.CodeLineUtil;
 import com.zlm.hp.util.ColorUtil;
-import com.zlm.hp.util.IntentUtils;
+import com.zlm.hp.util.IntentUtil;
 import com.zlm.hp.util.ToastUtil;
 import com.zlm.hp.util.ZLog;
 import com.zlm.hp.widget.IconfontImageButtonTextView;
@@ -435,7 +435,7 @@ public class MainActivity extends BaseActivity {
                             @Override
                             public void onPositive() {
                                 //跳转权限设置页面
-                                IntentUtils.gotoPermissionSetting(MainActivity.this);
+                                IntentUtil.gotoPermissionSetting(MainActivity.this);
                                 mDesktoplrcSwitchButton.setChecked(false);
                             }
 

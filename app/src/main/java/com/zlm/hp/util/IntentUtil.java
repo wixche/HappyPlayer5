@@ -17,12 +17,12 @@ import java.io.InputStreamReader;
  *    date   : 2017/11/10
  *    desc   : 工具类: Intent 意图相关
  *
- *             注: 部分 API 直接参考或使用 https://github.com/Blankj/AndroidUtilCode 中 IntentUtils 类里面的方法
+ *             注: 部分 API 直接参考或使用 https://github.com/Blankj/AndroidUtilCode 中 IntentUtil 类里面的方法
  * </pre>
  */
-public class IntentUtils {
+public class IntentUtil {
 
-    private IntentUtils() {
+    private IntentUtil() {
     }
 
     /**
@@ -97,7 +97,7 @@ public class IntentUtils {
         } catch (Exception e) {
             e.printStackTrace();
             // 跳转失败, 前往普通设置界面
-            IntentUtils.gotoSetting(context);
+            IntentUtil.gotoSetting(context);
             success = false;
             //LogUtils.i("无法跳转权限界面, 开始跳转普通设置界面");
         }
