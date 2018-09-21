@@ -126,10 +126,6 @@ public class MediaUtil {
 
         //过滤时间短的歌曲
         int duration = (int) trackInfoData.getDuration();
-        if (audioFile.length() < 1024 * 1024 || duration < 5000) {
-            return;
-        }
-
         String durationText = TimeUtil.parseTimeToAudioString(duration);
 
         // 歌曲文件的大小
