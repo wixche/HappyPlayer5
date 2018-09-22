@@ -40,9 +40,11 @@
                     android:layout_height="match_parent"
                     android:orientation="vertical">
 
-                    <RelativeLayout
+                    <com.zlm.hp.widget.ListItemRelativeLayout
+                        android:id="@+id/hello_lr"
                         android:layout_width="match_parent"
-                        android:layout_height="@dimen/title_setting_height">
+                        android:layout_height="@dimen/title_setting_height"
+                        android:clickable="true">
 
                         <TextView
                             android:layout_width="wrap_content"
@@ -62,15 +64,17 @@
                             android:layout_marginRight="5dp"
                             app:sb_checked_color="@color/defColor" />
 
-                    </RelativeLayout>
+                    </com.zlm.hp.widget.ListItemRelativeLayout>
 
                     <com.zlm.hp.widget.DividerView
                         android:layout_width="match_parent"
                         android:layout_height="1dp" />
 
-                    <RelativeLayout
+                    <com.zlm.hp.widget.ListItemRelativeLayout
+                        android:id="@+id/control_lr"
                         android:layout_width="match_parent"
-                        android:layout_height="@dimen/title_setting_height">
+                        android:layout_height="@dimen/title_setting_height"
+                        android:clickable="true">
 
                         <TextView
                             android:layout_width="wrap_content"
@@ -91,7 +95,39 @@
                             android:layout_marginRight="5dp"
                             app:sb_checked_color="@color/defColor" />
 
-                    </RelativeLayout>
+                    </com.zlm.hp.widget.ListItemRelativeLayout>
+
+                    <com.zlm.hp.widget.DividerView
+                        android:layout_width="match_parent"
+                        android:layout_height="1dp" />
+
+                    <com.zlm.hp.widget.ListItemRelativeLayout
+                        android:id="@+id/cache_lr"
+                        android:layout_width="match_parent"
+                        android:layout_height="@dimen/title_setting_height"
+                        android:clickable="true">
+
+                        <TextView
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:layout_alignParentLeft="true"
+                            android:layout_centerVertical="true"
+                            android:layout_marginLeft="10dp"
+                            android:layout_toLeftOf="@+id/cache_arrow"
+                            android:text="@string/clear_cache_txt"
+                            android:textColor="@color/textColor"
+                            android:textSize="@dimen/title_size" />
+
+                        <ImageView
+                            android:id="@+id/cache_arrow"
+                            android:layout_width="8dp"
+                            android:layout_height="15dp"
+                            android:layout_alignParentRight="true"
+                            android:layout_centerVertical="true"
+                            android:layout_marginLeft="10dp"
+                            android:layout_marginRight="15dp"
+                            android:background="@mipmap/c06" />
+                    </com.zlm.hp.widget.ListItemRelativeLayout>
 
                     <com.zlm.hp.widget.DividerView
                         android:layout_width="match_parent"
@@ -106,11 +142,55 @@
                         <TextView
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
+                            android:layout_alignParentLeft="true"
                             android:layout_centerVertical="true"
                             android:layout_marginLeft="10dp"
+                            android:layout_toLeftOf="@+id/about_arrow"
                             android:text="@string/about_app"
                             android:textColor="@color/textColor"
                             android:textSize="@dimen/title_size" />
+
+                        <ImageView
+                            android:id="@+id/about_arrow"
+                            android:layout_width="8dp"
+                            android:layout_height="15dp"
+                            android:layout_alignParentRight="true"
+                            android:layout_centerVertical="true"
+                            android:layout_marginLeft="10dp"
+                            android:layout_marginRight="15dp"
+                            android:background="@mipmap/c06" />
+                    </com.zlm.hp.widget.ListItemRelativeLayout>
+
+                    <com.zlm.hp.widget.DividerView
+                        android:layout_width="match_parent"
+                        android:layout_height="1dp" />
+
+                    <com.zlm.hp.widget.ListItemRelativeLayout
+                        android:id="@+id/help_lr"
+                        android:layout_width="match_parent"
+                        android:layout_height="@dimen/title_setting_height"
+                        android:clickable="true">
+
+                        <TextView
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:layout_alignParentLeft="true"
+                            android:layout_centerVertical="true"
+                            android:layout_marginLeft="10dp"
+                            android:layout_toLeftOf="@+id/help_arrow"
+                            android:text="@string/help_txt"
+                            android:textColor="@color/textColor"
+                            android:textSize="@dimen/title_size" />
+
+                        <ImageView
+                            android:id="@+id/help_arrow"
+                            android:layout_width="8dp"
+                            android:layout_height="15dp"
+                            android:layout_alignParentRight="true"
+                            android:layout_centerVertical="true"
+                            android:layout_marginLeft="10dp"
+                            android:layout_marginRight="15dp"
+                            android:background="@mipmap/c06" />
                     </com.zlm.hp.widget.ListItemRelativeLayout>
 
                     <com.zlm.hp.widget.DividerView

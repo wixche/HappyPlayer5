@@ -277,7 +277,7 @@ public class ConfigInfo implements Parcelable {
             }
         }
         //
-        _ConfigInfo = CREATOR.createFromParcel(parcel);
+        _ConfigInfo = this;
         return _ConfigInfo;
     }
 

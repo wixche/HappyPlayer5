@@ -24,10 +24,14 @@ public class SettingActivity extends BaseActivity {
      */
     private SwipeBackLayout mSwipeBackLayout;
 
+    private ListItemRelativeLayout mHelloLR;
+
     /**
      * 问候语开关
      */
     private SwitchButton mHelloSwitchButton;
+
+    private ListItemRelativeLayout mControlLR;
     /**
      * 线控按钮开关
      */
@@ -90,20 +94,38 @@ public class SettingActivity extends BaseActivity {
         });
 
         //问候语开关
+        mHelloLR = findViewById(R.id.hello_lr);
+        mHelloLR.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                boolean flag = mHelloSwitchButton.isChecked();
+                mHelloSwitchButton.setChecked(!flag);
+            }
+        });
         mHelloSwitchButton = findViewById(R.id.hello_switch);
         mHelloSwitchButton.setOnCheckedChangeListener(new SwitchButton.OnCheckedChangeListener() {
             @Override
             public void onCheckedChanged(SwitchButton view, boolean isChecked) {
-                mConfigInfo.setSayHello(isChecked).save();
+                if (mConfigInfo.isSayHello() != isChecked)
+                    mConfigInfo.setSayHello(isChecked).save();
             }
         });
 
         //线控按钮开关
+        mControlLR = findViewById(R.id.control_lr);
+        mControlLR.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                boolean flag = mControlSwitchButton.isChecked();
+                mControlSwitchButton.setChecked(!flag);
+            }
+        });
         mControlSwitchButton = findViewById(R.id.control_switch);
         mControlSwitchButton.setOnCheckedChangeListener(new SwitchButton.OnCheckedChangeListener() {
             @Override
             public void onCheckedChanged(SwitchButton view, boolean isChecked) {
-                mConfigInfo.setWire(isChecked).save();
+                if (mConfigInfo.isWire() != isChecked)
+                    mConfigInfo.setWire(isChecked).save();
             }
         });
 

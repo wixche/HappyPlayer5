@@ -1,6 +1,5 @@
 package com.zlm.hp.fragment;
 
-import android.annotation.SuppressLint;
 import android.graphics.Color;
 import android.os.Bundle;
 import android.os.Message;
@@ -9,13 +8,11 @@ import android.view.View;
 import com.zlm.hp.ui.R;
 
 /**
+ * 歌单
  * Created by zhangliangming on 2018-08-11.
  */
 
-@SuppressLint("ValidFragment")
 public class SpecialFragment extends BaseFragment {
-
-    private boolean isFristVisibleToUser = false;
 
     public SpecialFragment() {
 
@@ -56,10 +53,7 @@ public class SpecialFragment extends BaseFragment {
     }
 
     @Override
-    public void setUserVisibleHint(boolean isVisibleToUser) {
-        if (!isFristVisibleToUser && isVisibleToUser) {
-            isFristVisibleToUser = true;
-            showContentView();
-        }
+    protected void isFristVisibleToUser() {
+        showContentView();
     }
 }

@@ -1,6 +1,5 @@
 package com.zlm.hp.fragment;
 
-import android.annotation.SuppressLint;
 import android.graphics.Color;
 import android.os.Bundle;
 import android.os.Message;
@@ -12,7 +11,6 @@ import com.zlm.hp.ui.R;
  * Created by zhangliangming on 2018-08-11.
  */
 
-@SuppressLint("ValidFragment")
 public class MeFragment extends BaseFragment {
 
     public MeFragment() {
@@ -31,6 +29,11 @@ public class MeFragment extends BaseFragment {
     @Override
     protected void preInitStatusBar() {
         setStatusBarViewBG(Color.TRANSPARENT);
+    }
+
+    @Override
+    protected void isFristVisibleToUser() {
+
     }
 
     @Override

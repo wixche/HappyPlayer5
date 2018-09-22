@@ -35,6 +35,7 @@ import com.zlm.hp.util.ToastUtil;
 import com.zlm.hp.util.ZLog;
 import com.zlm.hp.widget.IconfontImageButtonTextView;
 import com.zlm.hp.widget.IconfontIndicatorTextView;
+import com.zlm.hp.widget.WhiteTranRelativeLayout;
 import com.zlm.libs.widget.SlidingMenuLayout;
 
 import java.util.ArrayList;
@@ -77,7 +78,7 @@ public class MainActivity extends BaseActivity {
     /**
      * 选中索引
      */
-    private int mSelectedIndex = 0;
+    private int mSelectedIndex = 1;
 
     /**
      * 保存退出时间
@@ -94,15 +95,20 @@ public class MainActivity extends BaseActivity {
      */
     private LinearLayout mExitLL;
 
+    private WhiteTranRelativeLayout mWifiLR;
+
     /**
      * wifi开关
      */
     private SwitchButton mWifiSwitchButton;
 
+    private WhiteTranRelativeLayout mDesktoplrcLR;
     /**
      * 桌面歌词开关
      */
     private SwitchButton mDesktoplrcSwitchButton;
+
+    private WhiteTranRelativeLayout mLocklrcLR;
     /**
      * 锁屏歌词开关
      */
@@ -272,6 +278,7 @@ public class MainActivity extends BaseActivity {
 
             }
         });
+        mViewPager.setCurrentItem(mSelectedIndex);
     }
 
     /**
@@ -305,7 +312,7 @@ public class MainActivity extends BaseActivity {
                 }
             }
         });
-        mTabImageButton[index++].setSelected(true);
+        mTabImageButton[index++].setSelected(false);
 
         //新歌
         mTabImageButton[index] = findViewById(R.id.lastSongImageButton);
@@ -374,6 +381,8 @@ public class MainActivity extends BaseActivity {
                 ZLog.e(new CodeLineUtil().getCodeLineInfo(), result.toString());
             }
         });
+
+        mTabImageButton[mSelectedIndex].setSelected(true);
     }
 
     /**
@@ -414,15 +423,32 @@ public class MainActivity extends BaseActivity {
         });
 
         //wifi开关
+        mWifiLR = findViewById(R.id.wifi_lr);
+        mWifiLR.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                boolean flag = mWifiSwitchButton.isChecked();
+                mWifiSwitchButton.setChecked(!flag);
+            }
+        });
         mWifiSwitchButton = findViewById(R.id.wifi_switch);
         mWifiSwitchButton.setOnCheckedChangeListener(new SwitchButton.OnCheckedChangeListener() {
             @Override
             public void onCheckedChanged(SwitchButton view, boolean isChecked) {
-                mConfigInfo.setWifi(isChecked).save();
+                if (mConfigInfo.isWifi() != isChecked)
+                    mConfigInfo.setWifi(isChecked).save();
             }
         });
 
         //桌面歌词开关
+        mDesktoplrcLR = findViewById(R.id.desktoplrc_lr);
+        mDesktoplrcLR.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                boolean flag = mDesktoplrcSwitchButton.isChecked();
+                mDesktoplrcSwitchButton.setChecked(!flag);
+            }
+        });
         mDesktoplrcSwitchButton = findViewById(R.id.desktoplrc_switch);
         mDesktoplrcSwitchButton.setOnCheckedChangeListener(new SwitchButton.OnCheckedChangeListener() {
             @Override
@@ -452,16 +478,26 @@ public class MainActivity extends BaseActivity {
                         return;
                     }
                 }
-                mConfigInfo.setShowDesktopLrc(isChecked).save();
+                if (mConfigInfo.isShowDesktopLrc() != isChecked)
+                    mConfigInfo.setShowDesktopLrc(isChecked).save();
             }
         });
 
         //锁屏歌词开关
+        mLocklrcLR = findViewById(R.id.locklrc_lr);
+        mLocklrcLR.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                boolean flag = mLocklrcSwitchButton.isChecked();
+                mLocklrcSwitchButton.setChecked(!flag);
+            }
+        });
         mLocklrcSwitchButton = findViewById(R.id.locklrc_switch);
         mLocklrcSwitchButton.setOnCheckedChangeListener(new SwitchButton.OnCheckedChangeListener() {
             @Override
             public void onCheckedChanged(SwitchButton view, boolean isChecked) {
-                mConfigInfo.setShowLockScreenLrc(isChecked).save();
+                if (mConfigInfo.isShowLockScreenLrc() != isChecked)
+                    mConfigInfo.setShowLockScreenLrc(isChecked).save();
             }
         });
     }

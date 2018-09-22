@@ -16,6 +16,7 @@
         android:layout_width="match_parent"
         android:layout_height="match_parent"
         android:layout="@layout/fragment_loading"
+        android:visibility="gone"
         app:layout_constraintBottom_toBottomOf="@+id/status_bar_view"></ViewStub>
 
     <ViewStub

@@ -7,7 +7,6 @@ import android.os.HandlerThread;
 import android.os.Looper;
 import android.os.Message;
 import android.os.Process;
-import android.support.annotation.Nullable;
 import android.support.constraint.ConstraintLayout;
 import android.support.v4.app.Fragment;
 import android.support.v4.content.ContextCompat;
@@ -35,6 +34,10 @@ import com.zlm.hp.widget.IconfontTextView;
  */
 
 public abstract class BaseFragment extends Fragment {
+    /**
+     * 是否是第一次可视
+     */
+    private boolean mIsFristVisibleToUser = false;
 
     /**
      *
@@ -93,13 +96,14 @@ public abstract class BaseFragment extends Fragment {
     private RefreshListener mRefreshListener;
 
     public BaseFragment() {
-        this.mContext = ContextUtil.getContext();
+        init();
     }
 
-    @Override
-    public void onCreate(@Nullable Bundle savedInstanceState) {
-        super.onCreate(savedInstanceState);
-
+    /**
+     * 初始化
+     */
+    private void init() {
+        this.mContext = ContextUtil.getContext();
         //创建ui handler
         mUIHandler = new WeakRefHandler(Looper.getMainLooper(), this, new Handler.Callback() {
             @Override
@@ -148,12 +152,19 @@ public abstract class BaseFragment extends Fragment {
         mContentContainer = mainView.findViewById(R.id.viewstub_content_container);
         mContentContainer.setLayoutResource(setContentLayoutResID());
         mContentContainer.inflate();
+        mContentContainer.setVisibility(View.GONE);
 
         initLoadingView(mainView);
         initNoNetView(mainView);
 
         //初始化view相关数据
         initViews(mainView, savedInstanceState);
+
+        //初始化是否可视
+        if (!mIsFristVisibleToUser && getUserVisibleHint()) {
+            mIsFristVisibleToUser = true;
+            isFristVisibleToUser();
+        }
         return mainView;
     }
 
@@ -243,6 +254,7 @@ public abstract class BaseFragment extends Fragment {
                 R.anim.anim_rotate);
         rotateAnimation.setInterpolator(new LinearInterpolator());// 匀速
         mLoadImgView.startAnimation(rotateAnimation);
+        mLoadingContainer.setVisibility(View.GONE);
 
     }
 
@@ -283,6 +295,7 @@ public abstract class BaseFragment extends Fragment {
                 }
             }
         });
+        mNetContainer.setVisibility(View.GONE);
     }
 
     /**
@@ -334,6 +347,21 @@ public abstract class BaseFragment extends Fragment {
     public void setStatusBarViewBG(int statusBarViewBG) {
         this.mStatusBarViewBG = statusBarViewBG;
     }
+
+
+    @Override
+    public void setUserVisibleHint(boolean isVisibleToUser) {
+        super.setUserVisibleHint(isVisibleToUser);
+        if (!mIsFristVisibleToUser && getUserVisibleHint() && getView() != null) {
+            mIsFristVisibleToUser = true;
+            isFristVisibleToUser();
+        }
+    }
+
+    /**
+     * 视图可见，只执行一次
+     */
+    protected abstract void isFristVisibleToUser();
 
     /**
      * 设置主界面内容视图

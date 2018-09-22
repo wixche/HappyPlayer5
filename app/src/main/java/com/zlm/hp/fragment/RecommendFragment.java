@@ -1,6 +1,5 @@
 package com.zlm.hp.fragment;
 
-import android.annotation.SuppressLint;
 import android.graphics.Color;
 import android.os.Bundle;
 import android.os.Message;
@@ -9,14 +8,11 @@ import android.view.View;
 import com.zlm.hp.ui.R;
 
 /**
+ * 排行
  * Created by zhangliangming on 2018-08-11.
  */
 
-@SuppressLint("ValidFragment")
 public class RecommendFragment extends BaseFragment {
-
-    private boolean isFristVisibleToUser = false;
-
 
     public RecommendFragment() {
 
@@ -43,7 +39,7 @@ public class RecommendFragment extends BaseFragment {
 
     @Override
     protected void initViews(View mainView, Bundle savedInstanceState) {
-
+        showLoadingView();
     }
 
     @Override
@@ -57,10 +53,7 @@ public class RecommendFragment extends BaseFragment {
     }
 
     @Override
-    public void setUserVisibleHint(boolean isVisibleToUser) {
-        if (!isFristVisibleToUser && isVisibleToUser) {
-            isFristVisibleToUser = true;
-            showContentView();
-        }
+    protected void isFristVisibleToUser() {
+
     }
 }

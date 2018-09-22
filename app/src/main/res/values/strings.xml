@@ -22,6 +22,8 @@
     <string name="nomore">已经到底了</string>
     <string name="nodata">数据为空</string>
     <string name="about_app">关于乐乐</string>
+    <string name="help_txt">帮助与反馈</string>
+    <string name="clear_cache_txt">清除缓存</string>
     <string name="desktoplrc_tip">1.进入设置>更多应用>乐乐音乐>权限管理>显示悬浮窗\n\n2.开启允许</string>
     <string name="exit_app_tip">是否退出应用？</string>
 

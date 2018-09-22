@@ -124,9 +124,11 @@
                     android:layout_below="@+id/header"
                     android:background="#50ffffff"></View>
 
-                <RelativeLayout
+                <com.zlm.hp.widget.WhiteTranRelativeLayout
+                    android:id="@+id/wifi_lr"
                     android:layout_width="match_parent"
-                    android:layout_height="@dimen/title_setting_height">
+                    android:layout_height="@dimen/title_setting_height"
+                    android:clickable="true">
 
                     <com.zlm.hp.widget.IconfontTextView
                         android:id="@+id/tab_wifi_img"
@@ -158,11 +160,13 @@
                         android:layout_marginRight="5dp"
                         app:sb_checked_color="@color/defColor" />
 
-                </RelativeLayout>
+                </com.zlm.hp.widget.WhiteTranRelativeLayout>
 
-                <RelativeLayout
+                <com.zlm.hp.widget.WhiteTranRelativeLayout
+                    android:id="@+id/desktoplrc_lr"
                     android:layout_width="match_parent"
-                    android:layout_height="@dimen/title_setting_height">
+                    android:layout_height="@dimen/title_setting_height"
+                    android:clickable="true">
 
                     <com.zlm.hp.widget.IconfontTextView
                         android:id="@+id/tab_desktoplrc_img"
@@ -193,11 +197,13 @@
                         android:layout_marginRight="5dp"
                         app:sb_checked_color="@color/defColor" />
 
-                </RelativeLayout>
+                </com.zlm.hp.widget.WhiteTranRelativeLayout>
 
-                <RelativeLayout
+                <com.zlm.hp.widget.WhiteTranRelativeLayout
+                    android:id="@+id/locklrc_lr"
                     android:layout_width="match_parent"
-                    android:layout_height="@dimen/title_setting_height">
+                    android:layout_height="@dimen/title_setting_height"
+                    android:clickable="true">
 
                     <com.zlm.hp.widget.IconfontTextView
                         android:id="@+id/tab_locklrc_img"
@@ -229,7 +235,7 @@
                         app:sb_checked_color="@color/defColor" />
 
 
-                </RelativeLayout>
+                </com.zlm.hp.widget.WhiteTranRelativeLayout>
 
 
             </LinearLayout>
