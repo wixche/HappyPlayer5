@@ -34,8 +34,12 @@
 - [Utils-Everywhere](https://github.com/SenhLinsh/Utils-Everywhere.git "Utils-Everywhere")
 - [greenDAO：sqlite数据库框架](https://github.com/greenrobot/greenDAO "greenDAO")
 - [jjdxm_dialogui：弹出窗口框架](https://github.com/jjdxmashl/jjdxm_dialogui/ "jjdxm_dialogui")
+- [LRecyclerView：RecyclerView上拉加载更多，下拉刷新](https://github.com/jdsjlzx/LRecyclerView "LRecyclerView")
 
 # 更新日志 #
+
+## 2018-09-24 ##
+- 添加新歌、排行和歌单列表
 
 ## 2018-08-27 ##
 - 修复状态栏半透明的问题

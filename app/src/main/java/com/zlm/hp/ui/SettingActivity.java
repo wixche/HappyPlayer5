@@ -24,23 +24,15 @@ public class SettingActivity extends BaseActivity {
      */
     private SwipeBackLayout mSwipeBackLayout;
 
-    private ListItemRelativeLayout mHelloLR;
-
     /**
      * 问候语开关
      */
     private SwitchButton mHelloSwitchButton;
 
-    private ListItemRelativeLayout mControlLR;
     /**
      * 线控按钮开关
      */
     private SwitchButton mControlSwitchButton;
-
-    /**
-     * 关于
-     */
-    private ListItemRelativeLayout mAboutLR;
 
     /**
      * 加载数据
@@ -81,8 +73,8 @@ public class SettingActivity extends BaseActivity {
         });
 
         //关于
-        mAboutLR = findViewById(R.id.about_lr);
-        mAboutLR.setOnClickListener(new View.OnClickListener() {
+        ListItemRelativeLayout aboutLR = findViewById(R.id.about_lr);
+        aboutLR.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
 
@@ -94,8 +86,8 @@ public class SettingActivity extends BaseActivity {
         });
 
         //问候语开关
-        mHelloLR = findViewById(R.id.hello_lr);
-        mHelloLR.setOnClickListener(new View.OnClickListener() {
+        ListItemRelativeLayout helloLR = findViewById(R.id.hello_lr);
+        helloLR.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
                 boolean flag = mHelloSwitchButton.isChecked();
@@ -112,8 +104,8 @@ public class SettingActivity extends BaseActivity {
         });
 
         //线控按钮开关
-        mControlLR = findViewById(R.id.control_lr);
-        mControlLR.setOnClickListener(new View.OnClickListener() {
+        ListItemRelativeLayout controlLR = findViewById(R.id.control_lr);
+        controlLR.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
                 boolean flag = mControlSwitchButton.isChecked();
@@ -126,6 +118,18 @@ public class SettingActivity extends BaseActivity {
             public void onCheckedChanged(SwitchButton view, boolean isChecked) {
                 if (mConfigInfo.isWire() != isChecked)
                     mConfigInfo.setWire(isChecked).save();
+            }
+        });
+
+        //帮助
+        ListItemRelativeLayout helpLR = findViewById(R.id.help_lr);
+        helpLR.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                Intent intent = new Intent(SettingActivity.this, HelpActivity.class);
+                startActivity(intent);
+                //去掉动画
+                overridePendingTransition(0, 0);
             }
         });
 

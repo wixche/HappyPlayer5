@@ -113,4 +113,9 @@ dependencies {
      * 第三方弹出窗口：jjdxm_dialogui
      */
     implementation 'com.github.zhangliangming:Dialog:v1.0'
+
+    /**
+     * 第三方上拉加载更多，下拉刷新
+     */
+    implementation 'com.github.jdsjlzx:LRecyclerView:1.5.0'
 }

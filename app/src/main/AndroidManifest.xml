@@ -22,7 +22,6 @@
     <uses-permission android:name="android.permission.WAKE_LOCK" />
 
     <application
-
         android:name="com.zlm.hp.application.HPApplication"
         android:allowBackup="true"
         android:hardwareAccelerated="false"
@@ -34,8 +33,9 @@
         android:theme="@style/AppTheme">
 
         <!-- 支持全面屏 -->
-        <meta-data android:name="android.max_aspect"
-            android:value="2.1"/>
+        <meta-data
+            android:name="android.max_aspect"
+            android:value="2.1" />
 
         <activity android:name=".SplashActivity">
             <intent-filter>
@@ -46,7 +46,8 @@
         </activity>
         <activity android:name=".MainActivity" />
         <activity android:name=".SettingActivity" />
-        <activity android:name=".AboutActivity"></activity>
+        <activity android:name=".AboutActivity" />
+        <activity android:name=".HelpActivity"></activity>
     </application>
 
 </manifest>

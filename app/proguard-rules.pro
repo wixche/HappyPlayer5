@@ -166,6 +166,10 @@ public static java.lang.String TABLENAME;
 #第三方弹出窗口：
 -keep class com.dou361.dialogui.** { *; }
 
+#第三方上拉加载更多，下拉刷新：
+-dontwarn com.github.jdsjlzx.**
+-keep class com.github.jdsjlzx.progressindicator.indicators.** { *; }
+
 #6混淆项目代码
 -keep class com.zlm.**
 -keepclassmembers class com.zlm.** {
