@@ -14,6 +14,7 @@ import android.support.v7.app.AppCompatActivity;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.view.ViewParent;
 import android.widget.FrameLayout;
 import android.widget.LinearLayout;
 import android.widget.RelativeLayout;
@@ -46,7 +47,7 @@ public abstract class BaseActivity extends AppCompatActivity {
     /**
      *
      */
-    private Context mContext;
+    public Context mContext;
     //创建异步HandlerThread
     private HandlerThread mHandlerThread;
     /**
@@ -125,20 +126,22 @@ public abstract class BaseActivity extends AppCompatActivity {
             statusBarView.setVisibility(View.GONE);
             return;
         }
+
+        ViewParent parentView = statusBarView.getParent();
         int statusBarViewHeight = AppBarUtil.getStatusBarHeight(mContext);
-        if (view instanceof ConstraintLayout) {
+        if (parentView instanceof ConstraintLayout) {
             ConstraintLayout.LayoutParams clp = new ConstraintLayout.LayoutParams(-1, statusBarViewHeight);
             statusBarView.setLayoutParams(clp);
-        } else if (view instanceof LinearLayout) {
+        } else if (parentView instanceof LinearLayout) {
             LinearLayout.LayoutParams llp = new LinearLayout.LayoutParams(-1, statusBarViewHeight);
             statusBarView.setLayoutParams(llp);
-        } else if (view instanceof RelativeLayout) {
+        } else if (parentView instanceof RelativeLayout) {
             RelativeLayout.LayoutParams rlp = new RelativeLayout.LayoutParams(-1, statusBarViewHeight);
             statusBarView.setLayoutParams(rlp);
-        } else if (view instanceof FrameLayout) {
+        } else if (parentView instanceof FrameLayout) {
             FrameLayout.LayoutParams flp = new FrameLayout.LayoutParams(-1, statusBarViewHeight);
             statusBarView.setLayoutParams(flp);
-        } else if (view instanceof ViewGroup) {
+        } else if (parentView instanceof ViewGroup) {
             ViewGroup.LayoutParams vplp = new ViewGroup.LayoutParams(-1, statusBarViewHeight);
             statusBarView.setLayoutParams(vplp);
         }

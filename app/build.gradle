@@ -64,11 +64,11 @@ dependencies {
     /**
      * 右滑动关闭
      */
-    implementation 'com.github.zhangliangming:SwipeBackLayout:v2.6'
+    implementation 'com.github.zhangliangming:SwipeBackLayout:v2.7'
     /**
      * 旋转界面
      */
-    implementation 'com.github.zhangliangming:RotateLayout:v2.6'
+    implementation 'com.github.zhangliangming:RotateLayout:v2.7'
     /**
      * 进度条
      */
@@ -76,7 +76,7 @@ dependencies {
     /**
      * 歌词
      */
-    implementation 'com.github.zhangliangming:HPLyrics:v1.44'
+    implementation 'com.github.zhangliangming:HPLyrics:v1.46'
     /**
      * 音频
      */
@@ -92,7 +92,7 @@ dependencies {
     /**
      * SlidingMenuLayout
      */
-    implementation 'com.github.zhangliangming:SlidingMenuLayout:v1.4'
+    implementation 'com.github.zhangliangming:SlidingMenuLayout:v1.6'
     /**
      * 第三方switch-button
      */

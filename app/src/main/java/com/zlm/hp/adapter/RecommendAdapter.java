@@ -1,6 +1,7 @@
 package com.zlm.hp.adapter;
 
 import android.content.Context;
+import android.os.Bundle;
 import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -9,6 +10,8 @@ import android.widget.ImageView;
 import android.widget.TextView;
 
 import com.zlm.hp.entity.RankInfo;
+import com.zlm.hp.fragment.NetSongFragment;
+import com.zlm.hp.receiver.FragmentReceiver;
 import com.zlm.hp.ui.R;
 import com.zlm.hp.widget.ListItemRelativeLayout;
 
@@ -55,6 +58,18 @@ public class RecommendAdapter extends RecyclerView.Adapter<RecyclerView.ViewHold
     private void reshViewHolder(int position, final RecommendViewHolder viewHolder, final RankInfo rankInfo) {
 
         viewHolder.getRankTitleTv().setText(rankInfo.getRankName());
+        viewHolder.getListItemRelativeLayout().setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+
+                Bundle bundle = new Bundle();
+                bundle.putInt(NetSongFragment.NETSONGTYPE_KEY, NetSongFragment.NET_SONG_TYPE_RECOMMEND);
+                bundle.putParcelable(NetSongFragment.DATA_KEY, rankInfo);
+
+                //打开排行/推荐页面
+                FragmentReceiver.sendReceiver(mContext, FragmentReceiver.ACTION_CODE_OPEN_RECOMMENDFRAGMENT, NetSongFragment.ARGUMENTS_KEY, bundle);
+            }
+        });
 
     }
 

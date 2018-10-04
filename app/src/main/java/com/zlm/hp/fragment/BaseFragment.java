@@ -13,6 +13,7 @@ import android.support.v4.content.ContextCompat;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.view.ViewParent;
 import android.view.ViewStub;
 import android.view.animation.Animation;
 import android.view.animation.AnimationUtils;
@@ -146,7 +147,6 @@ public abstract class BaseFragment extends Fragment {
         mStatusBarViewBG = ColorUtil.parserColor(ContextCompat.getColor(mContext, R.color.defColor));
         preInitStatusBar();
         View mainView = inflater.inflate(R.layout.fragment_base, container, false);
-        initStatusBar(mainView);
 
         //添加主布局
         mContentContainer = mainView.findViewById(R.id.viewstub_content_container);
@@ -154,6 +154,7 @@ public abstract class BaseFragment extends Fragment {
         mContentContainer.inflate();
         mContentContainer.setVisibility(View.GONE);
 
+        initStatusBar(mainView);
         initLoadingView(mainView);
         initNoNetView(mainView);
 
@@ -213,21 +214,22 @@ public abstract class BaseFragment extends Fragment {
         }
 
 
+        ViewParent parentView = statusBarView.getParent();
         int statusBarViewHeight = AppBarUtil.getStatusBarHeight(mContext);
 
-        if (mainView instanceof ConstraintLayout) {
+        if (parentView instanceof ConstraintLayout) {
             ConstraintLayout.LayoutParams clp = new ConstraintLayout.LayoutParams(-1, statusBarViewHeight);
             statusBarView.setLayoutParams(clp);
-        } else if (mainView instanceof LinearLayout) {
+        } else if (parentView instanceof LinearLayout) {
             LinearLayout.LayoutParams llp = new LinearLayout.LayoutParams(-1, statusBarViewHeight);
             statusBarView.setLayoutParams(llp);
-        } else if (mainView instanceof RelativeLayout) {
+        } else if (parentView instanceof RelativeLayout) {
             RelativeLayout.LayoutParams rlp = new RelativeLayout.LayoutParams(-1, statusBarViewHeight);
             statusBarView.setLayoutParams(rlp);
-        } else if (mainView instanceof FrameLayout) {
+        } else if (parentView instanceof FrameLayout) {
             FrameLayout.LayoutParams flp = new FrameLayout.LayoutParams(-1, statusBarViewHeight);
             statusBarView.setLayoutParams(flp);
-        } else if (mainView instanceof ViewGroup) {
+        } else if (parentView instanceof ViewGroup) {
             ViewGroup.LayoutParams vplp = new ViewGroup.LayoutParams(-1, statusBarViewHeight);
             statusBarView.setLayoutParams(vplp);
         }

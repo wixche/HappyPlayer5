@@ -7,6 +7,7 @@ import android.os.Message;
 import android.support.v4.app.Fragment;
 import android.support.v4.content.ContextCompat;
 import android.support.v4.view.ViewPager;
+import android.support.v4.widget.ViewDragHelper;
 import android.util.DisplayMetrics;
 import android.view.Display;
 import android.view.LayoutInflater;
@@ -23,9 +24,11 @@ import com.zlm.hp.async.AsyncHandlerTask;
 import com.zlm.hp.constants.ConfigInfo;
 import com.zlm.hp.fragment.LastSongFragment;
 import com.zlm.hp.fragment.MeFragment;
+import com.zlm.hp.fragment.NetSongFragment;
 import com.zlm.hp.fragment.RecommendFragment;
 import com.zlm.hp.fragment.SpecialFragment;
 import com.zlm.hp.manager.ActivityManager;
+import com.zlm.hp.receiver.FragmentReceiver;
 import com.zlm.hp.util.AppBarUtil;
 import com.zlm.hp.util.AppOpsUtils;
 import com.zlm.hp.util.CodeLineUtil;
@@ -115,6 +118,11 @@ public class MainActivity extends BaseActivity {
     private SwitchButton mLocklrcSwitchButton;
 
     /**
+     *
+     */
+    private FragmentReceiver mFragmentReceiver;
+
+    /**
      * 基本数据
      */
     private ConfigInfo mConfigInfo;
@@ -130,13 +138,62 @@ public class MainActivity extends BaseActivity {
 
     @Override
     protected void initViews(Bundle savedInstanceState) {
+
         initSlidingMenu();
         initViewPage();
         initTitleViews();
         initMenu();
+        initReceiver();
         loadData();
     }
 
+
+    /**
+     * 初始化广播
+     */
+    private void initReceiver() {
+        mFragmentReceiver = new FragmentReceiver(mContext);
+        mFragmentReceiver.setFragmentReceiverListener(new FragmentReceiver.FragmentReceiverListener() {
+            @Override
+            public void onReceive(Context context, Intent intent, int code) {
+                handleFragmentReceiver(intent, code);
+            }
+
+            /**
+             * 处理fragment
+             * @param intent
+             * @param code
+             */
+            private void handleFragmentReceiver(Intent intent, int code) {
+
+                switch (code) {
+                    case FragmentReceiver.ACTION_CODE_OPEN_RECOMMENDFRAGMENT:
+                        //排行
+                        Bundle recommendBundle = intent.getBundleExtra(NetSongFragment.ARGUMENTS_KEY);
+                        NetSongFragment recommendSongFragment = NetSongFragment.newInstance();
+                        recommendBundle.putInt(NetSongFragment.NETSONGTYPE_KEY, NetSongFragment.NET_SONG_TYPE_RECOMMEND);
+
+                        recommendSongFragment.setArguments(recommendBundle);
+                        mSlidingMenuOnListener.addAndShowFragment(recommendSongFragment);
+
+                        break;
+                    case FragmentReceiver.ACTION_CODE_OPEN_SPECIALFRAGMENT:
+                        //歌单
+                        Bundle specialBundle = intent.getBundleExtra(NetSongFragment.ARGUMENTS_KEY);
+                        NetSongFragment specialSongFragment = NetSongFragment.newInstance();
+                        specialBundle.putInt(NetSongFragment.NETSONGTYPE_KEY, NetSongFragment.NET_SONG_TYPE_SPECIAL);
+                        specialSongFragment.setArguments(specialBundle);
+
+                        mSlidingMenuOnListener.addAndShowFragment(specialSongFragment);
+                        break;
+                    case FragmentReceiver.ACTION_CODE_CLOSE_FRAGMENT:
+                        mSlidingMenuOnListener.hideFragment();
+                        break;
+                }
+            }
+        });
+        mFragmentReceiver.registerReceiver(mContext);
+    }
 
     /**
      * 加载数据
@@ -201,8 +258,14 @@ public class MainActivity extends BaseActivity {
         //主界面
         LinearLayout mainView = (LinearLayout) LayoutInflater.from(getApplicationContext()).inflate(R.layout.layout_main, null);
         FrameLayout.LayoutParams mainLayoutParams = new FrameLayout.LayoutParams(FrameLayout.LayoutParams.MATCH_PARENT, FrameLayout.LayoutParams.MATCH_PARENT);
-        mPlayerBarLL = mainView.findViewById(R.id.playerBar);
-        mSlidingMenuLayout.addIgnoreHorizontalView(mPlayerBarLL);
+        mPlayerBarLL = findViewById(R.id.playerBar);
+        //mSlidingMenuLayout.addIgnoreHorizontalView(mPlayerBarLL);
+        mSlidingMenuLayout.addOnPageChangeListener(new SlidingMenuLayout.OnPageChangeListener() {
+            @Override
+            public void onMainPageScrolled(int leftx) {
+                mPlayerBarLL.setTranslationX(leftx);
+            }
+        });
 
         mViewPager = mainView.findViewById(R.id.viewpage);
 
@@ -522,4 +585,15 @@ public class MainActivity extends BaseActivity {
         }
     }
 
+    @Override
+    protected void onDestroy() {
+        destroyReceiver();
+        super.onDestroy();
+    }
+
+    private void destroyReceiver() {
+        if (mFragmentReceiver != null) {
+            mFragmentReceiver.unregisterReceiver(mContext);
+        }
+    }
 }

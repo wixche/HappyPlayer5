@@ -2,7 +2,6 @@
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:background="#fff"
     android:orientation="vertical">
 
     <View
@@ -12,18 +11,16 @@
         android:visibility="gone" />
 
     <include
-        android:id="@+id/title"
-        layout="@layout/layout_main_title"
+        android:id="@+id/title_view"
+        layout="@layout/layout_title"
         android:layout_width="match_parent"
-        android:layout_height="@dimen/title_height"></include>
+        android:layout_height="@dimen/title_height" />
 
-
-    <android.support.v4.view.ViewPager
-        android:id="@+id/viewpage"
+    <com.github.jdsjlzx.recyclerview.LRecyclerView
+        android:id="@+id/recyclerView"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        android:overScrollMode="never"
-        android:paddingBottom="@dimen/player_height"></android.support.v4.view.ViewPager>
+        android:paddingBottom="@dimen/player_height"></com.github.jdsjlzx.recyclerview.LRecyclerView>
 
 
 </LinearLayout>

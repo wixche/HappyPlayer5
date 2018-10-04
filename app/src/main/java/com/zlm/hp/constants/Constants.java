@@ -26,4 +26,5 @@ public class Constants {
      * 设备id
      */
     public final static String DEVICE_ID = "DeviceID";
+
 }

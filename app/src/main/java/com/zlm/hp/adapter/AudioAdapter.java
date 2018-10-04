@@ -62,6 +62,12 @@ public class AudioAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> 
         viewHolder.getSongNameTv().setText(audioInfo.getSongName());
         viewHolder.getSingerNameTv().setText(audioInfo.getSingerName());
         viewHolder.getMenuLinearLayout().setVisibility(View.GONE);
+        viewHolder.getListItemRelativeLayout().setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+
+            }
+        });
 
     }
 
