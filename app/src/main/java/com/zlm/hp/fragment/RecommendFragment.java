@@ -1,6 +1,5 @@
 package com.zlm.hp.fragment;
 
-import android.graphics.Color;
 import android.os.Bundle;
 import android.os.Message;
 import android.support.v7.widget.LinearLayoutManager;
@@ -58,11 +57,6 @@ public class RecommendFragment extends BaseFragment {
         RecommendFragment fragment = new RecommendFragment();
         return fragment;
 
-    }
-
-    @Override
-    protected void preInitStatusBar() {
-        setStatusBarViewBG(Color.TRANSPARENT);
     }
 
     @Override

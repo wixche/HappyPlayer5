@@ -162,7 +162,7 @@ public class SplashActivity extends BaseActivity {
         Intent intent = new Intent(this, MainActivity.class);
         intent.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
         startActivity(intent);
-        overridePendingTransition(R.anim.zoomin, R.anim.zoomout);
+        overridePendingTransition(R.anim.fadein, R.anim.fadeout);
 
         finish();
     }

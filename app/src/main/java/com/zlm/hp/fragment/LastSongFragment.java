@@ -1,6 +1,5 @@
 package com.zlm.hp.fragment;
 
-import android.graphics.Color;
 import android.os.Bundle;
 import android.os.Message;
 import android.support.v7.widget.LinearLayoutManager;
@@ -69,11 +68,6 @@ public class LastSongFragment extends BaseFragment {
         LastSongFragment fragment = new LastSongFragment();
         return fragment;
 
-    }
-
-    @Override
-    protected void preInitStatusBar() {
-        setStatusBarViewBG(Color.TRANSPARENT);
     }
 
     @Override
