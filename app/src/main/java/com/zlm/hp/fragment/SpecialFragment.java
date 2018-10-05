@@ -97,7 +97,7 @@ public class SpecialFragment extends BaseFragment {
         mRecyclerView.setLayoutManager(layoutManager);
         //
         mDatas = new ArrayList<SpecialInfo>();
-        mAdapter = new LRecyclerViewAdapter(new SpecialAdapter(mContext, mDatas));
+        mAdapter = new LRecyclerViewAdapter(new SpecialAdapter(mUIHandler,mWorkerHandler,mContext, mDatas));
         mRecyclerView.setAdapter(mAdapter);
 
 

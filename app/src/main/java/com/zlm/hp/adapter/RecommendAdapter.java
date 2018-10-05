@@ -9,10 +9,16 @@ import android.view.ViewGroup;
 import android.widget.ImageView;
 import android.widget.TextView;
 
+import com.zlm.hp.async.AsyncHandlerTask;
+import com.zlm.hp.constants.ConfigInfo;
+import com.zlm.hp.constants.ResourceConstants;
 import com.zlm.hp.entity.RankInfo;
 import com.zlm.hp.fragment.NetSongFragment;
+import com.zlm.hp.handler.WeakRefHandler;
 import com.zlm.hp.receiver.FragmentReceiver;
 import com.zlm.hp.ui.R;
+import com.zlm.hp.util.ImageUtil;
+import com.zlm.hp.util.ResourceUtil;
 import com.zlm.hp.widget.ListItemRelativeLayout;
 
 import java.util.ArrayList;
@@ -23,11 +29,15 @@ import java.util.ArrayList;
  */
 public class RecommendAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> {
 
+    private WeakRefHandler mUIHandler;
+    private WeakRefHandler mWorkerHandler;
 
     private Context mContext;
     private ArrayList<RankInfo> mDatas;
 
-    public RecommendAdapter(Context context, ArrayList<RankInfo> datas) {
+    public RecommendAdapter(WeakRefHandler uiHandler, WeakRefHandler workerHandler, Context context, ArrayList<RankInfo> datas) {
+        this.mUIHandler = uiHandler;
+        this.mWorkerHandler = workerHandler;
         this.mContext = context;
         this.mDatas = datas;
     }
@@ -56,7 +66,9 @@ public class RecommendAdapter extends RecyclerView.Adapter<RecyclerView.ViewHold
      * @param rankInfo
      */
     private void reshViewHolder(int position, final RecommendViewHolder viewHolder, final RankInfo rankInfo) {
-
+        ConfigInfo configInfo = ConfigInfo.obtain();
+        String filePath = ResourceUtil.getFilePath(mContext, ResourceConstants.PATH_CACHE_IMAGE, rankInfo.getImageUrl().hashCode() + ".png");
+        ImageUtil.loadImage(mContext, filePath, rankInfo.getImageUrl(), configInfo.isWifi(), viewHolder.getItemImg(), 400, 400, new AsyncHandlerTask(mUIHandler, mWorkerHandler), null);
         viewHolder.getRankTitleTv().setText(rankInfo.getRankName());
         viewHolder.getListItemRelativeLayout().setOnClickListener(new View.OnClickListener() {
             @Override

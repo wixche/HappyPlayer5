@@ -67,20 +67,20 @@ public class AsyncHandlerTask {
     /**
      * 工作任务
      */
-    public static abstract class Task {
+    public static abstract class Task<T> {
         /**
          * 后台执行
          *
          * @return
          */
-        protected abstract Object doInBackground();
+        protected abstract T doInBackground();
 
         /**
          * 主线程回调
          *
          * @param result
          */
-        protected void onPostExecute(Object result) {
+        protected void onPostExecute(T result) {
         }
     }
 }

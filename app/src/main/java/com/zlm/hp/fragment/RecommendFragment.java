@@ -86,7 +86,7 @@ public class RecommendFragment extends BaseFragment {
         mRecyclerView.setLayoutManager(layoutManager);
         //
         mDatas = new ArrayList<RankInfo>();
-        mAdapter = new LRecyclerViewAdapter(new RecommendAdapter(mContext, mDatas));
+        mAdapter = new LRecyclerViewAdapter(new RecommendAdapter(mUIHandler, mWorkerHandler, mContext, mDatas));
         mRecyclerView.setAdapter(mAdapter);
 
         mRecyclerView.setLoadMoreEnabled(false);

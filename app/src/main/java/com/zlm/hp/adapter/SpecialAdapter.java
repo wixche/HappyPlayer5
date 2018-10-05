@@ -9,10 +9,16 @@ import android.view.ViewGroup;
 import android.widget.ImageView;
 import android.widget.TextView;
 
+import com.zlm.hp.async.AsyncHandlerTask;
+import com.zlm.hp.constants.ConfigInfo;
+import com.zlm.hp.constants.ResourceConstants;
 import com.zlm.hp.entity.SpecialInfo;
 import com.zlm.hp.fragment.NetSongFragment;
+import com.zlm.hp.handler.WeakRefHandler;
 import com.zlm.hp.receiver.FragmentReceiver;
 import com.zlm.hp.ui.R;
+import com.zlm.hp.util.ImageUtil;
+import com.zlm.hp.util.ResourceUtil;
 import com.zlm.hp.widget.ListItemRelativeLayout;
 
 import java.util.ArrayList;
@@ -23,11 +29,15 @@ import java.util.ArrayList;
  */
 public class SpecialAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> {
 
+    private WeakRefHandler mUIHandler;
+    private WeakRefHandler mWorkerHandler;
 
     private Context mContext;
     private ArrayList<SpecialInfo> mDatas;
 
-    public SpecialAdapter(Context context, ArrayList<SpecialInfo> datas) {
+    public SpecialAdapter(WeakRefHandler uiHandler, WeakRefHandler workerHandler, Context context, ArrayList<SpecialInfo> datas) {
+        this.mUIHandler = uiHandler;
+        this.mWorkerHandler = workerHandler;
         this.mContext = context;
         this.mDatas = datas;
     }
@@ -56,6 +66,10 @@ public class SpecialAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder
      * @param specialInfo
      */
     private void reshViewHolder(int position, final SpecialViewHolder viewHolder, final SpecialInfo specialInfo) {
+
+        ConfigInfo configInfo = ConfigInfo.obtain();
+        String filePath = ResourceUtil.getFilePath(mContext, ResourceConstants.PATH_CACHE_IMAGE, specialInfo.getImageUrl().hashCode() + ".png");
+        ImageUtil.loadImage(mContext, filePath, specialInfo.getImageUrl(), configInfo.isWifi(), viewHolder.getItemImg(), 400, 400, new AsyncHandlerTask(mUIHandler, mWorkerHandler), null);
 
         viewHolder.getSpecialTitleTv().setText(specialInfo.getSpecialName());
         viewHolder.getListItemRelativeLayout().setOnClickListener(new View.OnClickListener() {
