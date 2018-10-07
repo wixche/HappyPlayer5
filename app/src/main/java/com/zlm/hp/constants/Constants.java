@@ -17,10 +17,16 @@ public class Constants {
      * app应用名
      */
     public final static String APPNAME = "HappyPlayer";
+
     /**
      * 配置文件名称
      */
     public final static String CONFIG = "happy-player-config";
+
+    /**
+     * 歌曲播放列表
+     */
+    public final static String PLAYLIST = "happy-player-list";
 
     /**
      * 设备id

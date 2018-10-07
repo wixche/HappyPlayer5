@@ -258,6 +258,15 @@ public class MainActivity extends BaseActivity {
         LinearLayout mainView = (LinearLayout) LayoutInflater.from(getApplicationContext()).inflate(R.layout.layout_main, null);
         FrameLayout.LayoutParams mainLayoutParams = new FrameLayout.LayoutParams(FrameLayout.LayoutParams.MATCH_PARENT, FrameLayout.LayoutParams.MATCH_PARENT);
         mPlayerBarLL = findViewById(R.id.playerBar);
+        mPlayerBarLL.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                if(mSlidingMenuLayout.isShowingMenu()){
+                    mSlidingMenuLayout.hideMenu();
+                    return;
+                }
+            }
+        });
         //mSlidingMenuLayout.addIgnoreHorizontalView(mPlayerBarLL);
         mSlidingMenuLayout.addOnPageChangeListener(new SlidingMenuLayout.OnPageChangeListener() {
             @Override

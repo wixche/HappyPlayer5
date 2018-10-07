@@ -6,9 +6,9 @@ import android.database.sqlite.SQLiteDatabase.CursorFactory;
 import android.util.Log;
 
 import org.greenrobot.greendao.AbstractDaoMaster;
-import org.greenrobot.greendao.database.StandardDatabase;
 import org.greenrobot.greendao.database.Database;
 import org.greenrobot.greendao.database.DatabaseOpenHelper;
+import org.greenrobot.greendao.database.StandardDatabase;
 import org.greenrobot.greendao.identityscope.IdentityScopeType;
 
 
@@ -22,6 +22,7 @@ public class DaoMaster extends AbstractDaoMaster {
     /** Creates underlying database table using DAOs. */
     public static void createAllTables(Database db, boolean ifNotExists) {
         DownloadTaskDao.createTable(db, ifNotExists);
+        DownloadThreadInfoDao.createTable(db, ifNotExists);
         AudioInfoDao.createTable(db, ifNotExists);
         SingerInfoDao.createTable(db, ifNotExists);
         VideoInfoDao.createTable(db, ifNotExists);
@@ -30,6 +31,7 @@ public class DaoMaster extends AbstractDaoMaster {
     /** Drops underlying database table using DAOs. */
     public static void dropAllTables(Database db, boolean ifExists) {
         DownloadTaskDao.dropTable(db, ifExists);
+        DownloadThreadInfoDao.dropTable(db, ifExists);
         AudioInfoDao.dropTable(db, ifExists);
         SingerInfoDao.dropTable(db, ifExists);
         VideoInfoDao.dropTable(db, ifExists);
@@ -52,6 +54,7 @@ public class DaoMaster extends AbstractDaoMaster {
     public DaoMaster(Database db) {
         super(db, SCHEMA_VERSION);
         registerDaoClass(DownloadTaskDao.class);
+        registerDaoClass(DownloadThreadInfoDao.class);
         registerDaoClass(AudioInfoDao.class);
         registerDaoClass(SingerInfoDao.class);
         registerDaoClass(VideoInfoDao.class);

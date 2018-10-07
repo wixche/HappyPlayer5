@@ -8,10 +8,8 @@
     <dimen name="copyright_size">14sp</dimen>
     <dimen name="about_img_height">120dp</dimen>
 
-    <dimen name="bar_dragflag_size">15dp</dimen>
     <dimen name="bar_height">80dp</dimen>
-    <dimen name="player_height">75dp</dimen>
-    <dimen name="player_artist_imgSize">55dp</dimen>
+    <dimen name="player_artist_imgSize">60dp</dimen>
 
     <dimen name="item_height">100dp</dimen>
     <dimen name="item_icon_imgSize">60dp</dimen>

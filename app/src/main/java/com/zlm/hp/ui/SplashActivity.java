@@ -102,6 +102,8 @@ public class SplashActivity extends BaseActivity {
      * 初始化加载数据
      */
     private void loadData() {
+        ConfigInfo configInfo = ConfigInfo.load();
+
         boolean isFrist = PreferencesUtil.getBoolean(getApplicationContext(), Constants.IS_FRIST_KEY, true);
         if (isFrist) {
 
@@ -109,13 +111,13 @@ public class SplashActivity extends BaseActivity {
             List<AudioInfo> audioInfos = MediaUtil.scanLocalMusic(getApplicationContext(), null);
             if (audioInfos != null && audioInfos.size() > 0) {
                 AudioInfoDB.addAudioInfos(getApplicationContext(), audioInfos);
+                configInfo.setAudioInfos(audioInfos);
             }
 
             PreferencesUtil.putBoolean(getApplicationContext(), Constants.IS_FRIST_KEY, false);
         }
 
         //2.加载基本数据
-        ConfigInfo configInfo = ConfigInfo.load();
         if (configInfo.isSayHello()) {
             loadSplashMusic();
         } else {

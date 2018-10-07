@@ -7,11 +7,10 @@ import android.os.Parcelable;
 import com.zlm.down.thread.DownloadTaskThreadManager;
 
 import org.greenrobot.greendao.annotation.Entity;
+import org.greenrobot.greendao.annotation.Id;
 import org.greenrobot.greendao.annotation.Transient;
-import org.greenrobot.greendao.annotation.Unique;
 
 import java.util.Date;
-import org.greenrobot.greendao.annotation.Generated;
 
 /**
  * @Description: 下载任务
@@ -51,6 +50,7 @@ public class DownloadTask implements Parcelable {
     /**
      * 任务id
      */
+    @Id
     private String taskId;
     /**
      * 任务名称
@@ -65,11 +65,7 @@ public class DownloadTask implements Parcelable {
      * 任务保存路径
      */
     private String taskPath;
-    /**
-     * 任务hash
-     */
-    @Unique
-    private String taskHash;
+
     /**
      * 任务临时保存路径
      */
@@ -94,7 +90,7 @@ public class DownloadTask implements Parcelable {
     /**
      * 线程总数
      */
-    @Unique
+    @Id
     private int threadNum;
     /**
      * 任务文件大小
@@ -115,7 +111,6 @@ public class DownloadTask implements Parcelable {
         taskName = in.readString();
         taskExt = in.readString();
         taskPath = in.readString();
-        taskHash = in.readString();
         taskTempPath = in.readString();
         rootPath = in.readString();
         taskUrl = in.readString();
@@ -166,14 +161,6 @@ public class DownloadTask implements Parcelable {
 
     public void setTaskPath(String taskPath) {
         this.taskPath = taskPath;
-    }
-
-    public String getTaskHash() {
-        return taskHash;
-    }
-
-    public void setTaskHash(String taskHash) {
-        this.taskHash = taskHash;
     }
 
     public String getTaskTempPath() {
@@ -252,7 +239,6 @@ public class DownloadTask implements Parcelable {
         dest.writeString(taskName);
         dest.writeString(taskExt);
         dest.writeString(taskPath);
-        dest.writeString(taskHash);
         dest.writeString(taskTempPath);
         dest.writeString(rootPath);
         dest.writeString(taskUrl);

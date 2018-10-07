@@ -14,7 +14,7 @@
     <LinearLayout
         android:id="@+id/playerBar"
         android:layout_width="match_parent"
-        android:layout_height="@dimen/player_height"
+        android:layout_height="@dimen/bar_height"
         android:layout_alignParentBottom="true"
         android:background="#fff"
         android:clickable="true"
@@ -23,7 +23,10 @@
         <com.zlm.hp.widget.DividerView
             android:id="@+id/divider"
             android:layout_width="match_parent"
-            android:layout_height="2dp" />
+            android:layout_height="1dp" />
+
+        <include layout="@layout/layout_playbar" />
+
 
     </LinearLayout>
 

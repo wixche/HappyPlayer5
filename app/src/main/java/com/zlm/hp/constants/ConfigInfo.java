@@ -9,9 +9,11 @@ import com.zlm.hp.util.CodeLineUtil;
 import com.zlm.hp.util.ColorUtil;
 import com.zlm.hp.util.ContextUtil;
 import com.zlm.hp.util.FileUtil;
+import com.zlm.hp.util.RandomUtil;
 import com.zlm.hp.util.ResourceUtil;
 import com.zlm.hp.util.ZLog;
 
+import java.util.ArrayList;
 import java.util.List;
 
 /**
@@ -177,7 +179,7 @@ public class ConfigInfo implements Parcelable {
             desktopLrcY = in.readInt();
             playHash = in.readString();
             playModel = in.readInt();
-            audioInfos = in.createTypedArrayList(AudioInfo.CREATOR);
+//            audioInfos = in.createTypedArrayList(AudioInfo.CREATOR);
         }
     }
 
@@ -196,7 +198,7 @@ public class ConfigInfo implements Parcelable {
         dest.writeInt(desktopLrcY);
         dest.writeString(playHash);
         dest.writeInt(playModel);
-        dest.writeTypedList(audioInfos);
+//        dest.writeTypedList(audioInfos);
     }
 
     @Override
@@ -399,11 +401,72 @@ public class ConfigInfo implements Parcelable {
     }
 
     public List<AudioInfo> getAudioInfos() {
+        if (audioInfos == null) {
+            loadPlayListData();
+        }
         return audioInfos;
     }
 
     public ConfigInfo setAudioInfos(List<AudioInfo> audioInfos) {
+        //添加随机数
+        RandomUtil.setNums(audioInfos.size());
         this.audioInfos = audioInfos;
+        savePlayListData(audioInfos);
         return this;
+    }
+
+    /**
+     * @throws
+     * @Description: 加载播放列表
+     * @param:
+     * @return:
+     * @author: zhangliangming
+     * @date: 2018-10-06 23:21
+     */
+    private void loadPlayListData() {
+        Parcel parcel = null;
+        synchronized (lock) {
+            String filePath = ResourceUtil.getContextFilePath(ContextUtil.getContext(), ResourceConstants.PATH_CONFIG, Constants.PLAYLIST);
+            try {
+                byte[] data = FileUtil.readFile(filePath);
+                if (data == null) {
+                    parcel = null;
+                    ZLog.i(new CodeLineUtil().getCodeLineInfo(), "ConfigInfo.loadPlayListData readFile => null");
+                } else {
+                    parcel = Parcel.obtain();
+                    parcel.unmarshall(data, 0, data.length);
+                    parcel.setDataPosition(0);
+                }
+            } catch (Exception e) {
+                ZLog.e(new CodeLineUtil().getCodeLineInfo(), "ConfigInfo.loadPlayListData Exception: ", e.getMessage());
+            }
+        }
+
+        if (parcel == null) {
+            audioInfos = new ArrayList<AudioInfo>();
+        } else {
+            audioInfos = parcel.createTypedArrayList(AudioInfo.CREATOR);
+        }
+    }
+
+    /**
+     * @throws
+     * @Description: 保存播放列表数据
+     * @param:
+     * @return:
+     * @author: zhangliangming
+     * @date: 2018-10-06 23:26
+     */
+    private void savePlayListData(List<AudioInfo> audioInfos) {
+        Parcel parcel = Parcel.obtain();
+        parcel.writeTypedList(audioInfos);
+        synchronized (lock) {
+            try {
+                String filePath = ResourceUtil.getContextFilePath(ContextUtil.getContext(), ResourceConstants.PATH_CONFIG, Constants.PLAYLIST);
+                FileUtil.writeFile(filePath, parcel.marshall());
+            } catch (Exception e) {
+                ZLog.e(new CodeLineUtil().getCodeLineInfo(), "ConfigInfo.savePlayListData Exception: ", e.getMessage());
+            }
+        }
     }
 }
