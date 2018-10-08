@@ -11,6 +11,7 @@ import org.greenrobot.greendao.annotation.Id;
 import org.greenrobot.greendao.annotation.Transient;
 
 import java.util.Date;
+import org.greenrobot.greendao.annotation.Generated;
 
 /**
  * @Description: 下载任务

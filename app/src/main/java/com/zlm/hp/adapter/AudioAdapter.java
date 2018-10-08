@@ -11,6 +11,7 @@ import android.widget.RelativeLayout;
 import android.widget.TextView;
 
 import com.zlm.hp.entity.AudioInfo;
+import com.zlm.hp.manager.AudioPlayerManager;
 import com.zlm.hp.ui.R;
 import com.zlm.hp.widget.IconfontImageButtonTextView;
 import com.zlm.hp.widget.ListItemRelativeLayout;
@@ -67,7 +68,7 @@ public class AudioAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> 
         viewHolder.getListItemRelativeLayout().setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-
+                AudioPlayerManager.newInstance(mContext).playSong(audioInfo);
             }
         });
 

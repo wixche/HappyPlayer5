@@ -27,6 +27,7 @@ import com.zlm.hp.fragment.NetSongFragment;
 import com.zlm.hp.fragment.RecommendFragment;
 import com.zlm.hp.fragment.SpecialFragment;
 import com.zlm.hp.manager.ActivityManager;
+import com.zlm.hp.manager.AudioPlayerManager;
 import com.zlm.hp.receiver.FragmentReceiver;
 import com.zlm.hp.util.AppBarUtil;
 import com.zlm.hp.util.AppOpsUtils;
@@ -261,7 +262,7 @@ public class MainActivity extends BaseActivity {
         mPlayerBarLL.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                if(mSlidingMenuLayout.isShowingMenu()){
+                if (mSlidingMenuLayout.isShowingMenu()) {
                     mSlidingMenuLayout.hideMenu();
                     return;
                 }
@@ -595,10 +596,21 @@ public class MainActivity extends BaseActivity {
 
     @Override
     protected void onDestroy() {
+        releaseData();
         destroyReceiver();
         super.onDestroy();
     }
 
+    /**
+     * 释放数据
+     */
+    private void releaseData() {
+        AudioPlayerManager.newInstance(mContext).release();
+    }
+
+    /**
+     * 销毁广播
+     */
     private void destroyReceiver() {
         if (mFragmentReceiver != null) {
             mFragmentReceiver.unregisterReceiver(mContext);

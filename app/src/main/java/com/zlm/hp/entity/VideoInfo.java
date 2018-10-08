@@ -5,6 +5,7 @@ import android.os.Parcelable;
 
 import org.greenrobot.greendao.annotation.Entity;
 import org.greenrobot.greendao.annotation.Unique;
+import org.greenrobot.greendao.annotation.Generated;
 
 /**
  * @Description: 视频信息

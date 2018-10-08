@@ -31,19 +31,25 @@ public class AudioPlayerManager {
     private static AudioPlayerManager _AudioPlayerManager;
 
     /**
+     * 在线音频管理
+     */
+    private OnLineAudioManager mOnLineAudioManager;
+
+    /**
      *
      */
     private static Context mContext;
 
     public AudioPlayerManager(Context context) {
         this.mContext = context;
+        mOnLineAudioManager = new OnLineAudioManager(context);
     }
 
     /**
      * @param context
      * @return
      */
-    public AudioPlayerManager newInstance(Context context) {
+    public static AudioPlayerManager newInstance(Context context) {
         if (_AudioPlayerManager == null) {
             _AudioPlayerManager = new AudioPlayerManager(context);
         }
@@ -62,6 +68,7 @@ public class AudioPlayerManager {
         } else {
             audioInfoList.add(audioInfo);
         }
+        configInfo.setAudioInfos(audioInfoList);
     }
 
     /**
@@ -90,6 +97,11 @@ public class AudioPlayerManager {
      * 播放歌曲
      */
     private void play(AudioInfo audioInfo) {
+
+        ConfigInfo configInfo = ConfigInfo.obtain();
+        configInfo.setPlayHash(audioInfo.getHash());
+        configInfo.save();
+
         switch (audioInfo.getType()) {
             case AudioInfo.TYPE_LOCAL:
                 playLocalSong(audioInfo);
@@ -107,6 +119,7 @@ public class AudioPlayerManager {
      * @param audioInfo
      */
     private void playNetSong(AudioInfo audioInfo) {
+        mOnLineAudioManager.addDownloadTask(audioInfo);
     }
 
     /**
@@ -143,6 +156,7 @@ public class AudioPlayerManager {
      */
     public void release() {
         mPlayStatus = PAUSE;
+        mOnLineAudioManager.release();
     }
 
     /**
@@ -150,9 +164,7 @@ public class AudioPlayerManager {
      */
     public void playSong(AudioInfo audioInfo) {
         addNextSong(audioInfo);
-        ConfigInfo configInfo = ConfigInfo.obtain();
-        configInfo.setPlayHash(audioInfo.getHash());
-
+        play(audioInfo);
     }
 
     /**
@@ -165,6 +177,7 @@ public class AudioPlayerManager {
         ConfigInfo configInfo = ConfigInfo.obtain();
         configInfo.setAudioInfos(audioInfoList);
         //播放歌曲
+        play(audioInfo);
     }
 
     /**

@@ -106,8 +106,7 @@ public class DownloadTaskTest {
         DownloadTask downloadTask2 = new DownloadTask();
         downloadTask2.setTaskName("张学友 - 等你等到我心痛2");
         downloadTask2.setTaskExt("mkv");
-        downloadTask2.setTaskId("5b65e645");
-        downloadTask2.setTaskHash("5F8393A55D5762A63F1A5E92B46E575E");
+        downloadTask2.setTaskId("5F8393A55D5762A63F1A5E92B46E575E");
 
         String fileName2 = downloadTask2.getTaskName();
         String taskPath2 = ResourceUtil.getFilePath(appContext, ResourceConstants.PATH_VIDEO, fileName2 + "." + downloadTask2.getTaskExt());
@@ -123,8 +122,7 @@ public class DownloadTaskTest {
         DownloadTask downloadTask = new DownloadTask();
         downloadTask.setTaskName("张学友 - 等你等到我心痛");
         downloadTask.setTaskExt("mkv");
-        downloadTask.setTaskId("5b65e646");
-        downloadTask.setTaskHash("5F8393A55D5762A63F1A5E92B46E575E");
+        downloadTask.setTaskId("5F8393A55D5762A63F1A5E92B46E575E");
 
         String fileName = downloadTask.getTaskName();
         String taskPath = ResourceUtil.getFilePath(appContext, ResourceConstants.PATH_VIDEO, fileName + "." + downloadTask.getTaskExt());
