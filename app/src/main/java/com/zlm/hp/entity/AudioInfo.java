@@ -4,7 +4,7 @@ import android.os.Parcel;
 import android.os.Parcelable;
 
 import org.greenrobot.greendao.annotation.Entity;
-import org.greenrobot.greendao.annotation.Unique;
+import org.greenrobot.greendao.annotation.Transient;
 import org.greenrobot.greendao.annotation.Generated;
 
 /**
@@ -76,7 +76,6 @@ public class AudioInfo implements Parcelable {
     /**
      *
      */
-    @Unique
     private String hash;
     /**
      * mv hash
@@ -117,6 +116,12 @@ public class AudioInfo implements Parcelable {
      */
     private String downloadUrl;
 
+    /**
+     *
+     */
+    @Transient
+    private int playProgress;
+
     public AudioInfo() {
 
     }
@@ -145,6 +150,10 @@ public class AudioInfo implements Parcelable {
             childCategory = in.readString();
             downloadUrl = in.readString();
         }
+    }
+
+    public String getTitle() {
+        return getSingerName() + " - " + getSongName();
     }
 
     public static final Creator<AudioInfo> CREATOR = new Creator<AudioInfo>() {
@@ -327,7 +336,13 @@ public class AudioInfo implements Parcelable {
         this.downloadUrl = downloadUrl;
     }
 
+    public int getPlayProgress() {
+        return playProgress;
+    }
 
+    public void setPlayProgress(int playProgress) {
+        this.playProgress = playProgress;
+    }
 
     @Override
     public int describeContents() {

@@ -65,7 +65,7 @@ public class DownloadThreadInfoDB {
         Cursor cursor = null;
         try {
             String args[] = {tid, threadNum + "", threadID + ""};
-            String sql = "select count(*) from " + DownloadThreadInfoDao.TABLENAME + " WHERE " + DownloadThreadInfoDao.Properties.TaskId.columnName + "=? and  " + DownloadThreadInfoDao.Properties.ThreadNum.columnName + "=? and " + DownloadThreadInfoDao.Properties.ThreadId.columnName +
+            String sql = "select * from " + DownloadThreadInfoDao.TABLENAME + " WHERE " + DownloadThreadInfoDao.Properties.TaskId.columnName + "=? and  " + DownloadThreadInfoDao.Properties.ThreadNum.columnName + "=? and " + DownloadThreadInfoDao.Properties.ThreadId.columnName +
                     "=?";
             cursor = DBHelper.getInstance(context).getWritableDatabase().rawQuery(sql, args);
             if (cursor.moveToNext()) {
@@ -112,12 +112,18 @@ public class DownloadThreadInfoDB {
 
     /**
      * 更新下载线程任务
-     *
-     * @param downloadThreadInfo
      */
-    public static boolean update(Context context, DownloadThreadInfo downloadThreadInfo) {
+    public static boolean update(Context context, String tid, int threadNum, int threadID,
+                                 int downloadedSize) {
         try {
-            DBHelper.getInstance(context).getDaoSession().getDownloadThreadInfoDao().update(downloadThreadInfo);
+
+            String sql = "UPDATE ";
+            sql += DownloadThreadInfoDao.TABLENAME;
+            sql += " SET " + DownloadThreadInfoDao.Properties.DownloadedSize.columnName + " =?";
+            sql += " where " + DownloadThreadInfoDao.Properties.TaskId.columnName + "=? and " + DownloadThreadInfoDao.Properties.ThreadNum.columnName + "=?  and " + DownloadThreadInfoDao.Properties.ThreadId.columnName + "=?";
+
+            String args[] = {downloadedSize + "", tid, threadNum + "", threadID + ""};
+            DBHelper.getInstance(context).getWritableDatabase().execSQL(sql, args);
             return true;
         } catch (Exception e) {
             e.printStackTrace();
@@ -127,12 +133,15 @@ public class DownloadThreadInfoDB {
 
     /**
      * 删除下载线程任务
-     *
-     * @param downloadThreadInfo
      */
-    public static boolean delete(Context context, DownloadThreadInfo downloadThreadInfo) {
+    public static boolean delete(Context context, String tid, int threadNum) {
         try {
-            DBHelper.getInstance(context).getDaoSession().getDownloadThreadInfoDao().delete(downloadThreadInfo);
+            String sql = "DELETE FROM ";
+            sql += DownloadThreadInfoDao.TABLENAME;
+            sql += " where " + DownloadThreadInfoDao.Properties.TaskId.columnName + "=? and " + DownloadThreadInfoDao.Properties.ThreadNum.columnName + "=?";
+
+            String args[] = {tid, threadNum + ""};
+            DBHelper.getInstance(context).getWritableDatabase().execSQL(sql, args);
             return true;
         } catch (Exception e) {
             e.printStackTrace();

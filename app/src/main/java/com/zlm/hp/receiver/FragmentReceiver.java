@@ -5,6 +5,7 @@ import android.content.Context;
 import android.content.Intent;
 import android.content.IntentFilter;
 import android.os.Bundle;
+import android.text.TextUtils;
 
 
 /**
@@ -34,12 +35,12 @@ public class FragmentReceiver {
     /**
      * fragment的receiver的action
      */
-    private static final String FRAGMENT_RECEIVER_ACTION = "com.zlm.hp.fragment.receiver.action";
+    private static final String FRAGMENT_RECEIVER_ACTION = "com.zlm.hp.receiver.fragment.action";
 
     /**
      *
      */
-    private static final String ACTION_CODE_KEY = "com.zlm.hp.receiver.action.code.key";
+    private static final String ACTION_CODE_KEY = "com.zlm.hp.receiver.fragment.action.code.key";
 
     private BroadcastReceiver mFragmentBroadcastReceiver;
     private IntentFilter mFragmentIntentFilter;
@@ -83,7 +84,9 @@ public class FragmentReceiver {
     public static void sendReceiver(Context context, int code, String bundleKey, Bundle bundleValue) {
         Intent intent = new Intent(FRAGMENT_RECEIVER_ACTION);
         intent.putExtra(ACTION_CODE_KEY, code);
-        intent.putExtra(bundleKey, bundleValue);
+        if (!TextUtils.isEmpty(bundleKey) && bundleValue != null) {
+            intent.putExtra(bundleKey, bundleValue);
+        }
         intent.setFlags(Intent.FLAG_INCLUDE_STOPPED_PACKAGES);
         context.sendBroadcast(intent);
     }

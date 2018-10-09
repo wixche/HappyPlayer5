@@ -1,10 +1,16 @@
 package com.zlm.hp.manager;
 
 import android.content.Context;
+import android.os.Bundle;
 
 import com.zlm.hp.constants.ConfigInfo;
+import com.zlm.hp.constants.ResourceConstants;
+import com.zlm.hp.db.util.DownloadThreadInfoDB;
 import com.zlm.hp.entity.AudioInfo;
+import com.zlm.hp.receiver.AudioBroadcastReceiver;
+import com.zlm.hp.util.ResourceUtil;
 
+import java.io.File;
 import java.util.List;
 
 /**
@@ -97,6 +103,11 @@ public class AudioPlayerManager {
      * 播放歌曲
      */
     private void play(AudioInfo audioInfo) {
+        //还有旧的歌曲在播放
+        if (mPlayStatus == PLAYING) {
+            pause();
+        }
+        mPlayStatus = PLAYING;
 
         ConfigInfo configInfo = ConfigInfo.obtain();
         configInfo.setPlayHash(audioInfo.getHash());
@@ -107,10 +118,37 @@ public class AudioPlayerManager {
                 playLocalSong(audioInfo);
                 break;
             case AudioInfo.TYPE_NET:
-                playNetSong(audioInfo);
+
+                String fileName = audioInfo.getTitle();
+                String filePath = ResourceUtil.getFilePath(mContext, ResourceConstants.PATH_AUDIO, fileName + "." + audioInfo.getFileExt());
+                File audioFile = new File(filePath);
+                if (audioFile.exists()) {
+                    //设置文件路径
+                    audioInfo.setFilePath(filePath);
+                    playLocalSong(audioInfo);
+                } else {
+                    int downloadedSize = DownloadThreadInfoDB.getDownloadedSize(mContext, audioInfo.getHash(), OnLineAudioManager.threadNum);
+                    if (downloadedSize > 1024 * 200) {
+                        playNetSong(audioInfo);
+                    }
+                    mOnLineAudioManager.addDownloadTask(audioInfo);
+                }
                 break;
         }
 
+    }
+
+    /**
+     * 播放正在下载中的网络歌曲
+     *
+     * @param audioInfo
+     */
+    public void playDownloadingNetSong(AudioInfo audioInfo) {
+        //还有旧的歌曲在播放
+        if (mPlayStatus == PLAYING) {
+            pause();
+        }
+        playNetSong(audioInfo);
     }
 
     /**
@@ -119,7 +157,9 @@ public class AudioPlayerManager {
      * @param audioInfo
      */
     private void playNetSong(AudioInfo audioInfo) {
-        mOnLineAudioManager.addDownloadTask(audioInfo);
+        Bundle bundle = new Bundle();
+        bundle.putParcelable(AudioBroadcastReceiver.ACTION_DATA_KEY, audioInfo);
+        AudioBroadcastReceiver.sendReceiver(mContext, AudioBroadcastReceiver.ACTION_CODE_PLAYNETSONG, AudioBroadcastReceiver.ACTION_BUNDLEKEY, bundle);
     }
 
     /**
@@ -128,12 +168,21 @@ public class AudioPlayerManager {
      * @param audioInfo
      */
     private void playLocalSong(AudioInfo audioInfo) {
+        Bundle bundle = new Bundle();
+        bundle.putParcelable(AudioBroadcastReceiver.ACTION_DATA_KEY, audioInfo);
+        AudioBroadcastReceiver.sendReceiver(mContext, AudioBroadcastReceiver.ACTION_CODE_PLAYLOCALSONG, AudioBroadcastReceiver.ACTION_BUNDLEKEY, bundle);
     }
 
     /**
      * 暂停
      */
     public void pause() {
+
+        mPlayStatus = PAUSE;
+        //暂停在线任务
+        mOnLineAudioManager.pauseTask();
+
+        AudioBroadcastReceiver.sendReceiver(mContext, AudioBroadcastReceiver.ACTION_CODE_STOP);
 
     }
 
@@ -196,6 +245,17 @@ public class AudioPlayerManager {
             }
         }
         return index;
+    }
+
+    /**
+     * 获取当前播放歌曲
+     *
+     * @return
+     */
+    public AudioInfo getCurSong(String hash) {
+        ConfigInfo configInfo = ConfigInfo.obtain();
+        AudioInfo curAudioInfo = getCurSong(configInfo.getAudioInfos(), hash);
+        return curAudioInfo;
     }
 
     /**

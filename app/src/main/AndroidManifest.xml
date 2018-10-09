@@ -47,7 +47,12 @@
         <activity android:name=".MainActivity" />
         <activity android:name=".SettingActivity" />
         <activity android:name=".AboutActivity" />
-        <activity android:name=".HelpActivity"></activity>
+        <activity android:name=".HelpActivity" />
+
+        <service
+            android:name="com.zlm.hp.service.AudioPlayerService"
+            android:enabled="true"
+            android:exported="true"></service>
     </application>
 
 </manifest>

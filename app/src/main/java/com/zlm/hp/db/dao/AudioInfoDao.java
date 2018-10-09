@@ -69,7 +69,7 @@ public class AudioInfoDao extends AbstractDao<AudioInfo, Void> {
                 "\"ALBUM_ID\" TEXT," + // 6: albumId
                 "\"SONG_NAME\" TEXT," + // 7: songName
                 "\"SINGER_NAME\" TEXT," + // 8: singerName
-                "\"HASH\" TEXT UNIQUE ," + // 9: hash
+                "\"HASH\" TEXT," + // 9: hash
                 "\"MV_HASH\" TEXT," + // 10: mvHash
                 "\"FILE_EXT\" TEXT," + // 11: fileExt
                 "\"FILE_SIZE\" INTEGER NOT NULL ," + // 12: fileSize

@@ -51,6 +51,7 @@ public class DBHelper {
      */
     public Database getWritableDatabase() {
         return mDevOpenHelper.getEncryptedWritableDb(mPassword);
+//        return mDevOpenHelper.getWritableDb();
     }
 
     /**

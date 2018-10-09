@@ -24,7 +24,7 @@ public class DownloadTaskDao extends AbstractDao<DownloadTask, Void> {
      * Can be used for QueryBuilder and for referencing column names.
      */
     public static class Properties {
-        public final static Property TaskId = new Property(0, String.class, "taskId", true, "TASK_ID");
+        public final static Property TaskId = new Property(0, String.class, "taskId", false, "TASK_ID");
         public final static Property TaskName = new Property(1, String.class, "taskName", false, "TASK_NAME");
         public final static Property TaskExt = new Property(2, String.class, "taskExt", false, "TASK_EXT");
         public final static Property TaskPath = new Property(3, String.class, "taskPath", false, "TASK_PATH");
@@ -33,7 +33,7 @@ public class DownloadTaskDao extends AbstractDao<DownloadTask, Void> {
         public final static Property TaskUrl = new Property(6, String.class, "taskUrl", false, "TASK_URL");
         public final static Property CreateTime = new Property(7, java.util.Date.class, "createTime", false, "CREATE_TIME");
         public final static Property Status = new Property(8, int.class, "status", false, "STATUS");
-        public final static Property ThreadNum = new Property(9, int.class, "threadNum", true, "THREAD_NUM");
+        public final static Property ThreadNum = new Property(9, int.class, "threadNum", false, "THREAD_NUM");
         public final static Property TaskFileSize = new Property(10, long.class, "taskFileSize", false, "TASK_FILE_SIZE");
     }
 
@@ -50,7 +50,7 @@ public class DownloadTaskDao extends AbstractDao<DownloadTask, Void> {
     public static void createTable(Database db, boolean ifNotExists) {
         String constraint = ifNotExists? "IF NOT EXISTS ": "";
         db.execSQL("CREATE TABLE " + constraint + "\"DOWNLOAD_TASK\" (" + //
-                "\"TASK_ID\" TEXT PRIMARY KEY NOT NULL ," + // 0: taskId
+                "\"TASK_ID\" TEXT," + // 0: taskId
                 "\"TASK_NAME\" TEXT," + // 1: taskName
                 "\"TASK_EXT\" TEXT," + // 2: taskExt
                 "\"TASK_PATH\" TEXT," + // 3: taskPath
@@ -59,7 +59,7 @@ public class DownloadTaskDao extends AbstractDao<DownloadTask, Void> {
                 "\"TASK_URL\" TEXT," + // 6: taskUrl
                 "\"CREATE_TIME\" INTEGER," + // 7: createTime
                 "\"STATUS\" INTEGER NOT NULL ," + // 8: status
-                "\"THREAD_NUM\" INTEGER PRIMARY KEY NOT NULL ," + // 9: threadNum
+                "\"THREAD_NUM\" INTEGER NOT NULL ," + // 9: threadNum
                 "\"TASK_FILE_SIZE\" INTEGER NOT NULL );"); // 10: taskFileSize
     }
 

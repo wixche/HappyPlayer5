@@ -29,6 +29,7 @@ import com.zlm.hp.fragment.SpecialFragment;
 import com.zlm.hp.manager.ActivityManager;
 import com.zlm.hp.manager.AudioPlayerManager;
 import com.zlm.hp.receiver.FragmentReceiver;
+import com.zlm.hp.service.AudioPlayerService;
 import com.zlm.hp.util.AppBarUtil;
 import com.zlm.hp.util.AppOpsUtils;
 import com.zlm.hp.util.CodeLineUtil;
@@ -144,7 +145,15 @@ public class MainActivity extends BaseActivity {
         initTitleViews();
         initMenu();
         initReceiver();
+        initService();
         loadData();
+    }
+
+    /**
+     * 初始服务
+     */
+    private void initService() {
+        AudioPlayerService.startService(this);
     }
 
 
@@ -597,8 +606,16 @@ public class MainActivity extends BaseActivity {
     @Override
     protected void onDestroy() {
         releaseData();
+        destroyService();
         destroyReceiver();
         super.onDestroy();
+    }
+
+    /**
+     * 销毁服务
+     */
+    private void destroyService() {
+        AudioPlayerService.stopService(this);
     }
 
     /**

@@ -50,7 +50,7 @@ public class VideoInfoDao extends AbstractDao<VideoInfo, Void> {
     public static void createTable(Database db, boolean ifNotExists) {
         String constraint = ifNotExists? "IF NOT EXISTS ": "";
         db.execSQL("CREATE TABLE " + constraint + "\"VIDEO_INFO\" (" + //
-                "\"HASH\" TEXT UNIQUE ," + // 0: hash
+                "\"HASH\" TEXT," + // 0: hash
                 "\"FILE_EXT\" TEXT," + // 1: fileExt
                 "\"FILE_SIZE\" INTEGER NOT NULL ," + // 2: fileSize
                 "\"FILE_SIZE_TEXT\" TEXT," + // 3: fileSizeText

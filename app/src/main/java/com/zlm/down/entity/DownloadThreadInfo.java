@@ -4,7 +4,6 @@ import android.os.Parcel;
 import android.os.Parcelable;
 
 import org.greenrobot.greendao.annotation.Entity;
-import org.greenrobot.greendao.annotation.Id;
 import org.greenrobot.greendao.annotation.Generated;
 
 /**
@@ -17,11 +16,11 @@ import org.greenrobot.greendao.annotation.Generated;
         generateGettersSetters = false
 )
 public class DownloadThreadInfo implements Parcelable {
-    @Id
+
     private String taskId;
-    @Id
+
     private int threadNum;
-    @Id
+
     private int threadId;
     private int downloadedSize;
 

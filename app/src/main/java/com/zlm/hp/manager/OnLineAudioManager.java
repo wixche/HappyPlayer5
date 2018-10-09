@@ -75,6 +75,14 @@ public class OnLineAudioManager {
                 if (task.getTaskFileSize() <= downloadedSize) {
                     return;
                 }
+                if (downloadedSize > 1024 * 200) {
+                    //开始播放音频歌曲
+                    AudioInfo audioInfo = AudioPlayerManager.newInstance(mContext).getCurSong(task.getTaskId());
+                    if (audioInfo != null) {
+                        AudioPlayerManager.newInstance(mContext).playDownloadingNetSong(audioInfo);
+                    }
+                }
+
                 ZLog.d(new CodeLineUtil().getCodeLineInfo(), "task taskDownloading ->" + task.getTaskName() + " " + downloadedSize);
             }
 
@@ -135,7 +143,7 @@ public class OnLineAudioManager {
 
                 if (DownloadThreadInfoDB.isExists(mContext, task.getTaskId(), threadNum, threadId)) {
                     //任务存在
-                    DownloadThreadInfoDB.update(mContext, downloadThreadInfo);
+                    DownloadThreadInfoDB.update(mContext, task.getTaskId(), threadNum, threadId, downloadedSize);
                 } else {
                     //任务不存在
                     DownloadThreadInfoDB.add(mContext, downloadThreadInfo);
@@ -157,7 +165,7 @@ public class OnLineAudioManager {
                     downloadThreadInfo.setTaskId(task.getTaskId());
                     downloadThreadInfo.setThreadNum(threadNum);
                     //任务存在
-                    DownloadThreadInfoDB.update(mContext, downloadThreadInfo);
+                    DownloadThreadInfoDB.update(mContext, task.getTaskId(), threadNum, threadId, downloadedSize);
                 }
             }
 
@@ -176,9 +184,7 @@ public class OnLineAudioManager {
      */
     public synchronized void addDownloadTask(final AudioInfo audioInfo) {
         //暂停旧的任务
-        if (!mCurTaskId.equals("-1")) {
-            pauseTask(mCurTaskId);
-        }
+        pauseTask();
         //异步下载
         mWorkerHandler.post(new Runnable() {
             @Override
@@ -201,13 +207,13 @@ public class OnLineAudioManager {
         apiHttpClient.getSongInfo(mContext, audioInfo.getHash(), audioInfo, configInfo.isWifi());
 
         DownloadTask downloadTask = new DownloadTask();
-        downloadTask.setTaskName(audioInfo.getSingerName() + " - " + audioInfo.getSongName());
+        downloadTask.setTaskName(audioInfo.getTitle());
         downloadTask.setTaskExt(audioInfo.getFileExt());
         downloadTask.setTaskId(audioInfo.getHash());
 
-        String fileName = downloadTask.getTaskName();
+        String fileName = audioInfo.getTitle();
         //String taskPath = ResourceUtil.getFilePath(mContext, ResourceConstants.PATH_AUDIO, fileName + "." + downloadTask.getTaskExt());
-        String taskTempPath = ResourceUtil.getFilePath(mContext, ResourceConstants.PATH_CACHE_AUDIO, fileName + ".temp");
+        String taskTempPath = ResourceUtil.getFilePath(mContext, ResourceConstants.PATH_CACHE_AUDIO, audioInfo.getHash() + ".temp");
 
 //        downloadTask.setTaskPath(taskPath);
         downloadTask.setTaskTempPath(taskTempPath);
@@ -221,10 +227,13 @@ public class OnLineAudioManager {
     /**
      * 暂停任务
      *
-     * @param taskId
+     * @param
      */
-    private synchronized void pauseTask(String taskId) {
-        mDownloadTaskManager.pauseDownloadTask(taskId);
+    public synchronized void pauseTask() {
+        //暂停旧的任务
+        if (!mCurTaskId.equals("-1")) {
+            mDownloadTaskManager.pauseDownloadTask(mCurTaskId);
+        }
     }
 
 

@@ -7,7 +7,6 @@ import android.os.Parcelable;
 import com.zlm.down.thread.DownloadTaskThreadManager;
 
 import org.greenrobot.greendao.annotation.Entity;
-import org.greenrobot.greendao.annotation.Id;
 import org.greenrobot.greendao.annotation.Transient;
 
 import java.util.Date;
@@ -51,7 +50,7 @@ public class DownloadTask implements Parcelable {
     /**
      * 任务id
      */
-    @Id
+
     private String taskId;
     /**
      * 任务名称
@@ -91,7 +90,7 @@ public class DownloadTask implements Parcelable {
     /**
      * 线程总数
      */
-    @Id
+
     private int threadNum;
     /**
      * 任务文件大小
