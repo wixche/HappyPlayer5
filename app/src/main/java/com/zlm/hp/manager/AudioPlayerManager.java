@@ -1,13 +1,13 @@
 package com.zlm.hp.manager;
 
 import android.content.Context;
-import android.os.Bundle;
 
 import com.zlm.hp.constants.ConfigInfo;
 import com.zlm.hp.constants.ResourceConstants;
 import com.zlm.hp.db.util.DownloadThreadInfoDB;
 import com.zlm.hp.entity.AudioInfo;
 import com.zlm.hp.receiver.AudioBroadcastReceiver;
+import com.zlm.hp.util.RandomUtil;
 import com.zlm.hp.util.ResourceUtil;
 
 import java.io.File;
@@ -28,6 +28,11 @@ public class AudioPlayerManager {
      * 暂停
      */
     public static final int PAUSE = 1;
+
+    /**
+     * 正在播放
+     */
+    public static final int PLAYINGNET = 2;
 
     /**
      * 当前播放状态
@@ -55,7 +60,7 @@ public class AudioPlayerManager {
      * @param context
      * @return
      */
-    public static AudioPlayerManager newInstance(Context context) {
+    public synchronized static AudioPlayerManager newInstance(Context context) {
         if (_AudioPlayerManager == null) {
             _AudioPlayerManager = new AudioPlayerManager(context);
         }
@@ -63,11 +68,28 @@ public class AudioPlayerManager {
     }
 
     /**
+     *
+     */
+    public synchronized void init() {
+        ConfigInfo configInfo = ConfigInfo.obtain();
+        AudioInfo audioInfo = getCurSong(configInfo.getPlayHash());
+        if (audioInfo != null) {
+            AudioBroadcastReceiver.sendPlayInitReceiver(mContext, audioInfo);
+        } else {
+            AudioBroadcastReceiver.sendNullReceiver(mContext);
+        }
+    }
+
+    /**
      * 添加下一首准备播放的歌曲
      */
-    public void addNextSong(AudioInfo audioInfo) {
+    public synchronized void addNextSong(AudioInfo audioInfo) {
         ConfigInfo configInfo = ConfigInfo.obtain();
         List<AudioInfo> audioInfoList = configInfo.getAudioInfos();
+        int nextSongIndex = getCurSongIndex(audioInfoList, audioInfo.getHash());
+        if (nextSongIndex != -1) {
+            audioInfoList.remove(nextSongIndex);
+        }
         int curIndex = getCurSongIndex(audioInfoList, configInfo.getPlayHash());
         if (curIndex != -1) {
             audioInfoList.add((curIndex + 1), audioInfo);
@@ -78,44 +100,43 @@ public class AudioPlayerManager {
     }
 
     /**
-     * 播放或者暂停
-     */
-    public void playOrPause() {
-        if (mPlayStatus == PLAYING) {
-            pause();
-        } else {
-            play();
-        }
-    }
-
-    /**
      * 播放歌曲
+     *
+     * @param playProgress
      */
-    public void play() {
+    public synchronized void play(int playProgress) {
         ConfigInfo configInfo = ConfigInfo.obtain();
         AudioInfo curAudioInfo = getCurSong(configInfo.getAudioInfos(), configInfo.getPlayHash());
         if (curAudioInfo != null) {
-            play(curAudioInfo);
+            curAudioInfo.setPlayProgress(playProgress);
+            play(curAudioInfo, false);
         }
     }
 
     /**
      * 播放歌曲
      */
-    private void play(AudioInfo audioInfo) {
+    private void play(AudioInfo audioInfo, boolean isInit) {
         //还有旧的歌曲在播放
-        if (mPlayStatus == PLAYING) {
+        if (mPlayStatus == PLAYING || mPlayStatus == PLAYINGNET) {
             pause();
         }
-        mPlayStatus = PLAYING;
+
+        if (isInit) {
+            audioInfo.setPlayProgress(0);
+        }
 
         ConfigInfo configInfo = ConfigInfo.obtain();
         configInfo.setPlayHash(audioInfo.getHash());
         configInfo.save();
 
+        //发送play init 数据
+        AudioBroadcastReceiver.sendPlayInitReceiver(mContext, audioInfo);
+
         switch (audioInfo.getType()) {
             case AudioInfo.TYPE_LOCAL:
-                playLocalSong(audioInfo);
+                mPlayStatus = PLAYING;
+                AudioBroadcastReceiver.sendPlayLocalSongReceiver(mContext, audioInfo);
                 break;
             case AudioInfo.TYPE_NET:
 
@@ -123,13 +144,15 @@ public class AudioPlayerManager {
                 String filePath = ResourceUtil.getFilePath(mContext, ResourceConstants.PATH_AUDIO, fileName + "." + audioInfo.getFileExt());
                 File audioFile = new File(filePath);
                 if (audioFile.exists()) {
+                    mPlayStatus = PLAYING;
                     //设置文件路径
                     audioInfo.setFilePath(filePath);
-                    playLocalSong(audioInfo);
+                    AudioBroadcastReceiver.sendPlayLocalSongReceiver(mContext, audioInfo);
                 } else {
+                    mPlayStatus = PLAYINGNET;
                     int downloadedSize = DownloadThreadInfoDB.getDownloadedSize(mContext, audioInfo.getHash(), OnLineAudioManager.threadNum);
                     if (downloadedSize > 1024 * 200) {
-                        playNetSong(audioInfo);
+                        AudioBroadcastReceiver.sendPlayNetSongReceiver(mContext, audioInfo);
                     }
                     mOnLineAudioManager.addDownloadTask(audioInfo);
                 }
@@ -143,67 +166,174 @@ public class AudioPlayerManager {
      *
      * @param audioInfo
      */
-    public void playDownloadingNetSong(AudioInfo audioInfo) {
+    public synchronized void playDownloadingNetSong(AudioInfo audioInfo) {
         //还有旧的歌曲在播放
         if (mPlayStatus == PLAYING) {
             pause();
         }
-        playNetSong(audioInfo);
+        mPlayStatus = PLAYING;
+        AudioBroadcastReceiver.sendPlayNetSongReceiver(mContext, audioInfo);
     }
 
-    /**
-     * 播放网络歌曲
-     *
-     * @param audioInfo
-     */
-    private void playNetSong(AudioInfo audioInfo) {
-        Bundle bundle = new Bundle();
-        bundle.putParcelable(AudioBroadcastReceiver.ACTION_DATA_KEY, audioInfo);
-        AudioBroadcastReceiver.sendReceiver(mContext, AudioBroadcastReceiver.ACTION_CODE_PLAYNETSONG, AudioBroadcastReceiver.ACTION_BUNDLEKEY, bundle);
-    }
-
-    /**
-     * 播放本地歌曲
-     *
-     * @param audioInfo
-     */
-    private void playLocalSong(AudioInfo audioInfo) {
-        Bundle bundle = new Bundle();
-        bundle.putParcelable(AudioBroadcastReceiver.ACTION_DATA_KEY, audioInfo);
-        AudioBroadcastReceiver.sendReceiver(mContext, AudioBroadcastReceiver.ACTION_CODE_PLAYLOCALSONG, AudioBroadcastReceiver.ACTION_BUNDLEKEY, bundle);
-    }
 
     /**
      * 暂停
      */
-    public void pause() {
+    public synchronized void pause() {
 
         mPlayStatus = PAUSE;
         //暂停在线任务
         mOnLineAudioManager.pauseTask();
 
-        AudioBroadcastReceiver.sendReceiver(mContext, AudioBroadcastReceiver.ACTION_CODE_STOP);
+        AudioBroadcastReceiver.sendStopReceiver(mContext);
 
     }
 
     /**
      * 下一首
      */
-    public void next() {
+    public synchronized void next() {
+        AudioInfo nextAudioInfo = null;
+        ConfigInfo configInfo = ConfigInfo.obtain();
+        List<AudioInfo> audioInfoList = configInfo.getAudioInfos();
+        String hash = configInfo.getPlayHash();
+        //获取播放索引
+        int playIndex = getCurSongIndex(audioInfoList, hash);
+
+        if (playIndex == -1) {
+
+            pause();
+            AudioBroadcastReceiver.sendNullReceiver(mContext);
+
+            return;
+        }
+
+        int playModel = configInfo.getPlayModel();
+        switch (playModel) {
+            case 0:
+                // 顺序播放
+
+                playIndex++;
+
+
+                break;
+            case 1:
+                // 随机播放
+
+                playIndex = RandomUtil.createRandomNum();
+
+
+                break;
+            case 2:
+                // 循环播放
+
+                playIndex++;
+                if (playIndex >= audioInfoList.size()) {
+                    playIndex = 0;
+                }
+
+                break;
+            case 3:
+                // 单曲播放
+                break;
+        }
+
+        if (playIndex >= audioInfoList.size()) {
+            pause();
+            AudioBroadcastReceiver.sendNullReceiver(mContext);
+            return;
+        }
+        if (audioInfoList.size() > 0) {
+
+            nextAudioInfo = audioInfoList.get(playIndex);
+
+        }
+
+        if (nextAudioInfo == null) {
+            pause();
+            AudioBroadcastReceiver.sendNullReceiver(mContext);
+        } else {
+            play(nextAudioInfo, true);
+        }
 
     }
 
     /**
      * 上一首
      */
-    public void pre() {
+    public synchronized void pre() {
+        AudioInfo nextAudioInfo = null;
+        ConfigInfo configInfo = ConfigInfo.obtain();
+        List<AudioInfo> audioInfoList = configInfo.getAudioInfos();
+        String hash = configInfo.getPlayHash();
+        //获取播放索引
+        int playIndex = getCurSongIndex(audioInfoList, hash);
 
+        if (playIndex == -1) {
+
+            pause();
+            AudioBroadcastReceiver.sendNullReceiver(mContext);
+
+            return;
+        }
+
+        int playModel = configInfo.getPlayModel();
+        switch (playModel) {
+            case 0:
+                // 顺序播放
+
+                playIndex--;
+
+
+                break;
+            case 1:
+                // 随机播放
+
+                playIndex = RandomUtil.createRandomNum();
+
+
+                break;
+            case 2:
+                // 循环播放
+
+                // 循环播放
+                playIndex--;
+                if (playIndex < 0) {
+                    playIndex = 0;
+                }
+                if (playIndex >= audioInfoList.size()) {
+                    playIndex = 0;
+                }
+
+                break;
+            case 3:
+                // 单曲播放
+                break;
+        }
+
+        if (playIndex < 0) {
+            pause();
+            AudioBroadcastReceiver.sendNullReceiver(mContext);
+            return;
+        }
+        if (audioInfoList.size() > 0) {
+
+            nextAudioInfo = audioInfoList.get(playIndex);
+
+        }
+
+        if (nextAudioInfo == null) {
+            pause();
+            AudioBroadcastReceiver.sendNullReceiver(mContext);
+        } else {
+            play(nextAudioInfo, true);
+        }
     }
 
     /**
      * 释放
      */
-    public void release() {
+    public synchronized void release() {
         mPlayStatus = PAUSE;
         mOnLineAudioManager.release();
     }
@@ -211,9 +341,9 @@ public class AudioPlayerManager {
     /**
      * 播放歌曲
      */
-    public void playSong(AudioInfo audioInfo) {
+    public synchronized void playSong(AudioInfo audioInfo) {
         addNextSong(audioInfo);
-        play(audioInfo);
+        play(audioInfo, false);
     }
 
     /**
@@ -222,11 +352,13 @@ public class AudioPlayerManager {
      * @param audioInfoList
      * @param audioInfo
      */
-    public void playSong(List<AudioInfo> audioInfoList, AudioInfo audioInfo) {
-        ConfigInfo configInfo = ConfigInfo.obtain();
-        configInfo.setAudioInfos(audioInfoList);
-        //播放歌曲
-        play(audioInfo);
+    public synchronized void playSong(List<AudioInfo> audioInfoList, AudioInfo audioInfo) {
+        if (audioInfoList != null) {
+            ConfigInfo configInfo = ConfigInfo.obtain();
+            configInfo.setAudioInfos(audioInfoList);
+            //播放歌曲
+            play(audioInfo, false);
+        }
     }
 
     /**
@@ -236,7 +368,7 @@ public class AudioPlayerManager {
      */
     private int getCurSongIndex(List<AudioInfo> audioInfoList, String hash) {
         int index = -1;
-
+        if (audioInfoList == null) return index;
         for (int i = 0; i < audioInfoList.size(); i++) {
             AudioInfo temp = audioInfoList.get(i);
             if (temp.getHash().equals(hash)) {
@@ -252,7 +384,7 @@ public class AudioPlayerManager {
      *
      * @return
      */
-    public AudioInfo getCurSong(String hash) {
+    public synchronized AudioInfo getCurSong(String hash) {
         ConfigInfo configInfo = ConfigInfo.obtain();
         AudioInfo curAudioInfo = getCurSong(configInfo.getAudioInfos(), hash);
         return curAudioInfo;
@@ -265,6 +397,7 @@ public class AudioPlayerManager {
      */
     private AudioInfo getCurSong(List<AudioInfo> audioInfoList, String hash) {
         AudioInfo curAudioInfo = null;
+        if (audioInfoList == null) return null;
         for (int i = 0; i < audioInfoList.size(); i++) {
             AudioInfo temp = audioInfoList.get(i);
             if (temp.getHash().equals(hash)) {

@@ -7,6 +7,12 @@ import android.content.IntentFilter;
 import android.os.Bundle;
 import android.text.TextUtils;
 
+import com.zlm.hp.constants.ConfigInfo;
+import com.zlm.hp.entity.AudioInfo;
+
+import java.util.ArrayList;
+
+
 /**
  * @Description: 音频监听
  * @author: zhangliangming
@@ -34,26 +40,45 @@ public class AudioBroadcastReceiver {
     public static final String ACTION_DATA_KEY = "com.zlm.hp.receiver.audio.action.data.key";
 
     /**
+     * null
+     */
+    public static final int ACTION_CODE_NULL = 0;
+
+    /**
+     * 播放初始化
+     */
+    public static final int ACTION_CODE_INIT = 1;
+
+    /**
+     * 播放
+     */
+    public static final int ACTION_CODE_PLAY = 2;
+    /**
+     * 播放
+     */
+    public static final int ACTION_CODE_PLAYING = 3;
+
+    /**
      * 播放本地歌曲
      */
-    public static final int ACTION_CODE_PLAYLOCALSONG = 1;
+    public static final int ACTION_CODE_SERVICE_PLAYLOCALSONG = 4;
 
     /**
      * 播放网络歌曲
      */
-    public static final int ACTION_CODE_PLAYNETSONG = 2;
+    public static final int ACTION_CODE_SERVICE_PLAYNETSONG = 5;
 
     /**
      * 停止播放歌曲
      */
-    public static final int ACTION_CODE_STOP = 3;
+    public static final int ACTION_CODE_STOP = 6;
 
 
     private BroadcastReceiver mAudioBroadcastReceiver;
     private IntentFilter mAudioIntentFilter;
     private AudioReceiverListener mAudioReceiverListener;
 
-    public AudioBroadcastReceiver(Context context) {
+    public AudioBroadcastReceiver() {
         mAudioIntentFilter = new IntentFilter();
         mAudioIntentFilter.addAction(AUDIO_RECEIVER_ACTION);
     }
@@ -98,14 +123,89 @@ public class AudioBroadcastReceiver {
         context.sendBroadcast(intent);
     }
 
+
     /**
      * 发广播
      *
      * @param context
      * @param code
      */
-    public static void sendReceiver(Context context, int code) {
+    private static void sendReceiver(Context context, int code) {
         sendReceiver(context, code, null, null);
+    }
+
+    /**
+     * 发null广播
+     *
+     * @param context
+     */
+    public static void sendNullReceiver(Context context) {
+
+        //清空当前的播放的索引
+        ConfigInfo configInfo = ConfigInfo.obtain();
+        configInfo.setPlayHash("");
+        //configInfo.setAudioInfos(new ArrayList<AudioInfo>());
+        configInfo.save();
+
+        sendReceiver(context, ACTION_CODE_NULL, null, null);
+    }
+
+    /**
+     * 发null广播
+     *
+     * @param context
+     */
+    public static void sendStopReceiver(Context context) {
+        sendReceiver(context, ACTION_CODE_STOP, null, null);
+    }
+
+    /**
+     * 发播放中广播
+     */
+    public static void sendPlayingReceiver(Context context, AudioInfo audioInfo) {
+        Bundle bundle = new Bundle();
+        bundle.putParcelable(ACTION_DATA_KEY, audioInfo);
+        sendReceiver(context, ACTION_CODE_PLAYING, ACTION_BUNDLEKEY, bundle);
+    }
+
+    /**
+     * 发播放广播
+     */
+    public static void sendPlayReceiver(Context context) {
+        sendReceiver(context, ACTION_CODE_PLAY, null, null);
+    }
+    /**
+     * 播放网络歌曲
+     *
+     * @param audioInfo
+     */
+    public static void sendPlayNetSongReceiver(Context context, AudioInfo audioInfo) {
+        Bundle bundle = new Bundle();
+        bundle.putParcelable(ACTION_DATA_KEY, audioInfo);
+        sendReceiver(context, ACTION_CODE_SERVICE_PLAYNETSONG, ACTION_BUNDLEKEY, bundle);
+    }
+
+    /**
+     * init歌曲
+     *
+     * @param audioInfo
+     */
+    public static void sendPlayInitReceiver(Context context, AudioInfo audioInfo) {
+        Bundle bundle = new Bundle();
+        bundle.putParcelable(ACTION_DATA_KEY, audioInfo);
+        sendReceiver(context, ACTION_CODE_INIT, ACTION_BUNDLEKEY, bundle);
+    }
+
+
+    /**
+     * 播放本地歌曲
+     *
+     * @param audioInfo
+     */
+    public static void sendPlayLocalSongReceiver(Context context, AudioInfo audioInfo) {
+        Bundle bundle = new Bundle();
+        bundle.putParcelable(ACTION_DATA_KEY, audioInfo);
+        sendReceiver(context, ACTION_CODE_SERVICE_PLAYLOCALSONG, ACTION_BUNDLEKEY, bundle);
     }
 
 

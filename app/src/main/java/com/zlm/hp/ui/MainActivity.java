@@ -13,7 +13,9 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.WindowManager;
 import android.widget.FrameLayout;
+import android.widget.ImageView;
 import android.widget.LinearLayout;
+import android.widget.TextView;
 
 import com.dou361.dialogui.DialogUIUtils;
 import com.dou361.dialogui.listener.DialogUIListener;
@@ -21,6 +23,7 @@ import com.suke.widget.SwitchButton;
 import com.zlm.hp.adapter.TabFragmentAdapter;
 import com.zlm.hp.async.AsyncHandlerTask;
 import com.zlm.hp.constants.ConfigInfo;
+import com.zlm.hp.entity.AudioInfo;
 import com.zlm.hp.fragment.LastSongFragment;
 import com.zlm.hp.fragment.MeFragment;
 import com.zlm.hp.fragment.NetSongFragment;
@@ -28,6 +31,7 @@ import com.zlm.hp.fragment.RecommendFragment;
 import com.zlm.hp.fragment.SpecialFragment;
 import com.zlm.hp.manager.ActivityManager;
 import com.zlm.hp.manager.AudioPlayerManager;
+import com.zlm.hp.receiver.AudioBroadcastReceiver;
 import com.zlm.hp.receiver.FragmentReceiver;
 import com.zlm.hp.service.AudioPlayerService;
 import com.zlm.hp.util.AppBarUtil;
@@ -40,6 +44,7 @@ import com.zlm.hp.util.ZLog;
 import com.zlm.hp.widget.IconfontImageButtonTextView;
 import com.zlm.hp.widget.IconfontIndicatorTextView;
 import com.zlm.hp.widget.WhiteTranRelativeLayout;
+import com.zlm.libs.widget.MusicSeekBar;
 import com.zlm.libs.widget.SlidingMenuLayout;
 
 import java.util.ArrayList;
@@ -119,6 +124,31 @@ public class MainActivity extends BaseActivity {
     private SwitchButton mLocklrcSwitchButton;
 
     /**
+     * 歌曲名称tv
+     */
+    private TextView mSongNameTextView;
+    /**
+     * 歌手tv
+     */
+    private TextView mSingerNameTextView;
+    /**
+     * 播放按钮
+     */
+    private ImageView mPlayImageView;
+    /**
+     * 暂停按钮
+     */
+    private ImageView mPauseImageView;
+    /**
+     * 下一首按钮
+     */
+    private ImageView mNextImageView;
+    /**
+     * 歌曲进度
+     */
+    private MusicSeekBar mMusicSeekBar;
+
+    /**
      *
      */
     private FragmentReceiver mFragmentReceiver;
@@ -132,6 +162,11 @@ public class MainActivity extends BaseActivity {
      */
     private final int LOAD_CONFIG_DATA = 1;
 
+    /**
+     * 音频广播
+     */
+    private AudioBroadcastReceiver mAudioBroadcastReceiver;
+
     @Override
     protected int setContentLayoutResID() {
         return R.layout.activity_main;
@@ -144,10 +179,12 @@ public class MainActivity extends BaseActivity {
         initViewPage();
         initTitleViews();
         initMenu();
+        initPlayBarViews();
         initReceiver();
         initService();
         loadData();
     }
+
 
     /**
      * 初始服务
@@ -161,11 +198,18 @@ public class MainActivity extends BaseActivity {
      * 初始化广播
      */
     private void initReceiver() {
+
+        //fragment广播
         mFragmentReceiver = new FragmentReceiver(mContext);
         mFragmentReceiver.setFragmentReceiverListener(new FragmentReceiver.FragmentReceiverListener() {
             @Override
-            public void onReceive(Context context, Intent intent, int code) {
-                handleFragmentReceiver(intent, code);
+            public void onReceive(Context context, final Intent intent, final int code) {
+                mUIHandler.post(new Runnable() {
+                    @Override
+                    public void run() {
+                        handleFragmentReceiver(intent, code);
+                    }
+                });
             }
 
             /**
@@ -173,10 +217,11 @@ public class MainActivity extends BaseActivity {
              * @param intent
              * @param code
              */
-            private void handleFragmentReceiver(Intent intent, int code) {
+            private void handleFragmentReceiver(final Intent intent, int code) {
 
                 switch (code) {
                     case FragmentReceiver.ACTION_CODE_OPEN_RECOMMENDFRAGMENT:
+
                         //排行
                         Bundle recommendBundle = intent.getBundleExtra(NetSongFragment.ARGUMENTS_KEY);
                         NetSongFragment recommendSongFragment = NetSongFragment.newInstance();
@@ -185,8 +230,10 @@ public class MainActivity extends BaseActivity {
                         recommendSongFragment.setArguments(recommendBundle);
                         mSlidingMenuOnListener.addAndShowFragment(recommendSongFragment);
 
+
                         break;
                     case FragmentReceiver.ACTION_CODE_OPEN_SPECIALFRAGMENT:
+
                         //歌单
                         Bundle specialBundle = intent.getBundleExtra(NetSongFragment.ARGUMENTS_KEY);
                         NetSongFragment specialSongFragment = NetSongFragment.newInstance();
@@ -194,14 +241,89 @@ public class MainActivity extends BaseActivity {
                         specialSongFragment.setArguments(specialBundle);
 
                         mSlidingMenuOnListener.addAndShowFragment(specialSongFragment);
+
+
                         break;
                     case FragmentReceiver.ACTION_CODE_CLOSE_FRAGMENT:
+
                         mSlidingMenuOnListener.hideFragment();
+
                         break;
                 }
             }
         });
         mFragmentReceiver.registerReceiver(mContext);
+
+        //音频广播
+        mAudioBroadcastReceiver = new AudioBroadcastReceiver();
+        mAudioBroadcastReceiver.setAudioReceiverListener(new AudioBroadcastReceiver.AudioReceiverListener() {
+            @Override
+            public void onReceive(Context context, final Intent intent, final int code) {
+                mUIHandler.post(new Runnable() {
+                    @Override
+                    public void run() {
+                        handleAudioBroadcastReceiver(intent, code);
+                    }
+                });
+            }
+
+            private void handleAudioBroadcastReceiver(Intent intent, int code) {
+                switch (code) {
+                    case AudioBroadcastReceiver.ACTION_CODE_NULL:
+
+                        //空数据
+                        mSongNameTextView.setText(R.string.def_songName);
+                        mSingerNameTextView.setText(R.string.def_artist);
+                        mPauseImageView.setVisibility(View.INVISIBLE);
+                        mPlayImageView.setVisibility(View.VISIBLE);
+
+                        //
+                        mMusicSeekBar.setEnabled(false);
+                        mMusicSeekBar.setProgress(0);
+                        mMusicSeekBar.setSecondaryProgress(0);
+                        mMusicSeekBar.setMax(0);
+
+
+                        break;
+                    case AudioBroadcastReceiver.ACTION_CODE_INIT:
+                        Bundle initBundle = intent.getBundleExtra(AudioBroadcastReceiver.ACTION_BUNDLEKEY);
+                        AudioInfo initAudioInfo = initBundle.getParcelable(AudioBroadcastReceiver.ACTION_DATA_KEY);
+                        if (initAudioInfo != null) {
+                            mSongNameTextView.setText(initAudioInfo.getSongName());
+                            mSingerNameTextView.setText(initAudioInfo.getSingerName());
+                            mPauseImageView.setVisibility(View.INVISIBLE);
+                            mPlayImageView.setVisibility(View.VISIBLE);
+
+                            //
+                            mMusicSeekBar.setEnabled(true);
+                            mMusicSeekBar.setMax((int) initAudioInfo.getDuration());
+                            mMusicSeekBar.setProgress((int) initAudioInfo.getPlayProgress());
+                            mMusicSeekBar.setSecondaryProgress(0);
+                        }
+                        break;
+                    case AudioBroadcastReceiver.ACTION_CODE_PLAYING:
+
+                        Bundle playBundle = intent.getBundleExtra(AudioBroadcastReceiver.ACTION_BUNDLEKEY);
+                        AudioInfo playingAudioInfo = playBundle.getParcelable(AudioBroadcastReceiver.ACTION_DATA_KEY);
+                        if (playingAudioInfo != null) {
+                            mPauseImageView.setVisibility(View.VISIBLE);
+                            mPlayImageView.setVisibility(View.INVISIBLE);
+
+                            //
+                            mMusicSeekBar.setProgress((int) playingAudioInfo.getPlayProgress());
+                        }
+
+                        break;
+                    case AudioBroadcastReceiver.ACTION_CODE_STOP:
+                        //暂停完成
+                        mPauseImageView.setVisibility(View.INVISIBLE);
+                        mPlayImageView.setVisibility(View.VISIBLE);
+
+                        break;
+                }
+            }
+        });
+        mAudioBroadcastReceiver.registerReceiver(mContext);
     }
 
     /**
@@ -234,7 +356,10 @@ public class MainActivity extends BaseActivity {
     protected void handleWorkerMessage(Message msg) {
         switch (msg.what) {
             case LOAD_CONFIG_DATA:
+
                 mConfigInfo = ConfigInfo.obtain();
+                AudioPlayerManager.newInstance(mContext).init();
+
                 mUIHandler.sendEmptyMessage(LOAD_CONFIG_DATA);
                 break;
         }
@@ -449,20 +574,6 @@ public class MainActivity extends BaseActivity {
         mSearchButton.setConvert(true);
         mSearchButton.setPressed(false);
 
-        new AsyncHandlerTask(mUIHandler, mWorkerHandler).execute(new AsyncHandlerTask.Task() {
-            @Override
-            protected Object doInBackground() {
-                String ee = "";
-                ZLog.e(new CodeLineUtil().getCodeLineInfo(), ee);
-                return "success";
-            }
-
-            @Override
-            protected void onPostExecute(Object result) {
-                ZLog.e(new CodeLineUtil().getCodeLineInfo(), result.toString());
-            }
-        });
-
         mTabImageButton[mSelectedIndex].setSelected(true);
     }
 
@@ -583,6 +694,77 @@ public class MainActivity extends BaseActivity {
         });
     }
 
+    /**
+     * 初始化底部bar视图
+     */
+    private void initPlayBarViews() {
+        //
+        mSongNameTextView = findViewById(R.id.songName);
+        mSingerNameTextView = findViewById(R.id.singerName);
+        //播放
+        mPlayImageView = findViewById(R.id.bar_play);
+        mPlayImageView.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                AudioPlayerManager.newInstance(mContext).play(mMusicSeekBar.getProgress());
+            }
+        });
+        //暂停
+        mPauseImageView = findViewById(R.id.bar_pause);
+        mPauseImageView.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                AudioPlayerManager.newInstance(mContext).pause();
+            }
+        });
+        //下一首
+        mNextImageView = findViewById(R.id.bar_next);
+        mNextImageView.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                AudioPlayerManager.newInstance(mContext).next();
+            }
+        });
+
+        mMusicSeekBar = findViewById(R.id.seekBar);
+        mMusicSeekBar.setOnMusicListener(new MusicSeekBar.OnMusicListener() {
+            @Override
+            public String getTimeText() {
+                return null;
+            }
+
+            @Override
+            public String getLrcText() {
+
+                return null;
+            }
+
+            @Override
+            public void onProgressChanged(MusicSeekBar musicSeekBar) {
+
+            }
+
+            @Override
+            public void onTrackingTouchStart(MusicSeekBar musicSeekBar) {
+
+            }
+
+            @Override
+            public void onTrackingTouchFinish(MusicSeekBar musicSeekBar) {
+
+            }
+        });
+
+        //播放列表按钮
+        ImageView listMenuImg = findViewById(R.id.list_menu);
+        listMenuImg.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+
+            }
+        });
+    }
+
     @Override
     public void onBackPressed() {
         if (mSlidingMenuLayout.isShowingFragment()) {
@@ -631,6 +813,10 @@ public class MainActivity extends BaseActivity {
     private void destroyReceiver() {
         if (mFragmentReceiver != null) {
             mFragmentReceiver.unregisterReceiver(mContext);
+        }
+
+        if (mAudioBroadcastReceiver != null) {
+            mAudioBroadcastReceiver.unregisterReceiver(mContext);
         }
     }
 }

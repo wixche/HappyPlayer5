@@ -6,7 +6,10 @@ import android.content.Context;
 import android.content.Intent;
 import android.media.AudioManager;
 import android.os.Bundle;
+import android.os.Handler;
+import android.os.HandlerThread;
 import android.os.IBinder;
+import android.os.Process;
 
 import com.zlm.hp.constants.ResourceConstants;
 import com.zlm.hp.entity.AudioInfo;
@@ -27,6 +30,13 @@ import tv.danmaku.ijk.media.player.IjkMediaPlayer;
  * @date: 2018-10-09 21:13
  */
 public class AudioPlayerService extends Service {
+    /**
+     * 子线程用于执行耗时任务
+     */
+    public Handler mWorkerHandler;
+    //创建异步HandlerThread
+    private HandlerThread mHandlerThread;
+
     private AudioBroadcastReceiver mAudioBroadcastReceiver;
     private Context mContext;
 
@@ -37,21 +47,27 @@ public class AudioPlayerService extends Service {
 
     private AudioInfo mAudioInfo;
 
+    /**
+     * 播放线程
+     */
+
+    private Runnable mPlayerRunable;
+
     @Override
     public void onCreate() {
         super.onCreate();
 
         mContext = getApplicationContext();
-        mAudioBroadcastReceiver = new AudioBroadcastReceiver(mContext);
+        mAudioBroadcastReceiver = new AudioBroadcastReceiver();
         mAudioBroadcastReceiver.setAudioReceiverListener(new AudioBroadcastReceiver.AudioReceiverListener() {
             @Override
             public void onReceive(Context context, Intent intent, int code) {
                 switch (code) {
 
                     //播放网络歌曲
-                    case AudioBroadcastReceiver.ACTION_CODE_PLAYNETSONG:
+                    case AudioBroadcastReceiver.ACTION_CODE_SERVICE_PLAYNETSONG:
                         //播放本地歌曲
-                    case AudioBroadcastReceiver.ACTION_CODE_PLAYLOCALSONG:
+                    case AudioBroadcastReceiver.ACTION_CODE_SERVICE_PLAYLOCALSONG:
                         Bundle bundle = intent.getBundleExtra(AudioBroadcastReceiver.ACTION_BUNDLEKEY);
                         AudioInfo audioInfo = bundle.getParcelable(AudioBroadcastReceiver.ACTION_DATA_KEY);
                         handleSong(audioInfo);
@@ -65,14 +81,55 @@ public class AudioPlayerService extends Service {
             }
         });
         mAudioBroadcastReceiver.registerReceiver(mContext);
+
+        //
+        //创建异步HandlerThread
+        mHandlerThread = new HandlerThread("AudioPlayerServiceThread", Process.THREAD_PRIORITY_BACKGROUND);
+        //必须先开启线程
+        mHandlerThread.start();
+        //子线程Handler
+        mWorkerHandler = new Handler(mHandlerThread.getLooper());
+
+        //
+        mPlayerRunable = new Runnable() {
+            @Override
+            public void run() {
+                while (true) {
+                    try {
+
+                        if (mAudioInfo != null && mMediaPlayer != null && mMediaPlayer.isPlaying()) {
+
+                            mAudioInfo.setPlayProgress((int) mMediaPlayer.getCurrentPosition());
+                            AudioBroadcastReceiver.sendPlayingReceiver(mContext, mAudioInfo);
+                        }
+
+                        Thread.sleep(1000);//
+                    } catch (InterruptedException e) {
+                        e.printStackTrace();
+                    }
+                }
+            }
+        };
     }
 
     @Override
     public void onDestroy() {
         super.onDestroy();
 
+        releaseHandle();
         releasePlayer();
         mAudioBroadcastReceiver.unregisterReceiver(mContext);
+    }
+
+    private void releaseHandle() {
+        //移除队列任务
+        if (mWorkerHandler != null) {
+            mWorkerHandler.removeCallbacksAndMessages(null);
+        }
+
+        //关闭线程
+        if (mHandlerThread != null)
+            mHandlerThread.quit();
     }
 
     @Override
@@ -104,6 +161,12 @@ public class AudioPlayerService extends Service {
             mMediaPlayer.setOnSeekCompleteListener(new IMediaPlayer.OnSeekCompleteListener() {
                 @Override
                 public void onSeekComplete(IMediaPlayer mp) {
+
+                    //发送播放中广播
+                    AudioBroadcastReceiver.sendPlayReceiver(mContext);
+                    mWorkerHandler.removeCallbacksAndMessages(null);
+                    mWorkerHandler.post(mPlayerRunable);
+
                     mMediaPlayer.start();
                 }
             });
@@ -132,7 +195,14 @@ public class AudioPlayerService extends Service {
                     if (mAudioInfo.getPlayProgress() != 0) {
                         mMediaPlayer.seekTo(mAudioInfo.getPlayProgress());
                     } else {
+
+                        //发送播放中广播
+                        AudioBroadcastReceiver.sendPlayReceiver(mContext);
+                        mWorkerHandler.removeCallbacksAndMessages(null);
+                        mWorkerHandler.post(mPlayerRunable);
+
                         mMediaPlayer.start();
+
                     }
                 }
             });
@@ -178,6 +248,8 @@ public class AudioPlayerService extends Service {
      * 释放播放器
      */
     private void releasePlayer() {
+        //移除
+        mWorkerHandler.removeCallbacksAndMessages(null);
 
         if (mMediaPlayer != null) {
             if (mMediaPlayer.isPlaying()) {
@@ -188,6 +260,8 @@ public class AudioPlayerService extends Service {
             mMediaPlayer = null;
         }
         System.gc();
+
+
     }
 
     /**

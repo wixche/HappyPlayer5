@@ -75,7 +75,9 @@ public class OnLineAudioManager {
                 if (task.getTaskFileSize() <= downloadedSize) {
                     return;
                 }
-                if (downloadedSize > 1024 * 200) {
+
+                int playStatus = AudioPlayerManager.newInstance(mContext).getPlayStatus();
+                if (playStatus == AudioPlayerManager.PLAYINGNET && downloadedSize > 1024 * 200) {
                     //开始播放音频歌曲
                     AudioInfo audioInfo = AudioPlayerManager.newInstance(mContext).getCurSong(task.getTaskId());
                     if (audioInfo != null) {

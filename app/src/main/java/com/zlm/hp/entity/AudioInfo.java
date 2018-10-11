@@ -149,6 +149,7 @@ public class AudioInfo implements Parcelable {
             category = in.readString();
             childCategory = in.readString();
             downloadUrl = in.readString();
+            playProgress = in.readInt();
         }
     }
 
@@ -372,5 +373,6 @@ public class AudioInfo implements Parcelable {
         dest.writeString(category);
         dest.writeString(childCategory);
         dest.writeString(downloadUrl);
+        dest.writeInt(playProgress);
     }
 }
