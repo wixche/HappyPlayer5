@@ -10,7 +10,11 @@ import android.util.LruCache;
 import android.widget.ImageView;
 
 import com.zlm.hp.async.AsyncHandlerTask;
+import com.zlm.hp.constants.ResourceConstants;
+import com.zlm.hp.entity.SingerInfo;
+import com.zlm.hp.http.APIHttpClient;
 import com.zlm.hp.http.HttpClient;
+import com.zlm.hp.http.HttpReturnResult;
 import com.zlm.hp.ui.R;
 
 import java.io.BufferedOutputStream;
@@ -51,6 +55,39 @@ public class ImageUtil {
         return sImageCache;
     }
 
+    /**
+     * 加载歌手头像
+     *
+     * @param context
+     * @param imageView
+     */
+    public static void loadSingerImage(final Context context, ImageView imageView, final String singerName, final boolean askWifi, int width, int height, AsyncHandlerTask asyncHandlerTask, ImageLoadCallBack imageLoadCallBack) {
+        //多个歌手，则取第一个歌手头像
+        String regex = "、";
+        String searchSingerName = singerName;
+        if (singerName.contains(regex)) {
+            searchSingerName = singerName.split(regex)[0];
+        }
+
+        final String filePath = ResourceUtil.getFilePath(context, ResourceConstants.PATH_SINGER, searchSingerName + File.separator + searchSingerName + ".jpg");
+
+        final String finalSearchSingerName = searchSingerName;
+        LoadImgUrlCallBack loadImgUrlCallBack = new LoadImgUrlCallBack() {
+            @Override
+            public String getImageUrl() {
+
+                APIHttpClient apiHttpClient = HttpUtil.getHttpClient();
+                HttpReturnResult httpReturnResult = apiHttpClient.getSingerIcon(context, finalSearchSingerName, askWifi);
+                if (httpReturnResult.isSuccessful()) {
+                    SingerInfo singerInfo = (SingerInfo) httpReturnResult.getResult();
+                    return singerInfo.getImageUrl();
+                }
+
+                return null;
+            }
+        };
+        loadImage(context, filePath, null, askWifi, imageView, width, height, asyncHandlerTask, loadImgUrlCallBack, imageLoadCallBack);
+    }
 
     /**
      * 加载图片
@@ -62,6 +99,20 @@ public class ImageUtil {
      * @param asyncHandlerTask
      */
     public static void loadImage(final Context context, final String filePath, final String imageUrl, final boolean askWifi, final ImageView imageView, final int width, final int height, AsyncHandlerTask asyncHandlerTask, final ImageLoadCallBack imageLoadCallBack) {
+        loadImage(context, filePath, imageUrl, askWifi, imageView, width, height, asyncHandlerTask, null, imageLoadCallBack);
+    }
+
+
+    /**
+     * 加载图片
+     *
+     * @param context
+     * @param filePath
+     * @param imageUrl
+     * @param imageView
+     * @param asyncHandlerTask
+     */
+    private static void loadImage(final Context context, final String filePath, final String imageUrl, final boolean askWifi, final ImageView imageView, final int width, final int height, AsyncHandlerTask asyncHandlerTask, final LoadImgUrlCallBack loadImgUrlCallBack, final ImageLoadCallBack imageLoadCallBack) {
         final String key = filePath.hashCode() + "";
         //如果当前的图片与上一次一样，则不操作
         if (imageView.getTag() != null && imageView.getTag().equals(key)) {
@@ -75,7 +126,7 @@ public class ImageUtil {
         asyncHandlerTask.execute(new AsyncHandlerTask.Task<Bitmap>() {
             @Override
             protected Bitmap doInBackground() {
-                return loadImageFormCache(context, filePath, imageUrl, key, width, height, askWifi);
+                return loadImageFormCache(context, filePath, imageUrl, key, width, height, askWifi, loadImgUrlCallBack);
             }
 
             @Override
@@ -101,13 +152,13 @@ public class ImageUtil {
      * @author: zhangliangming
      * @date: 2018-10-05 16:37
      */
-    private static Bitmap loadImageFormCache(Context context, String filePath, String imageUrl, String key, int width, int height, boolean askWifi) {
+    private static Bitmap loadImageFormCache(Context context, String filePath, String imageUrl, String key, int width, int height, boolean askWifi, LoadImgUrlCallBack loadImgUrlCallBack) {
         Bitmap bitmap = null;
         if (mImageCache.get(key) != null) {
             bitmap = mImageCache.get(key);
         }
         if (bitmap == null) {
-            bitmap = loadImageFormFile(context, filePath, imageUrl, width, height, askWifi);
+            bitmap = loadImageFormFile(context, filePath, imageUrl, width, height, askWifi, loadImgUrlCallBack);
             if (bitmap != null) {
                 mImageCache.put(key, bitmap);
             }
@@ -123,10 +174,10 @@ public class ImageUtil {
      * @author: zhangliangming
      * @date: 2018-10-05 15:18
      */
-    private static Bitmap loadImageFormFile(Context context, String filePath, String imageUrl, int width, int height, boolean askWifi) {
+    private static Bitmap loadImageFormFile(Context context, String filePath, String imageUrl, int width, int height, boolean askWifi, LoadImgUrlCallBack loadImgUrlCallBack) {
         Bitmap bitmap = readBitmapFromFile(filePath, width, height);
         if (bitmap == null) {
-            bitmap = loadImageFormUrl(context, imageUrl, width, height, askWifi);
+            bitmap = loadImageFormUrl(context, imageUrl, width, height, askWifi, loadImgUrlCallBack);
             if (bitmap != null) {
                 writeBitmapToFile(filePath, bitmap, 100);
             }
@@ -142,12 +193,24 @@ public class ImageUtil {
      * @author: zhangliangming
      * @date: 2018-10-05 15:19
      */
-    private static Bitmap loadImageFormUrl(Context context, String imageUrl, int width, int height, boolean askWifi) {
+    private static Bitmap loadImageFormUrl(Context context, String imageUrl, int width, int height, boolean askWifi, LoadImgUrlCallBack loadImgUrlCallBack) {
         if (askWifi) {
             if (!NetUtil.isWifiConnected(context)) {
                 return null;
             }
         }
+        if (imageUrl == null && loadImgUrlCallBack == null) {
+            return null;
+        }
+
+        if (imageUrl == null && loadImgUrlCallBack != null) {
+            imageUrl = loadImgUrlCallBack.getImageUrl();
+        }
+
+        if (imageUrl == null) {
+            return null;
+        }
+
         HttpClient.Result result = new HttpClient().get(imageUrl);
         if (!result.isSuccessful() || result.getData() == null || result.getData().length == 0) {
             return null;
@@ -321,6 +384,10 @@ public class ImageUtil {
         } catch (IOException e) {
             e.printStackTrace();
         }
+    }
+
+    private interface LoadImgUrlCallBack {
+        String getImageUrl();
     }
 
     public interface ImageLoadCallBack {

@@ -72,7 +72,7 @@ dependencies {
     /**
      * 进度条
      */
-    implementation 'com.github.zhangliangming:SeekBar:v3.5'
+    implementation 'com.github.zhangliangming:SeekBar:v3.6'
     /**
      * 歌词
      */
@@ -84,7 +84,7 @@ dependencies {
     /**
      * 注册码
      */
-    implementation 'com.github.zhangliangming:Register:v1.1'
+    implementation 'com.github.zhangliangming:Register:v1.2'
     /**
      * ijkplayer
      */

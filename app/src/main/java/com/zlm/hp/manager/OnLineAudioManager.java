@@ -14,6 +14,7 @@ import com.zlm.hp.constants.ResourceConstants;
 import com.zlm.hp.db.util.DownloadThreadInfoDB;
 import com.zlm.hp.entity.AudioInfo;
 import com.zlm.hp.http.APIHttpClient;
+import com.zlm.hp.receiver.AudioBroadcastReceiver;
 import com.zlm.hp.util.CodeLineUtil;
 import com.zlm.hp.util.HttpUtil;
 import com.zlm.hp.util.ResourceUtil;
@@ -76,6 +77,9 @@ public class OnLineAudioManager {
                     return;
                 }
 
+                //更新在线缓存进度
+                AudioBroadcastReceiver.sendDownloadingOnlineSongReceiver(mContext, task);
+
                 int playStatus = AudioPlayerManager.newInstance(mContext).getPlayStatus();
                 if (playStatus == AudioPlayerManager.PLAYINGNET && downloadedSize > 1024 * 200) {
                     //开始播放音频歌曲
@@ -107,6 +111,8 @@ public class OnLineAudioManager {
                     //任务完成后，重置任务id
                     mCurTaskId = "-1";
                 }
+                //更新在线缓存进度
+                AudioBroadcastReceiver.sendDownloadingOnlineSongReceiver(mContext, task);
                 ZLog.d(new CodeLineUtil().getCodeLineInfo(), "task taskFinish ->" + task.getTaskName() + " " + downloadedSize);
             }
 

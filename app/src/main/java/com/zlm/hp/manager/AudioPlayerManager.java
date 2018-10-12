@@ -1,6 +1,7 @@
 package com.zlm.hp.manager;
 
 import android.content.Context;
+import android.text.TextUtils;
 
 import com.zlm.hp.constants.ConfigInfo;
 import com.zlm.hp.constants.ResourceConstants;
@@ -30,6 +31,11 @@ public class AudioPlayerManager {
     public static final int PAUSE = 1;
 
     /**
+     * 停止
+     */
+    public static final int STOP = 2;
+
+    /**
      * 正在播放
      */
     public static final int PLAYINGNET = 2;
@@ -37,7 +43,7 @@ public class AudioPlayerManager {
     /**
      * 当前播放状态
      */
-    private int mPlayStatus = PAUSE;
+    private int mPlayStatus = STOP;
 
     private static AudioPlayerManager _AudioPlayerManager;
 
@@ -109,14 +115,15 @@ public class AudioPlayerManager {
         AudioInfo curAudioInfo = getCurSong(configInfo.getAudioInfos(), configInfo.getPlayHash());
         if (curAudioInfo != null) {
             curAudioInfo.setPlayProgress(playProgress);
-            play(curAudioInfo, false);
+            play(curAudioInfo);
         }
     }
 
     /**
      * 播放歌曲
      */
-    private void play(AudioInfo audioInfo, boolean isInit) {
+    private void play(AudioInfo audioInfo) {
+        boolean isInit = (mPlayStatus != PAUSE);
         //还有旧的歌曲在播放
         if (mPlayStatus == PLAYING || mPlayStatus == PLAYINGNET) {
             pause();
@@ -193,6 +200,9 @@ public class AudioPlayerManager {
      * 下一首
      */
     public synchronized void next() {
+        //下一首时，说明现在播放停止了
+        mPlayStatus = STOP;
+
         AudioInfo nextAudioInfo = null;
         ConfigInfo configInfo = ConfigInfo.obtain();
         List<AudioInfo> audioInfoList = configInfo.getAudioInfos();
@@ -253,7 +263,7 @@ public class AudioPlayerManager {
             pause();
             AudioBroadcastReceiver.sendNullReceiver(mContext);
         } else {
-            play(nextAudioInfo, true);
+            play(nextAudioInfo);
         }
 
     }
@@ -262,6 +272,9 @@ public class AudioPlayerManager {
      * 上一首
      */
     public synchronized void pre() {
+        //上一首时，说明现在播放停止了
+        mPlayStatus = STOP;
+
         AudioInfo nextAudioInfo = null;
         ConfigInfo configInfo = ConfigInfo.obtain();
         List<AudioInfo> audioInfoList = configInfo.getAudioInfos();
@@ -326,7 +339,7 @@ public class AudioPlayerManager {
             pause();
             AudioBroadcastReceiver.sendNullReceiver(mContext);
         } else {
-            play(nextAudioInfo, true);
+            play(nextAudioInfo);
         }
     }
 
@@ -343,7 +356,7 @@ public class AudioPlayerManager {
      */
     public synchronized void playSong(AudioInfo audioInfo) {
         addNextSong(audioInfo);
-        play(audioInfo, false);
+        play(audioInfo);
     }
 
     /**
@@ -357,7 +370,7 @@ public class AudioPlayerManager {
             ConfigInfo configInfo = ConfigInfo.obtain();
             configInfo.setAudioInfos(audioInfoList);
             //播放歌曲
-            play(audioInfo, false);
+            play(audioInfo);
         }
     }
 
@@ -397,7 +410,7 @@ public class AudioPlayerManager {
      */
     private AudioInfo getCurSong(List<AudioInfo> audioInfoList, String hash) {
         AudioInfo curAudioInfo = null;
-        if (audioInfoList == null) return null;
+        if (audioInfoList == null || TextUtils.isEmpty(hash)) return null;
         for (int i = 0; i < audioInfoList.size(); i++) {
             AudioInfo temp = audioInfoList.get(i);
             if (temp.getHash().equals(hash)) {

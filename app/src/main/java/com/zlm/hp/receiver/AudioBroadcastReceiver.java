@@ -7,10 +7,9 @@ import android.content.IntentFilter;
 import android.os.Bundle;
 import android.text.TextUtils;
 
+import com.zlm.down.entity.DownloadTask;
 import com.zlm.hp.constants.ConfigInfo;
 import com.zlm.hp.entity.AudioInfo;
-
-import java.util.ArrayList;
 
 
 /**
@@ -72,6 +71,12 @@ public class AudioBroadcastReceiver {
      * 停止播放歌曲
      */
     public static final int ACTION_CODE_STOP = 6;
+
+
+    /**
+     *  网络歌曲下载中
+     */
+    public static final int ACTION_CODE_DOWNLOADONLINESONG = 7;
 
 
     private BroadcastReceiver mAudioBroadcastReceiver;
@@ -206,6 +211,18 @@ public class AudioBroadcastReceiver {
         Bundle bundle = new Bundle();
         bundle.putParcelable(ACTION_DATA_KEY, audioInfo);
         sendReceiver(context, ACTION_CODE_SERVICE_PLAYLOCALSONG, ACTION_BUNDLEKEY, bundle);
+    }
+
+    /**
+     * 网络歌曲下载中
+     * @param context
+     * @param task
+     */
+    public static void sendDownloadingOnlineSongReceiver(Context context,DownloadTask task){
+        Bundle bundle = new Bundle();
+        bundle.putParcelable(ACTION_DATA_KEY, task);
+        sendReceiver(context, ACTION_CODE_DOWNLOADONLINESONG, ACTION_BUNDLEKEY, bundle);
+
     }
 
 

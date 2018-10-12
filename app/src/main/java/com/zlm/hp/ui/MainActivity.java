@@ -2,11 +2,15 @@ package com.zlm.hp.ui;
 
 import android.content.Context;
 import android.content.Intent;
+import android.graphics.Bitmap;
+import android.graphics.BitmapFactory;
+import android.graphics.drawable.BitmapDrawable;
 import android.os.Bundle;
 import android.os.Message;
 import android.support.v4.app.Fragment;
 import android.support.v4.content.ContextCompat;
 import android.support.v4.view.ViewPager;
+import android.text.TextUtils;
 import android.util.DisplayMetrics;
 import android.view.Display;
 import android.view.LayoutInflater;
@@ -20,9 +24,11 @@ import android.widget.TextView;
 import com.dou361.dialogui.DialogUIUtils;
 import com.dou361.dialogui.listener.DialogUIListener;
 import com.suke.widget.SwitchButton;
+import com.zlm.down.entity.DownloadTask;
 import com.zlm.hp.adapter.TabFragmentAdapter;
 import com.zlm.hp.async.AsyncHandlerTask;
 import com.zlm.hp.constants.ConfigInfo;
+import com.zlm.hp.db.util.DownloadThreadInfoDB;
 import com.zlm.hp.entity.AudioInfo;
 import com.zlm.hp.fragment.LastSongFragment;
 import com.zlm.hp.fragment.MeFragment;
@@ -31,16 +37,16 @@ import com.zlm.hp.fragment.RecommendFragment;
 import com.zlm.hp.fragment.SpecialFragment;
 import com.zlm.hp.manager.ActivityManager;
 import com.zlm.hp.manager.AudioPlayerManager;
+import com.zlm.hp.manager.OnLineAudioManager;
 import com.zlm.hp.receiver.AudioBroadcastReceiver;
 import com.zlm.hp.receiver.FragmentReceiver;
 import com.zlm.hp.service.AudioPlayerService;
 import com.zlm.hp.util.AppBarUtil;
 import com.zlm.hp.util.AppOpsUtils;
-import com.zlm.hp.util.CodeLineUtil;
 import com.zlm.hp.util.ColorUtil;
+import com.zlm.hp.util.ImageUtil;
 import com.zlm.hp.util.IntentUtil;
 import com.zlm.hp.util.ToastUtil;
-import com.zlm.hp.util.ZLog;
 import com.zlm.hp.widget.IconfontImageButtonTextView;
 import com.zlm.hp.widget.IconfontIndicatorTextView;
 import com.zlm.hp.widget.WhiteTranRelativeLayout;
@@ -124,6 +130,11 @@ public class MainActivity extends BaseActivity {
     private SwitchButton mLocklrcSwitchButton;
 
     /**
+     * 歌手头像
+     */
+    private ImageView mArtistImageView;
+
+    /**
      * 歌曲名称tv
      */
     private TextView mSongNameTextView;
@@ -149,11 +160,6 @@ public class MainActivity extends BaseActivity {
     private MusicSeekBar mMusicSeekBar;
 
     /**
-     *
-     */
-    private FragmentReceiver mFragmentReceiver;
-
-    /**
      * 基本数据
      */
     private ConfigInfo mConfigInfo;
@@ -162,10 +168,16 @@ public class MainActivity extends BaseActivity {
      */
     private final int LOAD_CONFIG_DATA = 1;
 
+
+    /**
+     *
+     */
+    private FragmentReceiver mFragmentReceiver;
     /**
      * 音频广播
      */
     private AudioBroadcastReceiver mAudioBroadcastReceiver;
+
 
     @Override
     protected int setContentLayoutResID() {
@@ -283,6 +295,10 @@ public class MainActivity extends BaseActivity {
                         mMusicSeekBar.setSecondaryProgress(0);
                         mMusicSeekBar.setMax(0);
 
+                        //
+                        Bitmap bitmap = BitmapFactory.decodeResource(getResources(), R.mipmap.bpz);
+                        mArtistImageView.setImageDrawable(new BitmapDrawable(bitmap));
+                        mArtistImageView.setTag("");
 
                         break;
                     case AudioBroadcastReceiver.ACTION_CODE_INIT:
@@ -294,11 +310,14 @@ public class MainActivity extends BaseActivity {
                             mPauseImageView.setVisibility(View.INVISIBLE);
                             mPlayImageView.setVisibility(View.VISIBLE);
 
-                            //
+                            //设置进度条
                             mMusicSeekBar.setEnabled(true);
                             mMusicSeekBar.setMax((int) initAudioInfo.getDuration());
                             mMusicSeekBar.setProgress((int) initAudioInfo.getPlayProgress());
                             mMusicSeekBar.setSecondaryProgress(0);
+
+                            //加载歌手头像
+                            ImageUtil.loadSingerImage(mContext, mArtistImageView, initAudioInfo.getSingerName(), mConfigInfo.isWifi(), 400, 400, new AsyncHandlerTask(mUIHandler, mWorkerHandler), null);
                         }
                         break;
                     case AudioBroadcastReceiver.ACTION_CODE_PLAYING:
@@ -318,6 +337,21 @@ public class MainActivity extends BaseActivity {
                         //暂停完成
                         mPauseImageView.setVisibility(View.INVISIBLE);
                         mPlayImageView.setVisibility(View.VISIBLE);
+
+                        break;
+
+                    case AudioBroadcastReceiver.ACTION_CODE_DOWNLOADONLINESONG:
+                        //网络歌曲下载中
+                        Bundle downloadOnlineSongBundle = intent.getBundleExtra(AudioBroadcastReceiver.ACTION_BUNDLEKEY);
+                        DownloadTask downloadingTask = downloadOnlineSongBundle.getParcelable(AudioBroadcastReceiver.ACTION_DATA_KEY);
+                        String hash = mConfigInfo.getPlayHash();
+                        AudioInfo audioInfo = AudioPlayerManager.newInstance(mContext).getCurSong(hash);
+                        if (audioInfo != null && downloadingTask != null && !TextUtils.isEmpty(hash) && hash.equals(downloadingTask.getTaskId())) {
+                            int downloadedSize = DownloadThreadInfoDB.getDownloadedSize(mContext, downloadingTask.getTaskId(), OnLineAudioManager.threadNum);
+                            double pre = downloadedSize * 1.0 / audioInfo.getFileSize();
+                            int downloadProgress = (int) (mMusicSeekBar.getMax() * pre);
+                            mMusicSeekBar.setSecondaryProgress(downloadProgress);
+                        }
 
                         break;
                 }
@@ -698,6 +732,7 @@ public class MainActivity extends BaseActivity {
      * 初始化底部bar视图
      */
     private void initPlayBarViews() {
+        mArtistImageView = findViewById(R.id.play_bar_artist);
         //
         mSongNameTextView = findViewById(R.id.songName);
         mSingerNameTextView = findViewById(R.id.singerName);
