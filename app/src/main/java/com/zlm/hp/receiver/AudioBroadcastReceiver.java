@@ -72,11 +72,16 @@ public class AudioBroadcastReceiver {
      */
     public static final int ACTION_CODE_STOP = 6;
 
+    /**
+     * seekto歌曲
+     */
+    public static final int ACTION_CODE_SEEKTO = 7;
+
 
     /**
-     *  网络歌曲下载中
+     * 网络歌曲下载中
      */
-    public static final int ACTION_CODE_DOWNLOADONLINESONG = 7;
+    public static final int ACTION_CODE_DOWNLOADONLINESONG = 8;
 
 
     private BroadcastReceiver mAudioBroadcastReceiver;
@@ -179,6 +184,7 @@ public class AudioBroadcastReceiver {
     public static void sendPlayReceiver(Context context) {
         sendReceiver(context, ACTION_CODE_PLAY, null, null);
     }
+
     /**
      * 播放网络歌曲
      *
@@ -215,14 +221,26 @@ public class AudioBroadcastReceiver {
 
     /**
      * 网络歌曲下载中
+     *
      * @param context
      * @param task
      */
-    public static void sendDownloadingOnlineSongReceiver(Context context,DownloadTask task){
+    public static void sendDownloadingOnlineSongReceiver(Context context, DownloadTask task) {
         Bundle bundle = new Bundle();
         bundle.putParcelable(ACTION_DATA_KEY, task);
         sendReceiver(context, ACTION_CODE_DOWNLOADONLINESONG, ACTION_BUNDLEKEY, bundle);
 
+    }
+
+    /**
+     * seekto歌曲
+     *
+     * @param audioInfo
+     */
+    public static void sendSeektoSongReceiver(Context context, AudioInfo audioInfo) {
+        Bundle bundle = new Bundle();
+        bundle.putParcelable(ACTION_DATA_KEY, audioInfo);
+        sendReceiver(context, ACTION_CODE_SEEKTO, ACTION_BUNDLEKEY, bundle);
     }
 
 

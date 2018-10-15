@@ -38,7 +38,12 @@ public class AudioPlayerManager {
     /**
      * 正在播放
      */
-    public static final int PLAYINGNET = 2;
+    public static final int PLAYINGNET = 3;
+
+    /**
+     * seekto
+     */
+    public static final int SEEKTO = 4;
 
     /**
      * 当前播放状态
@@ -106,6 +111,22 @@ public class AudioPlayerManager {
     }
 
     /**
+     * 快进
+     *
+     * @param audioInfo
+     */
+    public synchronized void seekto(AudioInfo audioInfo) {
+        //还有旧的歌曲在播放
+        if (mPlayStatus == PLAYING || mPlayStatus == PLAYINGNET) {
+            seektoPause();
+            play(audioInfo);
+        } else {
+            mPlayStatus = SEEKTO;
+        }
+        AudioBroadcastReceiver.sendSeektoSongReceiver(mContext,audioInfo);
+    }
+
+    /**
      * 播放歌曲
      *
      * @param playProgress
@@ -123,9 +144,10 @@ public class AudioPlayerManager {
      * 播放歌曲
      */
     private void play(AudioInfo audioInfo) {
-        boolean isInit = (mPlayStatus != PAUSE);
+        boolean isSeekTo = mPlayStatus == SEEKTO;
+        boolean isInit = ((mPlayStatus != PAUSE) && !isSeekTo);
         //还有旧的歌曲在播放
-        if (mPlayStatus == PLAYING || mPlayStatus == PLAYINGNET) {
+        if ((mPlayStatus == PLAYING || mPlayStatus == PLAYINGNET) && !isSeekTo) {
             pause();
         }
 
@@ -137,8 +159,10 @@ public class AudioPlayerManager {
         configInfo.setPlayHash(audioInfo.getHash());
         configInfo.save();
 
-        //发送play init 数据
-        AudioBroadcastReceiver.sendPlayInitReceiver(mContext, audioInfo);
+        if (!isSeekTo) {
+            //发送play init 数据
+            AudioBroadcastReceiver.sendPlayInitReceiver(mContext, audioInfo);
+        }
 
         switch (audioInfo.getType()) {
             case AudioInfo.TYPE_LOCAL:
@@ -158,10 +182,17 @@ public class AudioPlayerManager {
                 } else {
                     mPlayStatus = PLAYINGNET;
                     int downloadedSize = DownloadThreadInfoDB.getDownloadedSize(mContext, audioInfo.getHash(), OnLineAudioManager.threadNum);
-                    if (downloadedSize > 1024 * 200) {
-                        AudioBroadcastReceiver.sendPlayNetSongReceiver(mContext, audioInfo);
+                    if (downloadedSize == audioInfo.getFileSize()) {
+                        mPlayStatus = PLAYING;
+                        //设置文件路径
+                        audioInfo.setFilePath(filePath);
+                        AudioBroadcastReceiver.sendPlayLocalSongReceiver(mContext, audioInfo);
+                    } else {
+                        if (downloadedSize > 1024 * 200) {
+                            AudioBroadcastReceiver.sendPlayNetSongReceiver(mContext, audioInfo);
+                        }
+                        mOnLineAudioManager.addDownloadTask(audioInfo);
                     }
-                    mOnLineAudioManager.addDownloadTask(audioInfo);
                 }
                 break;
         }
@@ -174,12 +205,17 @@ public class AudioPlayerManager {
      * @param audioInfo
      */
     public synchronized void playDownloadingNetSong(AudioInfo audioInfo) {
-        //还有旧的歌曲在播放
-        if (mPlayStatus == PLAYING) {
-            pause();
-        }
         mPlayStatus = PLAYING;
         AudioBroadcastReceiver.sendPlayNetSongReceiver(mContext, audioInfo);
+    }
+
+    /**
+     * seek to pause
+     */
+    private void seektoPause() {
+        mPlayStatus = SEEKTO;
+        //暂停在线任务
+        mOnLineAudioManager.pauseTask();
     }
 
 
@@ -187,11 +223,9 @@ public class AudioPlayerManager {
      * 暂停
      */
     public synchronized void pause() {
-
         mPlayStatus = PAUSE;
         //暂停在线任务
         mOnLineAudioManager.pauseTask();
-
         AudioBroadcastReceiver.sendStopReceiver(mContext);
 
     }

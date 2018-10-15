@@ -27,6 +27,7 @@ import com.suke.widget.SwitchButton;
 import com.zlm.down.entity.DownloadTask;
 import com.zlm.hp.adapter.TabFragmentAdapter;
 import com.zlm.hp.async.AsyncHandlerTask;
+import com.zlm.hp.audio.utils.MediaUtil;
 import com.zlm.hp.constants.ConfigInfo;
 import com.zlm.hp.db.util.DownloadThreadInfoDB;
 import com.zlm.hp.entity.AudioInfo;
@@ -320,23 +321,30 @@ public class MainActivity extends BaseActivity {
                             ImageUtil.loadSingerImage(mContext, mArtistImageView, initAudioInfo.getSingerName(), mConfigInfo.isWifi(), 400, 400, new AsyncHandlerTask(mUIHandler, mWorkerHandler), null);
                         }
                         break;
+                    case AudioBroadcastReceiver.ACTION_CODE_PLAY:
+                        if (mPauseImageView.getVisibility() != View.VISIBLE)
+                            mPauseImageView.setVisibility(View.VISIBLE);
+
+                        if (mPlayImageView.getVisibility() != View.INVISIBLE)
+                            mPlayImageView.setVisibility(View.INVISIBLE);
+
+                        break;
                     case AudioBroadcastReceiver.ACTION_CODE_PLAYING:
 
                         Bundle playBundle = intent.getBundleExtra(AudioBroadcastReceiver.ACTION_BUNDLEKEY);
                         AudioInfo playingAudioInfo = playBundle.getParcelable(AudioBroadcastReceiver.ACTION_DATA_KEY);
                         if (playingAudioInfo != null) {
-                            mPauseImageView.setVisibility(View.VISIBLE);
-                            mPlayImageView.setVisibility(View.INVISIBLE);
-
-                            //
                             mMusicSeekBar.setProgress((int) playingAudioInfo.getPlayProgress());
                         }
 
                         break;
                     case AudioBroadcastReceiver.ACTION_CODE_STOP:
                         //暂停完成
-                        mPauseImageView.setVisibility(View.INVISIBLE);
-                        mPlayImageView.setVisibility(View.VISIBLE);
+                        if (mPauseImageView.getVisibility() != View.INVISIBLE)
+                            mPauseImageView.setVisibility(View.INVISIBLE);
+
+                        if (mPlayImageView.getVisibility() != View.VISIBLE)
+                            mPlayImageView.setVisibility(View.VISIBLE);
 
                         break;
 
@@ -765,7 +773,7 @@ public class MainActivity extends BaseActivity {
         mMusicSeekBar.setOnMusicListener(new MusicSeekBar.OnMusicListener() {
             @Override
             public String getTimeText() {
-                return null;
+                return MediaUtil.formatTime(mMusicSeekBar.getProgress());
             }
 
             @Override
@@ -786,7 +794,12 @@ public class MainActivity extends BaseActivity {
 
             @Override
             public void onTrackingTouchFinish(MusicSeekBar musicSeekBar) {
-
+                int progress = mMusicSeekBar.getProgress();
+                AudioInfo audioInfo = AudioPlayerManager.newInstance(mContext).getCurSong(mConfigInfo.getPlayHash());
+                if (audioInfo != null && progress <= audioInfo.getDuration()) {
+                    audioInfo.setPlayProgress(progress);
+                    AudioPlayerManager.newInstance(mContext).seekto(audioInfo);
+                }
             }
         });
 

@@ -153,6 +153,10 @@ public class AudioPlayerService extends Service {
                 filePath = ResourceUtil.getFilePath(mContext, ResourceConstants.PATH_CACHE_AUDIO, audioInfo.getHash() + ".temp");
             }
 
+            if(mMediaPlayer != null){
+                releasePlayer();
+            }
+
             mMediaPlayer = new IjkMediaPlayer();
             mMediaPlayer.setAudioStreamType(AudioManager.STREAM_MUSIC);
             mMediaPlayer.setDataSource(filePath);
