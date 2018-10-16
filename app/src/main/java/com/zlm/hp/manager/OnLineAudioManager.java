@@ -14,6 +14,7 @@ import com.zlm.hp.constants.ResourceConstants;
 import com.zlm.hp.db.util.DownloadThreadInfoDB;
 import com.zlm.hp.entity.AudioInfo;
 import com.zlm.hp.http.APIHttpClient;
+import com.zlm.hp.receiver.AppSystemReceiver;
 import com.zlm.hp.receiver.AudioBroadcastReceiver;
 import com.zlm.hp.util.CodeLineUtil;
 import com.zlm.hp.util.HttpUtil;
@@ -81,7 +82,7 @@ public class OnLineAudioManager {
                 AudioBroadcastReceiver.sendDownloadingOnlineSongReceiver(mContext, task);
 
                 int playStatus = AudioPlayerManager.newInstance(mContext).getPlayStatus();
-                if (playStatus == AudioPlayerManager.PLAYINGNET && downloadedSize > 1024 * 200) {
+                if (playStatus == AudioPlayerManager.PLAYINGNET && downloadedSize > 1024 * 500) {
                     //开始播放音频歌曲
                     AudioInfo audioInfo = AudioPlayerManager.newInstance(mContext).getCurSong(task.getTaskId());
                     if (audioInfo != null) {
@@ -118,7 +119,8 @@ public class OnLineAudioManager {
 
             @Override
             public void taskError(DownloadTask task, String msg) {
-
+                ZLog.d(new CodeLineUtil().getCodeLineInfo(), "task taskError ->" + task.getTaskName());
+                AppSystemReceiver.sendToastErrorMsgReceiver(mContext, msg);
             }
 
             @Override

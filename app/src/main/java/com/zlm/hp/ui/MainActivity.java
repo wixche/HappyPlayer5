@@ -39,6 +39,7 @@ import com.zlm.hp.fragment.SpecialFragment;
 import com.zlm.hp.manager.ActivityManager;
 import com.zlm.hp.manager.AudioPlayerManager;
 import com.zlm.hp.manager.OnLineAudioManager;
+import com.zlm.hp.receiver.AppSystemReceiver;
 import com.zlm.hp.receiver.AudioBroadcastReceiver;
 import com.zlm.hp.receiver.FragmentReceiver;
 import com.zlm.hp.service.AudioPlayerService;
@@ -178,6 +179,10 @@ public class MainActivity extends BaseActivity {
      * 音频广播
      */
     private AudioBroadcastReceiver mAudioBroadcastReceiver;
+    /**
+     * app系统广播
+     */
+    private AppSystemReceiver mAppSystemReceiver;
 
 
     @Override
@@ -214,7 +219,7 @@ public class MainActivity extends BaseActivity {
 
         //fragment广播
         mFragmentReceiver = new FragmentReceiver(mContext);
-        mFragmentReceiver.setFragmentReceiverListener(new FragmentReceiver.FragmentReceiverListener() {
+        mFragmentReceiver.setReceiverListener(new FragmentReceiver.FragmentReceiverListener() {
             @Override
             public void onReceive(Context context, final Intent intent, final int code) {
                 mUIHandler.post(new Runnable() {
@@ -269,7 +274,7 @@ public class MainActivity extends BaseActivity {
 
         //音频广播
         mAudioBroadcastReceiver = new AudioBroadcastReceiver();
-        mAudioBroadcastReceiver.setAudioReceiverListener(new AudioBroadcastReceiver.AudioReceiverListener() {
+        mAudioBroadcastReceiver.setReceiverListener(new AudioBroadcastReceiver.AudioReceiverListener() {
             @Override
             public void onReceive(Context context, final Intent intent, final int code) {
                 mUIHandler.post(new Runnable() {
@@ -366,6 +371,32 @@ public class MainActivity extends BaseActivity {
             }
         });
         mAudioBroadcastReceiver.registerReceiver(mContext);
+
+        //系统
+        mAppSystemReceiver = new AppSystemReceiver();
+        mAppSystemReceiver.setReceiverListener(new AppSystemReceiver.AppSystemReceiverListener() {
+            @Override
+            public void onReceive(Context context, final Intent intent, final int code) {
+                mUIHandler.post(new Runnable() {
+                    @Override
+                    public void run() {
+                        handleAppSystemBroadcastReceiver(intent, code);
+                    }
+                });
+            }
+
+            private void handleAppSystemBroadcastReceiver(Intent intent, int code) {
+                switch (code) {
+                    case AppSystemReceiver.ACTION_CODE_TOAST_ERRORMSG:
+                        Bundle toastErrorMSGBundle = intent.getBundleExtra(AppSystemReceiver.ACTION_BUNDLEKEY);
+                        String msg = toastErrorMSGBundle.getString(AppSystemReceiver.ACTION_DATA_KEY);
+                        ToastUtil.showTextToast(mContext, msg);
+
+                        break;
+                }
+            }
+        });
+        mAppSystemReceiver.registerReceiver(mContext);
     }
 
     /**
@@ -865,6 +896,10 @@ public class MainActivity extends BaseActivity {
 
         if (mAudioBroadcastReceiver != null) {
             mAudioBroadcastReceiver.unregisterReceiver(mContext);
+        }
+
+        if (mAppSystemReceiver != null) {
+            mAppSystemReceiver.unregisterReceiver(mContext);
         }
     }
 }

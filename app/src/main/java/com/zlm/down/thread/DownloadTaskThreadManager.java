@@ -135,7 +135,10 @@ public class DownloadTaskThreadManager implements Runnable {
         if (mIDownloadTaskEvent != null) {
             askWifi = mIDownloadTaskEvent.getAskWifi();
         }
-        startDownloadTask(mContext, askWifi);
+        boolean resultFlag = startDownloadTask(mContext, askWifi);
+        if (!resultFlag) {
+            return;
+        }
         mUpdateDownloadThread.start();
         try {
             synchronized (mWorkerHandler) {
@@ -151,14 +154,24 @@ public class DownloadTaskThreadManager implements Runnable {
      *
      * @param context
      */
-    private void startDownloadTask(Context context, boolean askWifi) {
+    private boolean startDownloadTask(Context context, boolean askWifi) {
         // 1.获取文件的长度
         // 2.对文件进行多线程下载
         try {
+            String taskUrl = mDownloadTask.getTaskUrl();
+            if (TextUtils.isEmpty(taskUrl)) {
+                if (mIDownloadTaskEvent != null) {
+                    mIDownloadTaskEvent.taskError(mDownloadTask, HttpReturnResult.ERROR_MSG_NULLURL);
+                }
+
+
+                return false;
+            }
+
             // 1获取文件的长度
             int fileLength = (int) mDownloadTask.getTaskFileSize();
             if (fileLength == 0)
-                fileLength = getFileLength(mDownloadTask.getTaskUrl());
+                fileLength = getFileLength(taskUrl);
             if (fileLength <= 0) {
                 // 获取文件的长度失败
 
@@ -166,7 +179,7 @@ public class DownloadTaskThreadManager implements Runnable {
                     mIDownloadTaskEvent.taskError(mDownloadTask, HttpReturnResult.ERROR_FILE_ZERO);
                 }
 
-                return;
+                return false;
             }
 
             //如果根目录不为空，则判断空间大小是否能继续下载
@@ -178,7 +191,8 @@ public class DownloadTaskThreadManager implements Runnable {
                         mIDownloadTaskEvent.taskError(mDownloadTask, HttpReturnResult.ERROR_MEMORY);
                     }
 
-                    return;
+
+                    return false;
                 }
             }
 
@@ -225,7 +239,9 @@ public class DownloadTaskThreadManager implements Runnable {
             if (mIDownloadTaskEvent != null) {
                 mIDownloadTaskEvent.taskError(mDownloadTask, HttpReturnResult.ERROR_MSG_NET);
             }
+            return false;
         }
+        return true;
     }
 
     /**

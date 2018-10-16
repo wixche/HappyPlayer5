@@ -104,7 +104,7 @@ public class FragmentReceiver {
         void onReceive(Context context, Intent intent, int code);
     }
 
-    public void setFragmentReceiverListener(FragmentReceiverListener mFragmentReceiverListener) {
+    public void setReceiverListener(FragmentReceiverListener mFragmentReceiverListener) {
         this.mFragmentReceiverListener = mFragmentReceiverListener;
     }
 }

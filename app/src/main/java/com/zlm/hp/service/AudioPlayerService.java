@@ -59,7 +59,7 @@ public class AudioPlayerService extends Service {
 
         mContext = getApplicationContext();
         mAudioBroadcastReceiver = new AudioBroadcastReceiver();
-        mAudioBroadcastReceiver.setAudioReceiverListener(new AudioBroadcastReceiver.AudioReceiverListener() {
+        mAudioBroadcastReceiver.setReceiverListener(new AudioBroadcastReceiver.AudioReceiverListener() {
             @Override
             public void onReceive(Context context, Intent intent, int code) {
                 switch (code) {

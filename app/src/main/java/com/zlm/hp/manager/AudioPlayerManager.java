@@ -188,7 +188,7 @@ public class AudioPlayerManager {
                         audioInfo.setFilePath(filePath);
                         AudioBroadcastReceiver.sendPlayLocalSongReceiver(mContext, audioInfo);
                     } else {
-                        if (downloadedSize > 1024 * 200) {
+                        if (downloadedSize > 1024 * 500) {
                             AudioBroadcastReceiver.sendPlayNetSongReceiver(mContext, audioInfo);
                         }
                         mOnLineAudioManager.addDownloadTask(audioInfo);

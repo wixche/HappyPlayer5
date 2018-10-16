@@ -257,7 +257,7 @@ public class AudioBroadcastReceiver {
         void onReceive(Context context, Intent intent, int code);
     }
 
-    public void setAudioReceiverListener(AudioReceiverListener audioReceiverListener) {
+    public void setReceiverListener(AudioReceiverListener audioReceiverListener) {
         this.mAudioReceiverListener = audioReceiverListener;
     }
 }
