@@ -423,6 +423,9 @@ public class LrcActivity extends BaseActivity {
 
                     //
                     mSongProgressTv.setText(MediaUtil.formatTime((int) playingAudioInfo.getPlayProgress()));
+                    if (mManyLineLyricsView.getLyricsReader() != null && mManyLineLyricsView.getLrcStatus() == AbstractLrcView.LRCSTATUS_LRC && mManyLineLyricsView.getLrcPlayerStatus() != AbstractLrcView.LRCPLAYERSTATUS_PLAY && mManyLineLyricsView.getLyricsReader().getHash().equals(playingAudioInfo.getHash())) {
+                        mManyLineLyricsView.play((int) playingAudioInfo.getPlayProgress());
+                    }
                 }
 
                 break;
@@ -479,11 +482,7 @@ public class LrcActivity extends BaseActivity {
                     if (lyricsReader != null) {
                         mManyLineLyricsView.setLyricsReader(lyricsReader);
                         if (mManyLineLyricsView.getLrcStatus() == AbstractLrcView.LRCSTATUS_LRC) {
-                            if (AudioPlayerManager.newInstance(mContext).getPlayStatus() == AudioPlayerManager.PLAYING) {
-                                mManyLineLyricsView.play((int) curAudioInfo.getPlayProgress());
-                            } else {
-                                mManyLineLyricsView.seekto((int) curAudioInfo.getPlayProgress());
-                            }
+                            mManyLineLyricsView.seekto((int) curAudioInfo.getPlayProgress());
                         }
                     }
                 }
