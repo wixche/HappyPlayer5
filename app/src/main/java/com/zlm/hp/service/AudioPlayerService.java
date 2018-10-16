@@ -153,7 +153,7 @@ public class AudioPlayerService extends Service {
                 filePath = ResourceUtil.getFilePath(mContext, ResourceConstants.PATH_CACHE_AUDIO, audioInfo.getHash() + ".temp");
             }
 
-            if(mMediaPlayer != null){
+            if (mMediaPlayer != null) {
                 releasePlayer();
             }
 
@@ -167,7 +167,7 @@ public class AudioPlayerService extends Service {
                 public void onSeekComplete(IMediaPlayer mp) {
 
                     //发送播放中广播
-                    AudioBroadcastReceiver.sendPlayReceiver(mContext);
+                    AudioBroadcastReceiver.sendPlayReceiver(mContext, mAudioInfo);
                     mWorkerHandler.removeCallbacksAndMessages(null);
                     mWorkerHandler.post(mPlayerRunable);
 
@@ -201,7 +201,7 @@ public class AudioPlayerService extends Service {
                     } else {
 
                         //发送播放中广播
-                        AudioBroadcastReceiver.sendPlayReceiver(mContext);
+                        AudioBroadcastReceiver.sendPlayReceiver(mContext, mAudioInfo);
                         mWorkerHandler.removeCallbacksAndMessages(null);
                         mWorkerHandler.post(mPlayerRunable);
 

@@ -83,6 +83,10 @@ public class AudioBroadcastReceiver {
      */
     public static final int ACTION_CODE_DOWNLOADONLINESONG = 8;
 
+    /**
+     * 歌词加载完成
+     */
+    public static final int ACTION_CODE_LRCLOADED = 9;
 
     private BroadcastReceiver mAudioBroadcastReceiver;
     private IntentFilter mAudioIntentFilter;
@@ -181,8 +185,10 @@ public class AudioBroadcastReceiver {
     /**
      * 发播放广播
      */
-    public static void sendPlayReceiver(Context context) {
-        sendReceiver(context, ACTION_CODE_PLAY, null, null);
+    public static void sendPlayReceiver(Context context, AudioInfo audioInfo) {
+        Bundle bundle = new Bundle();
+        bundle.putParcelable(ACTION_DATA_KEY, audioInfo);
+        sendReceiver(context, ACTION_CODE_PLAY, ACTION_BUNDLEKEY, bundle);
     }
 
     /**
@@ -241,6 +247,17 @@ public class AudioBroadcastReceiver {
         Bundle bundle = new Bundle();
         bundle.putParcelable(ACTION_DATA_KEY, audioInfo);
         sendReceiver(context, ACTION_CODE_SEEKTO, ACTION_BUNDLEKEY, bundle);
+    }
+
+    /**
+     * 发lrc loaded
+     *
+     * @param context
+     */
+    public static void sendLrcLoadedReceiver(Context context, String hash) {
+        Bundle bundle = new Bundle();
+        bundle.putString(ACTION_DATA_KEY, hash);
+        sendReceiver(context, ACTION_CODE_LRCLOADED, ACTION_BUNDLEKEY, bundle);
     }
 
 

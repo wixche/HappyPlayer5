@@ -447,6 +447,8 @@ public class ConfigInfo implements Parcelable {
         } else {
             audioInfos = parcel.createTypedArrayList(AudioInfo.CREATOR);
         }
+        //添加随机数
+        RandomUtil.setNums(audioInfos.size());
     }
 
     /**

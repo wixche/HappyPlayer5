@@ -38,6 +38,7 @@ import com.zlm.hp.fragment.RecommendFragment;
 import com.zlm.hp.fragment.SpecialFragment;
 import com.zlm.hp.manager.ActivityManager;
 import com.zlm.hp.manager.AudioPlayerManager;
+import com.zlm.hp.manager.LyricsManager;
 import com.zlm.hp.manager.OnLineAudioManager;
 import com.zlm.hp.receiver.AppSystemReceiver;
 import com.zlm.hp.receiver.AudioBroadcastReceiver;
@@ -324,6 +325,15 @@ public class MainActivity extends BaseActivity {
 
                             //加载歌手头像
                             ImageUtil.loadSingerImage(mContext, mArtistImageView, initAudioInfo.getSingerName(), mConfigInfo.isWifi(), 400, 400, new AsyncHandlerTask(mUIHandler, mWorkerHandler), null);
+
+                            //加载歌词
+                            String keyWords = "";
+                            if (initAudioInfo.getSingerName().equals("未知")) {
+                                keyWords = initAudioInfo.getSongName();
+                            } else {
+                                keyWords = initAudioInfo.getTitle();
+                            }
+                            LyricsManager.newInstance(mContext).loadLyrics(keyWords, keyWords, initAudioInfo.getDuration() + "", initAudioInfo.getHash(), mConfigInfo.isWifi(), new AsyncHandlerTask(mUIHandler, mWorkerHandler), null);
                         }
                         break;
                     case AudioBroadcastReceiver.ACTION_CODE_PLAY:
@@ -351,6 +361,14 @@ public class MainActivity extends BaseActivity {
                         if (mPlayImageView.getVisibility() != View.VISIBLE)
                             mPlayImageView.setVisibility(View.VISIBLE);
 
+                        break;
+
+                    case AudioBroadcastReceiver.ACTION_CODE_SEEKTO:
+                        Bundle seektoBundle = intent.getBundleExtra(AudioBroadcastReceiver.ACTION_BUNDLEKEY);
+                        AudioInfo seektoAudioInfo = seektoBundle.getParcelable(AudioBroadcastReceiver.ACTION_DATA_KEY);
+                        if (seektoAudioInfo != null) {
+                            mMusicSeekBar.setProgress(seektoAudioInfo.getPlayProgress());
+                        }
                         break;
 
                     case AudioBroadcastReceiver.ACTION_CODE_DOWNLOADONLINESONG:
@@ -473,6 +491,11 @@ public class MainActivity extends BaseActivity {
                     mSlidingMenuLayout.hideMenu();
                     return;
                 }
+
+                Intent intent = new Intent(MainActivity.this, LrcActivity.class);
+                startActivity(intent);
+                //去掉动画
+                overridePendingTransition(0, 0);
             }
         });
         //mSlidingMenuLayout.addIgnoreHorizontalView(mPlayerBarLL);

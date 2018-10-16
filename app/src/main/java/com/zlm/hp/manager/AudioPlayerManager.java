@@ -123,7 +123,7 @@ public class AudioPlayerManager {
         } else {
             mPlayStatus = SEEKTO;
         }
-        AudioBroadcastReceiver.sendSeektoSongReceiver(mContext,audioInfo);
+        AudioBroadcastReceiver.sendSeektoSongReceiver(mContext, audioInfo);
     }
 
     /**
@@ -135,6 +135,7 @@ public class AudioPlayerManager {
         ConfigInfo configInfo = ConfigInfo.obtain();
         AudioInfo curAudioInfo = getCurSong(configInfo.getAudioInfos(), configInfo.getPlayHash());
         if (curAudioInfo != null) {
+            if (playProgress > 0) mPlayStatus = SEEKTO;
             curAudioInfo.setPlayProgress(playProgress);
             play(curAudioInfo);
         }

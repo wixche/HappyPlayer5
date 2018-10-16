@@ -1357,7 +1357,7 @@ public class KuGouAndKuWoHttpClient extends APIHttpClient {
         HttpClient.Result result = new HttpClient().get(url, null, params);
         httpReturnResult.setStatus(result.getHttpCode());
 
-        if (result.isSuccessful() && result.getData() != null && result.getData().length > 0) {
+        if (result.isSuccessful() && result.getData() != null && result.getData().length > 1024) {
 
             LrcInfo lrcInfo = new LrcInfo();
             lrcInfo.setCharset("utf8");
