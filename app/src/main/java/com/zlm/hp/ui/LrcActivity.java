@@ -110,6 +110,12 @@ public class LrcActivity extends BaseActivity {
     }
 
     @Override
+    protected void preInitStatusBar() {
+        setStatusBarViewBG(Color.TRANSPARENT);
+    }
+
+
+    @Override
     protected void initViews(Bundle savedInstanceState) {
         initData();
         initView();
