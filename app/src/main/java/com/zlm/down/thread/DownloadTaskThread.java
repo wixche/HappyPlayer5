@@ -119,17 +119,15 @@ public class DownloadTaskThread extends Thread {
         public void run() {
             while (isCanDownload && !isFinish) {
                 synchronized (this) {
-                    int taskThreadDownloadedSize = 0;
+                    int taskThreadDownloadedSize = getDownloadedSize();
+                    //更新任务线程
+                    if (mIDownloadThreadEvent != null && !isFinish) {
+                            mIDownloadThreadEvent.taskThreadDownloading(mDownloadTask, mThreadId, taskThreadDownloadedSize);
+                    }
                     try {
-                        taskThreadDownloadedSize = getDownloadedSize();
                         Thread.sleep(1000);
                     } catch (InterruptedException e) {
                         e.printStackTrace();
-                    }
-                    //更新任务线程
-                    if (mIDownloadThreadEvent != null && !isFinish) {
-                        if (taskThreadDownloadedSize != 0)
-                            mIDownloadThreadEvent.taskThreadDownloading(mDownloadTask, mThreadId, taskThreadDownloadedSize);
                     }
                 }
             }

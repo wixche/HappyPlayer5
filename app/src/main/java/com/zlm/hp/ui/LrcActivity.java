@@ -479,8 +479,8 @@ public class LrcActivity extends BaseActivity {
                 AudioInfo curAudioInfo = AudioPlayerManager.newInstance(mContext).getCurSong(mConfigInfo.getPlayHash());
                 if (curAudioInfo != null && lrcHash.equals(curAudioInfo.getHash())) {
                     LyricsReader lyricsReader = LyricsManager.newInstance(mContext).getLyricsReader(lrcHash);
+                    mManyLineLyricsView.setLyricsReader(lyricsReader);
                     if (lyricsReader != null) {
-                        mManyLineLyricsView.setLyricsReader(lyricsReader);
                         if (mManyLineLyricsView.getLrcStatus() == AbstractLrcView.LRCSTATUS_LRC) {
                             mManyLineLyricsView.seekto((int) curAudioInfo.getPlayProgress());
                         }

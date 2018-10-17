@@ -85,8 +85,17 @@ public class LyricsManager {
         });
     }
 
+    /**
+     * 获取歌词读取器
+     * @param hash
+     * @return
+     */
     public LyricsReader getLyricsReader(String hash) {
-        return mLyricsReaderCache.get(hash).get();
+        SoftReference<LyricsReader> lyricsReaderSoftReference = mLyricsReaderCache.get(hash);
+        if (lyricsReaderSoftReference != null) {
+            return lyricsReaderSoftReference.get();
+        }
+        return null;
     }
 
     public interface LoadLyricsCallBack {
