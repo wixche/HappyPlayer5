@@ -1,7 +1,6 @@
 package com.zlm.hp.manager;
 
 import android.content.Context;
-import android.graphics.Bitmap;
 
 import com.zlm.hp.async.AsyncHandlerTask;
 import com.zlm.hp.constants.ResourceConstants;
@@ -53,24 +52,33 @@ public class LyricsManager {
         asyncHandlerTask.execute(new AsyncHandlerTask.Task() {
             @Override
             protected Object doInBackground() {
-                if (!mLyricsReaderCache.containsKey(hash)) {
-                    File lrcFile = LyricsUtils.getLrcFile(fileName, ResourceUtil.getFilePath(mContext, ResourceConstants.PATH_LYRICS, null));
-                    if (lrcFile != null && lrcFile.exists()) {
-                        LyricsReader lyricsReader = new LyricsReader();
-                        lyricsReader.setHash(hash);
-                        lyricsReader.loadLrc(lrcFile);
-                        mLyricsReaderCache.put(hash, new SoftReference<LyricsReader>(lyricsReader));
-                    } else {
-                        //下载歌词
-                        File saveLrcFile = new File(ResourceUtil.getFilePath(mContext, ResourceConstants.PATH_LYRICS, fileName + ".krc"));
-                        HttpReturnResult httpReturnResult = HttpUtil.getHttpClient().getLyricsInfo(mContext, keyword, duration, hash, askWifi);
-                        if (httpReturnResult.isSuccessful() && httpReturnResult.getResult() != null) {
-                            LrcInfo lrcInfo = (LrcInfo) httpReturnResult.getResult();
+                File lrcFile = LyricsUtils.getLrcFile(fileName, ResourceUtil.getFilePath(mContext, ResourceConstants.PATH_LYRICS, null));
+
+                try {
+
+                    if (!mLyricsReaderCache.containsKey(hash)) {
+                        if (lrcFile != null && lrcFile.exists()) {
                             LyricsReader lyricsReader = new LyricsReader();
                             lyricsReader.setHash(hash);
-                            lyricsReader.loadLrc(lrcInfo.getContent(), saveLrcFile, saveLrcFile.getName());
+                            lyricsReader.loadLrc(lrcFile);
                             mLyricsReaderCache.put(hash, new SoftReference<LyricsReader>(lyricsReader));
+                        } else {
+                            //下载歌词
+                            File saveLrcFile = new File(ResourceUtil.getFilePath(mContext, ResourceConstants.PATH_LYRICS, fileName + ".krc"));
+                            HttpReturnResult httpReturnResult = HttpUtil.getHttpClient().getLyricsInfo(mContext, keyword, duration, hash, askWifi);
+                            if (httpReturnResult.isSuccessful() && httpReturnResult.getResult() != null) {
+                                LrcInfo lrcInfo = (LrcInfo) httpReturnResult.getResult();
+                                LyricsReader lyricsReader = new LyricsReader();
+                                lyricsReader.setHash(hash);
+                                lyricsReader.loadLrc(lrcInfo.getContent(), saveLrcFile, saveLrcFile.getName());
+                                mLyricsReaderCache.put(hash, new SoftReference<LyricsReader>(lyricsReader));
+                            }
                         }
+                    }
+                } catch (Exception e) {
+                    e.printStackTrace();
+                    if (lrcFile != null && lrcFile.exists()) {
+                        lrcFile.delete();
                     }
                 }
                 return null;
@@ -87,6 +95,7 @@ public class LyricsManager {
 
     /**
      * 获取歌词读取器
+     *
      * @param hash
      * @return
      */

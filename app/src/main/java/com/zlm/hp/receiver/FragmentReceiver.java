@@ -7,6 +7,10 @@ import android.content.IntentFilter;
 import android.os.Bundle;
 import android.text.TextUtils;
 
+import com.zlm.hp.entity.RankInfo;
+import com.zlm.hp.entity.SpecialInfo;
+import com.zlm.hp.fragment.SongFragment;
+
 
 /**
  * @Description: fragment的广播
@@ -31,6 +35,11 @@ public class FragmentReceiver {
      * 关闭
      */
     public static final int ACTION_CODE_CLOSE_FRAGMENT = 2;
+
+    /**
+     * 打开本地歌曲
+     */
+    public static final int ACTION_CODE_OPEN_LOCALFRAGMENT = 3;
 
     /**
      * fragment的receiver的action
@@ -89,6 +98,45 @@ public class FragmentReceiver {
         }
         intent.setFlags(Intent.FLAG_INCLUDE_STOPPED_PACKAGES);
         context.sendBroadcast(intent);
+    }
+
+    /**
+     * 发打开歌单广播
+     *
+     * @param context
+     */
+    public static void sendSpecialFragmentReceiver(Context context, SpecialInfo specialInfo) {
+        Bundle bundle = new Bundle();
+        bundle.putInt(SongFragment.SONGTYPE_KEY, SongFragment.SONG_TYPE_SPECIAL);
+        bundle.putParcelable(SongFragment.DATA_KEY, specialInfo);
+
+        //打开歌单页面
+      sendReceiver(context, FragmentReceiver.ACTION_CODE_OPEN_SPECIALFRAGMENT, SongFragment.ARGUMENTS_KEY, bundle);
+
+    }
+
+    /**
+     * 发打开排行广播
+     *
+     * @param context
+     */
+    public static void sendRecommendFragmentReceiver(Context context, RankInfo rankInfo) {
+        Bundle bundle = new Bundle();
+        bundle.putInt(SongFragment.SONGTYPE_KEY, SongFragment.SONG_TYPE_RECOMMEND);
+        bundle.putParcelable(SongFragment.DATA_KEY, rankInfo);
+        sendReceiver(context, FragmentReceiver.ACTION_CODE_OPEN_RECOMMENDFRAGMENT, SongFragment.ARGUMENTS_KEY, bundle);
+    }
+
+    /**
+     * 发打开本地歌曲广播
+     *
+     * @param context
+     */
+    public static void sendLocalFragmentReceiver(Context context, String title) {
+        Bundle bundle = new Bundle();
+        bundle.putInt(SongFragment.SONGTYPE_KEY, SongFragment.SONG_TYPE_LOCAL);
+        bundle.putString(SongFragment.DATA_KEY, title);
+        sendReceiver(context, FragmentReceiver.ACTION_CODE_OPEN_LOCALFRAGMENT, SongFragment.ARGUMENTS_KEY, bundle);
     }
 
     /**

@@ -1,7 +1,6 @@
 package com.zlm.hp.adapter;
 
 import android.content.Context;
-import android.os.Bundle;
 import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -13,7 +12,6 @@ import com.zlm.hp.async.AsyncHandlerTask;
 import com.zlm.hp.constants.ConfigInfo;
 import com.zlm.hp.constants.ResourceConstants;
 import com.zlm.hp.entity.RankInfo;
-import com.zlm.hp.fragment.NetSongFragment;
 import com.zlm.hp.handler.WeakRefHandler;
 import com.zlm.hp.receiver.FragmentReceiver;
 import com.zlm.hp.ui.R;
@@ -73,13 +71,8 @@ public class RecommendAdapter extends RecyclerView.Adapter<RecyclerView.ViewHold
         viewHolder.getListItemRelativeLayout().setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-
-                Bundle bundle = new Bundle();
-                bundle.putInt(NetSongFragment.NETSONGTYPE_KEY, NetSongFragment.NET_SONG_TYPE_RECOMMEND);
-                bundle.putParcelable(NetSongFragment.DATA_KEY, rankInfo);
-
-                //打开排行/推荐页面
-                FragmentReceiver.sendReceiver(mContext, FragmentReceiver.ACTION_CODE_OPEN_RECOMMENDFRAGMENT, NetSongFragment.ARGUMENTS_KEY, bundle);
+                //打开排行页面
+                FragmentReceiver.sendRecommendFragmentReceiver(mContext, rankInfo);
             }
         });
 

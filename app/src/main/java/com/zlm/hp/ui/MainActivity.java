@@ -33,8 +33,8 @@ import com.zlm.hp.db.util.DownloadThreadInfoDB;
 import com.zlm.hp.entity.AudioInfo;
 import com.zlm.hp.fragment.LastSongFragment;
 import com.zlm.hp.fragment.MeFragment;
-import com.zlm.hp.fragment.NetSongFragment;
 import com.zlm.hp.fragment.RecommendFragment;
+import com.zlm.hp.fragment.SongFragment;
 import com.zlm.hp.fragment.SpecialFragment;
 import com.zlm.hp.manager.ActivityManager;
 import com.zlm.hp.manager.AudioPlayerManager;
@@ -53,8 +53,8 @@ import com.zlm.hp.util.ToastUtil;
 import com.zlm.hp.widget.IconfontImageButtonTextView;
 import com.zlm.hp.widget.IconfontIndicatorTextView;
 import com.zlm.hp.widget.WhiteTranRelativeLayout;
-import com.zlm.libs.widget.MusicSeekBar;
 import com.zlm.libs.widget.SlidingMenuLayout;
+import com.zlm.libs.widget.MusicSeekBar;
 
 import java.util.ArrayList;
 
@@ -242,27 +242,23 @@ public class MainActivity extends BaseActivity {
                     case FragmentReceiver.ACTION_CODE_OPEN_RECOMMENDFRAGMENT:
 
                         //排行
-                        Bundle recommendBundle = intent.getBundleExtra(NetSongFragment.ARGUMENTS_KEY);
-                        NetSongFragment recommendSongFragment = NetSongFragment.newInstance();
-                        recommendBundle.putInt(NetSongFragment.NETSONGTYPE_KEY, NetSongFragment.NET_SONG_TYPE_RECOMMEND);
-
+                        Bundle recommendBundle = intent.getBundleExtra(SongFragment.ARGUMENTS_KEY);
+                        SongFragment recommendSongFragment = SongFragment.newInstance();
                         recommendSongFragment.setArguments(recommendBundle);
                         mSlidingMenuOnListener.addAndShowFragment(recommendSongFragment);
 
 
                         break;
                     case FragmentReceiver.ACTION_CODE_OPEN_SPECIALFRAGMENT:
+                    case FragmentReceiver.ACTION_CODE_OPEN_LOCALFRAGMENT:
 
-                        //歌单
-                        Bundle specialBundle = intent.getBundleExtra(NetSongFragment.ARGUMENTS_KEY);
-                        NetSongFragment specialSongFragment = NetSongFragment.newInstance();
-                        specialBundle.putInt(NetSongFragment.NETSONGTYPE_KEY, NetSongFragment.NET_SONG_TYPE_SPECIAL);
-                        specialSongFragment.setArguments(specialBundle);
+                        Bundle bundle = intent.getBundleExtra(SongFragment.ARGUMENTS_KEY);
+                        SongFragment songFragment = SongFragment.newInstance();
+                        songFragment.setArguments(bundle);
 
-                        mSlidingMenuOnListener.addAndShowFragment(specialSongFragment);
-
-
+                        mSlidingMenuOnListener.addAndShowFragment(songFragment);
                         break;
+
                     case FragmentReceiver.ACTION_CODE_CLOSE_FRAGMENT:
 
                         mSlidingMenuOnListener.hideFragment();

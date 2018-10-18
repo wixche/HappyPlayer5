@@ -13,10 +13,12 @@ import com.github.jdsjlzx.recyclerview.LRecyclerView;
 import com.github.jdsjlzx.recyclerview.LRecyclerViewAdapter;
 import com.zlm.hp.adapter.AudioAdapter;
 import com.zlm.hp.constants.ConfigInfo;
+import com.zlm.hp.db.util.AudioInfoDB;
 import com.zlm.hp.entity.AudioInfo;
 import com.zlm.hp.entity.RankInfo;
 import com.zlm.hp.entity.SpecialInfo;
 import com.zlm.hp.http.APIHttpClient;
+import com.zlm.hp.http.HttpClient;
 import com.zlm.hp.http.HttpReturnResult;
 import com.zlm.hp.receiver.FragmentReceiver;
 import com.zlm.hp.ui.R;
@@ -24,15 +26,16 @@ import com.zlm.hp.util.HttpUtil;
 import com.zlm.hp.util.ToastUtil;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
 /**
- * 网络歌曲
+ * 歌曲
  * Created by zhangliangming on 2018-08-11.
  */
 
-public class NetSongFragment extends BaseFragment {
+public class SongFragment extends BaseFragment {
 
     /**
      *
@@ -65,21 +68,26 @@ public class NetSongFragment extends BaseFragment {
     /**
      * 歌单
      */
-    public static final int NET_SONG_TYPE_SPECIAL = 0;
+    public static final int SONG_TYPE_SPECIAL = 0;
 
     /**
      * 排行
      */
-    public static final int NET_SONG_TYPE_RECOMMEND = 1;
+    public static final int SONG_TYPE_RECOMMEND = 1;
+
+    /**
+     * 本地
+     */
+    public static final int SONG_TYPE_LOCAL = 2;
     /**
      * 网络歌曲类型
      */
-    private int mNetSongType = NET_SONG_TYPE_RECOMMEND;
+    private int mSongType = SONG_TYPE_RECOMMEND;
 
     /**
      * 歌曲类型key
      */
-    public static final String NETSONGTYPE_KEY = "NETSONGTYPE_KEY";
+    public static final String SONGTYPE_KEY = "SONGTYPE_KEY";
 
     /**
      * data key
@@ -91,22 +99,22 @@ public class NetSongFragment extends BaseFragment {
      */
     public static final String ARGUMENTS_KEY = "ARGUMENTS_KEY";
 
-    public NetSongFragment() {
+    public SongFragment() {
 
     }
 
     /**
      * @return
      */
-    public static NetSongFragment newInstance() {
-        NetSongFragment fragment = new NetSongFragment();
+    public static SongFragment newInstance() {
+        SongFragment fragment = new SongFragment();
         return fragment;
 
     }
 
     @Override
     protected int setContentLayoutResID() {
-        return R.layout.fragment_net_song;
+        return R.layout.fragment_song;
     }
 
     @Override
@@ -154,27 +162,27 @@ public class NetSongFragment extends BaseFragment {
         });
 
         String title = getString(R.string.app_name);
-        Object data = null;
         Bundle bundle = getArguments();
         if (bundle != null) {
-            mNetSongType = bundle.getInt(NETSONGTYPE_KEY, NET_SONG_TYPE_RECOMMEND);
-            data = bundle.get(DATA_KEY);
+            mSongType = bundle.getInt(SONGTYPE_KEY, SONG_TYPE_RECOMMEND);
         }
-        if (data == null) {
-            data = RankInfo.newDefRankInfo();
-        }
-        switch (mNetSongType) {
-            case NET_SONG_TYPE_RECOMMEND:
 
-                RankInfo rankInfo = (RankInfo) data;
+        switch (mSongType) {
+            case SONG_TYPE_RECOMMEND:
+
+                RankInfo rankInfo = bundle.getParcelable(DATA_KEY);
                 title = rankInfo.getRankName();
 
                 break;
-            case NET_SONG_TYPE_SPECIAL:
+            case SONG_TYPE_SPECIAL:
 
-                SpecialInfo specialInfo = (SpecialInfo) data;
+                SpecialInfo specialInfo = bundle.getParcelable(DATA_KEY);
                 title = specialInfo.getSpecialName();
 
+                break;
+            case SONG_TYPE_LOCAL:
+                title = bundle.getString(DATA_KEY);
+                mRecyclerView.setLoadMoreEnabled(false);
                 break;
         }
         TextView titleView = mainView.findViewById(R.id.title);
@@ -288,24 +296,16 @@ public class NetSongFragment extends BaseFragment {
         HttpReturnResult httpReturnResult = null;
 
         Bundle bundle = getArguments();
-        Object data = null;
-        if (bundle != null) {
-            mNetSongType = bundle.getInt(NETSONGTYPE_KEY, NET_SONG_TYPE_RECOMMEND);
-            data = bundle.get(DATA_KEY);
-        }
-        if (data == null) {
-            data = RankInfo.newDefRankInfo();
-        }
 
-        switch (mNetSongType) {
-            case NET_SONG_TYPE_RECOMMEND:
+        switch (mSongType) {
+            case SONG_TYPE_RECOMMEND:
 
-                RankInfo rankInfo = (RankInfo) data;
+                RankInfo rankInfo = bundle.getParcelable(DATA_KEY);
                 httpReturnResult = apiHttpClient.rankSongList(mContext, rankInfo.getRankId(), page, mPageSize, configInfo.isWifi());
 
                 break;
-            case NET_SONG_TYPE_SPECIAL:
-                SpecialInfo specialInfo = (SpecialInfo) data;
+            case SONG_TYPE_SPECIAL:
+                SpecialInfo specialInfo = bundle.getParcelable(DATA_KEY);
                 httpReturnResult = apiHttpClient.specialSongList(mContext, specialInfo.getSpecialId(), page, mPageSize, configInfo.isWifi());
 
                 break;
@@ -341,25 +341,31 @@ public class NetSongFragment extends BaseFragment {
         HttpReturnResult httpReturnResult = null;
 
         Bundle bundle = getArguments();
-        Object data = null;
-        if (bundle != null) {
-            mNetSongType = bundle.getInt(NETSONGTYPE_KEY, NET_SONG_TYPE_RECOMMEND);
-            data = bundle.get(DATA_KEY);
-        }
-        if (data == null) {
-            data = RankInfo.newDefRankInfo();
-        }
 
-        switch (mNetSongType) {
-            case NET_SONG_TYPE_RECOMMEND:
+        switch (mSongType) {
+            case SONG_TYPE_RECOMMEND:
 
-                RankInfo rankInfo = (RankInfo) data;
+                RankInfo rankInfo = bundle.getParcelable(DATA_KEY);
+                ;
                 httpReturnResult = apiHttpClient.rankSongList(mContext, rankInfo.getRankId(), mPage, mPageSize, configInfo.isWifi());
 
                 break;
-            case NET_SONG_TYPE_SPECIAL:
-                SpecialInfo specialInfo = (SpecialInfo) data;
+            case SONG_TYPE_SPECIAL:
+                SpecialInfo specialInfo = bundle.getParcelable(DATA_KEY);
+                ;
                 httpReturnResult = apiHttpClient.specialSongList(mContext, specialInfo.getSpecialId(), mPage, mPageSize, configInfo.isWifi());
+
+                break;
+            case SONG_TYPE_LOCAL:
+                httpReturnResult = new HttpReturnResult();
+                httpReturnResult.setStatus(HttpClient.HTTP_OK);
+                List<AudioInfo> audioInfos = AudioInfoDB.getLocalAudios(mContext);
+                if (audioInfos == null) {
+                    audioInfos = new ArrayList<AudioInfo>();
+                }
+                Map<String, Object> returnResult = new HashMap<String, Object>();
+                returnResult.put("rows", audioInfos);
+                httpReturnResult.setResult(returnResult);
 
                 break;
         }

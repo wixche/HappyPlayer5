@@ -7,6 +7,7 @@ import android.widget.LinearLayout;
 import android.widget.TextView;
 
 import com.zlm.hp.db.util.AudioInfoDB;
+import com.zlm.hp.receiver.FragmentReceiver;
 import com.zlm.hp.ui.R;
 
 /**
@@ -71,6 +72,7 @@ public class MeFragment extends BaseFragment {
         mLocalMusic.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
+                FragmentReceiver.sendLocalFragmentReceiver(mContext, getString(R.string.tab_localmusic));
             }
         });
         mLocalCountTv = mainView.findViewById(R.id.local_music_count);

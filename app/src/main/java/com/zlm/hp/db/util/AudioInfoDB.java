@@ -88,7 +88,7 @@ public class AudioInfoDB {
     public static List<AudioInfo> getLocalAudios(Context context) {
         try {
             List<AudioInfo> audioInfos = DBHelper.getInstance(context).getDaoSession().getAudioInfoDao().queryBuilder().where(new WhereCondition.StringCondition(AudioInfoDao.Properties.Type.columnName + "=? or ( " + AudioInfoDao.Properties.Type.columnName + "=? and " + AudioInfoDao.Properties.Status.columnName +
-                    "=? )", AudioInfo.TYPE_LOCAL + "", AudioInfo.TYPE_NET + "", AudioInfo.STATUS_FINISH + "")).list();
+                    "=? )", AudioInfo.TYPE_LOCAL + "", AudioInfo.TYPE_NET + "", AudioInfo.STATUS_FINISH + "")).orderAsc(AudioInfoDao.Properties.Category, AudioInfoDao.Properties.ChildCategory).list();
             return audioInfos;
         } catch (Exception e) {
             e.printStackTrace();

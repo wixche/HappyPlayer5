@@ -28,6 +28,8 @@ import javax.net.ssl.X509TrustManager;
  */
 
 public class HttpClient {
+
+    public static final int HTTP_OK = 200;
     private static final int MAX_JUMP = 20;
     /**
      * HTTP Status-Code 300: Multiple Choices.

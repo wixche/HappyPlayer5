@@ -78,7 +78,7 @@ public class ImageUtil {
 
                 APIHttpClient apiHttpClient = HttpUtil.getHttpClient();
                 HttpReturnResult httpReturnResult = apiHttpClient.getSingerIcon(context, finalSearchSingerName, askWifi);
-                if (httpReturnResult.isSuccessful()) {
+                if (httpReturnResult.isSuccessful() && httpReturnResult.getResult() != null) {
                     SingerInfo singerInfo = (SingerInfo) httpReturnResult.getResult();
                     return singerInfo.getImageUrl();
                 }
