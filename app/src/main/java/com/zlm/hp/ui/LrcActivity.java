@@ -26,7 +26,9 @@ import com.zlm.hp.manager.LyricsManager;
 import com.zlm.hp.manager.OnLineAudioManager;
 import com.zlm.hp.receiver.AudioBroadcastReceiver;
 import com.zlm.hp.util.ColorUtil;
+import com.zlm.hp.util.ImageUtil;
 import com.zlm.hp.util.ToastUtil;
+import com.zlm.hp.widget.TransitionImageView;
 import com.zlm.libs.widget.MusicSeekBar;
 import com.zlm.libs.widget.RotateLayout;
 
@@ -90,6 +92,11 @@ public class LrcActivity extends BaseActivity {
     private ImageView modeAllImg;
     private ImageView modeRandomImg;
     private ImageView modeSingleImg;
+
+    /**
+     * 歌手写真图片
+     */
+    private TransitionImageView mSingerImageView;
 
     /**
      * 音频广播
@@ -185,6 +192,10 @@ public class LrcActivity extends BaseActivity {
         //
         mSongNameTextView = findViewById(R.id.songName);
         mSingerNameTextView = findViewById(R.id.singerName);
+
+        //歌手写真
+        mSingerImageView = findViewById(R.id.singerimg);
+        mSingerImageView.setVisibility(View.INVISIBLE);
 
         //
         mManyLineLyricsView = findViewById(R.id.manyLineLyricsView);
@@ -369,6 +380,11 @@ public class LrcActivity extends BaseActivity {
 
                 //
                 mManyLineLyricsView.initLrcData();
+
+                //歌手写真
+                mSingerImageView.setVisibility(View.INVISIBLE);
+                mSingerImageView.resetData();
+
                 break;
             case AudioBroadcastReceiver.ACTION_CODE_INIT:
                 Bundle initBundle = intent.getBundleExtra(AudioBroadcastReceiver.ACTION_BUNDLEKEY);
@@ -397,6 +413,11 @@ public class LrcActivity extends BaseActivity {
                         keyWords = initAudioInfo.getTitle();
                     }
                     LyricsManager.newInstance(mContext).loadLyrics(keyWords, keyWords, initAudioInfo.getDuration() + "", initAudioInfo.getHash(), mConfigInfo.isWifi(), new AsyncHandlerTask(mUIHandler, mWorkerHandler), null);
+
+
+                    //加载歌手写真图片
+
+                    ImageUtil.loadSingerImage(mContext, mSingerImageView, initAudioInfo.getSingerName(), mConfigInfo.isWifi(), new AsyncHandlerTask(mUIHandler, mWorkerHandler));
 
                 }
                 //加载中
@@ -484,9 +505,15 @@ public class LrcActivity extends BaseActivity {
                 String lrcHash = lrcloadedBundle.getString(AudioBroadcastReceiver.ACTION_DATA_KEY);
                 AudioInfo curAudioInfo = AudioPlayerManager.newInstance(mContext).getCurSong(mConfigInfo.getPlayHash());
                 if (curAudioInfo != null && lrcHash.equals(curAudioInfo.getHash())) {
-                    LyricsReader lyricsReader = LyricsManager.newInstance(mContext).getLyricsReader(lrcHash);
-                    mManyLineLyricsView.setLyricsReader(lyricsReader);
-                    if (lyricsReader != null) {
+                    LyricsReader oldLyricsReader = mManyLineLyricsView.getLyricsReader();
+                    LyricsReader newLyricsReader = LyricsManager.newInstance(mContext).getLyricsReader(lrcHash);
+                    if (oldLyricsReader != null && newLyricsReader != null && oldLyricsReader.getHash().equals(newLyricsReader.getHash())) {
+
+                    } else {
+                        mManyLineLyricsView.setLyricsReader(newLyricsReader);
+                    }
+
+                    if (oldLyricsReader != null || newLyricsReader != null) {
                         if (mManyLineLyricsView.getLrcStatus() == AbstractLrcView.LRCSTATUS_LRC) {
                             mManyLineLyricsView.seekto((int) curAudioInfo.getPlayProgress());
                         }
@@ -535,6 +562,7 @@ public class LrcActivity extends BaseActivity {
 
     @Override
     protected void onDestroy() {
+        mSingerImageView.release();
         mManyLineLyricsView.release();
         destroyReceiver();
         super.onDestroy();

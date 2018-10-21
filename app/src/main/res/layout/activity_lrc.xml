@@ -16,6 +16,11 @@
             android:layout_width="match_parent"
             android:layout_height="match_parent">
 
+            <com.zlm.hp.widget.TransitionImageView
+                android:id="@+id/singerimg"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent" />
+
 
             <include layout="@layout/layout_lrc"></include>
 

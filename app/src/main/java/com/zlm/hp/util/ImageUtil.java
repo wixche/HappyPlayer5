@@ -7,6 +7,7 @@ import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.graphics.drawable.BitmapDrawable;
 import android.util.LruCache;
+import android.view.View;
 import android.widget.ImageView;
 
 import com.zlm.hp.async.AsyncHandlerTask;
@@ -16,6 +17,7 @@ import com.zlm.hp.http.APIHttpClient;
 import com.zlm.hp.http.HttpClient;
 import com.zlm.hp.http.HttpReturnResult;
 import com.zlm.hp.ui.R;
+import com.zlm.hp.widget.TransitionImageView;
 
 import java.io.BufferedOutputStream;
 import java.io.File;
@@ -23,6 +25,9 @@ import java.io.FileInputStream;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Map;
 
 /**
  * @Description:
@@ -63,7 +68,7 @@ public class ImageUtil {
      */
     public static void loadSingerImage(final Context context, ImageView imageView, final String singerName, final boolean askWifi, int width, int height, AsyncHandlerTask asyncHandlerTask, ImageLoadCallBack imageLoadCallBack) {
         //多个歌手，则取第一个歌手头像
-        String regex = "、";
+        String regex = "\\s*、\\s*";
         String searchSingerName = singerName;
         if (singerName.contains(regex)) {
             searchSingerName = singerName.split(regex)[0];
@@ -143,6 +148,90 @@ public class ImageUtil {
             }
         });
     }
+
+    /**
+     * 加载歌手写真图片
+     */
+    public static void loadSingerImage(final Context context, final TransitionImageView singerImageView, final String singerName, final boolean askWifi, final AsyncHandlerTask asyncHandlerTask) {
+
+        final String key = singerName.hashCode() + "";
+        //如果当前的图片与上一次一样，则不操作
+        if (singerImageView.getTag() != null && singerImageView.getTag().equals(key)) {
+            return;
+        }
+
+        singerImageView.setVisibility(View.INVISIBLE);
+        singerImageView.resetData();
+
+        String[] singerNameArray = null;
+        if (singerName.contains("、")) {
+
+            String regex = "\\s*、\\s*";
+            singerNameArray = singerName.split(regex);
+
+        } else {
+            singerNameArray = new String[1];
+            singerNameArray[0] = singerName;
+        }
+        singerImageView.setTag(key);
+
+        final List<SingerInfo> returnResult = new ArrayList<SingerInfo>();
+        for (int i = 0; i < singerNameArray.length; i++) {
+            final String searchSingerName = singerNameArray[i];
+
+            asyncHandlerTask.execute(new AsyncHandlerTask.Task<List<SingerInfo>>() {
+                @Override
+                protected List<SingerInfo> doInBackground() {
+                    APIHttpClient apiHttpClient = HttpUtil.getHttpClient();
+                    HttpReturnResult httpReturnResult = apiHttpClient.getSingerPicList(context, searchSingerName, askWifi);
+                    if (httpReturnResult.isSuccessful()) {
+                        Map<String, Object> returnResult = (Map<String, Object>) httpReturnResult.getResult();
+                        List<SingerInfo> lists = (List<SingerInfo>) returnResult.get("rows");
+                        if (lists != null && lists.size() > 0) {
+                            for (int i = 0; i < lists.size(); i++) {
+                                SingerInfo singerInfo = lists.get(i);
+                                String imageUrl = singerInfo.getImageUrl();
+                                ImageUtil.loadSingerImage(context, asyncHandlerTask, singerInfo.getSingerName(), imageUrl, askWifi);
+                            }
+                        }
+                        return lists;
+                    }
+
+                    return null;
+                }
+
+                @Override
+                protected void onPostExecute(List<SingerInfo> result) {
+                    super.onPostExecute(result);
+                    if (result != null && result.size() > 0) {
+                        returnResult.addAll(result);
+                        singerImageView.initData(returnResult, askWifi);
+                    }
+                }
+            });
+        }
+    }
+
+    /**
+     * 获取歌手写真图片
+     *
+     * @param context
+     * @param asyncHandlerTask
+     * @param singerName
+     * @return
+     */
+    public static void loadSingerImage(final Context context, AsyncHandlerTask asyncHandlerTask, String singerName, final String imageUrl, final boolean askWifi) {
+        final String filePath = ResourceUtil.getFilePath(context, ResourceConstants.PATH_SINGER, singerName + File.separator + imageUrl.hashCode() + ".jpg");
+        final String key = imageUrl.hashCode() + "";
+        asyncHandlerTask.execute(new AsyncHandlerTask.Task() {
+            @Override
+            protected Object doInBackground() {
+                loadImageFormCache(context, filePath, imageUrl, key, 720, 1080, askWifi, null);
+                return null;
+            }
+        });
+    }
+
 
     /**
      * @throws

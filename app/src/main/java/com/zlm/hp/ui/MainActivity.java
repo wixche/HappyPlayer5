@@ -53,8 +53,8 @@ import com.zlm.hp.util.ToastUtil;
 import com.zlm.hp.widget.IconfontImageButtonTextView;
 import com.zlm.hp.widget.IconfontIndicatorTextView;
 import com.zlm.hp.widget.WhiteTranRelativeLayout;
-import com.zlm.libs.widget.SlidingMenuLayout;
 import com.zlm.libs.widget.MusicSeekBar;
+import com.zlm.libs.widget.SlidingMenuLayout;
 
 import java.util.ArrayList;
 
