@@ -46,6 +46,8 @@ public class TransitionImageView extends AppCompatImageView {
      */
     private int mDuration = 500;
 
+    private boolean isFrist = true;
+
     /**
      * 切换图片操作
      */
@@ -77,7 +79,7 @@ public class TransitionImageView extends AppCompatImageView {
                     Bitmap preBitmap = ImageUtil.mImageCache.get(preImageUrl.hashCode() + "");
 
 
-                    if (preBitmap == null) {
+                    if (preBitmap == null || (isFrist && mIndex == 0)) {
                         drawables[0] = new BitmapDrawable(curBitmap);
                     } else {
                         drawables[0] = new BitmapDrawable(preBitmap);
@@ -153,6 +155,7 @@ public class TransitionImageView extends AppCompatImageView {
         if (mSingerInfo != null)
             mSingerInfo.clear();
         mIndex = 0;
+        isFrist = true;
         setBackground(new BitmapDrawable());
         mUIHandler.removeCallbacks(mChangeRunnable);
     }
