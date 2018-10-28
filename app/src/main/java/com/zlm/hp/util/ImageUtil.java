@@ -37,7 +37,7 @@ import java.util.Map;
 public class ImageUtil {
 
     // 缓存
-    public static LruCache<String, Bitmap> mImageCache = getImageCache();
+    private static LruCache<String, Bitmap> mImageCache = getImageCache();
 
     /**
      * 初始化图片内存
@@ -187,14 +187,18 @@ public class ImageUtil {
                     if (httpReturnResult.isSuccessful()) {
                         Map<String, Object> returnResult = (Map<String, Object>) httpReturnResult.getResult();
                         List<SingerInfo> lists = (List<SingerInfo>) returnResult.get("rows");
-                        if (lists != null && lists.size() > 0) {
-                            for (int i = 0; i < lists.size(); i++) {
-                                SingerInfo singerInfo = lists.get(i);
-                                String imageUrl = singerInfo.getImageUrl();
-                                ImageUtil.loadSingerImage(context, asyncHandlerTask, singerInfo.getSingerName(), imageUrl, askWifi);
+                        if (lists != null) {
+                            int maxSize = 3;
+                            int size = lists.size() > maxSize ? maxSize : lists.size();
+                            if (size > 0) {
+                                for (int i = 0; i < size; i++) {
+                                    SingerInfo singerInfo = lists.get(i);
+                                    String imageUrl = singerInfo.getImageUrl();
+                                    ImageUtil.loadSingerImage(context, asyncHandlerTask, singerInfo.getSingerName(), imageUrl, askWifi);
+                                }
                             }
+                            return lists;
                         }
-                        return lists;
                     }
 
                     return null;
@@ -205,7 +209,7 @@ public class ImageUtil {
                     super.onPostExecute(result);
                     if (result != null && result.size() > 0) {
                         returnResult.addAll(result);
-                        singerImageView.initData(returnResult, askWifi);
+                        singerImageView.initData(returnResult);
                     }
                 }
             });
@@ -473,6 +477,14 @@ public class ImageUtil {
         } catch (IOException e) {
             e.printStackTrace();
         }
+    }
+
+    /**
+     * @param key
+     * @return
+     */
+    public static Bitmap getBitmapFromCache(String key) {
+        return mImageCache.get(key);
     }
 
     private interface LoadImgUrlCallBack {

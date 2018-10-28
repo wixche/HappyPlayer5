@@ -78,7 +78,7 @@ public class SpecialFragment extends BaseFragment {
     @Override
     protected void initViews(View mainView, Bundle savedInstanceState) {
         initView(mainView);
-        showLoadingView();
+        //showLoadingView();
     }
 
     /**

@@ -390,7 +390,14 @@ public class AudioPlayerManager {
      * 播放歌曲
      */
     public synchronized void playSong(AudioInfo audioInfo) {
-        addNextSong(audioInfo);
+        ConfigInfo configInfo = ConfigInfo.obtain();
+        List<AudioInfo> audioInfoList = configInfo.getAudioInfos();
+        int curIndex = getCurSongIndex(audioInfoList, audioInfo.getHash());
+        if (curIndex == -1) {
+            audioInfoList.add(audioInfo);
+            configInfo.setAudioInfos(audioInfoList);
+        }
+
         play(audioInfo);
     }
 

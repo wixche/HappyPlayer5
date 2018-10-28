@@ -256,7 +256,7 @@ public abstract class BaseFragment extends Fragment {
                 R.anim.anim_rotate);
         rotateAnimation.setInterpolator(new LinearInterpolator());// 匀速
         mLoadImgView.startAnimation(rotateAnimation);
-        mLoadingContainer.setVisibility(View.GONE);
+        //mLoadingContainer.setVisibility(View.GONE);
 
     }
 

@@ -92,7 +92,7 @@ dependencies {
     /**
      * SlidingMenuLayout
      */
-    implementation 'com.github.zhangliangming:SlidingMenuLayout:v1.11'
+    implementation 'com.github.zhangliangming:SlidingMenuLayout:v1.12'
     /**
      * 第三方switch-button
      */

@@ -67,7 +67,7 @@ public class TransitionImageView extends AppCompatImageView {
 
 
                 String curImageUrl = mSingerInfo.get(curIndex).getImageUrl();
-                Bitmap curBitmap = ImageUtil.mImageCache.get(curImageUrl.hashCode() + "");
+                Bitmap curBitmap = ImageUtil.getBitmapFromCache(curImageUrl.hashCode() + "");
                 if (curBitmap != null) {
 
                     int preIndex = curIndex - 1;
@@ -76,7 +76,7 @@ public class TransitionImageView extends AppCompatImageView {
                     }
 
                     String preImageUrl = mSingerInfo.get(preIndex).getImageUrl();
-                    Bitmap preBitmap = ImageUtil.mImageCache.get(preImageUrl.hashCode() + "");
+                    Bitmap preBitmap = ImageUtil.getBitmapFromCache(preImageUrl.hashCode() + "");
 
 
                     if (preBitmap == null || (isFrist && mIndex == 0)) {
@@ -134,17 +134,17 @@ public class TransitionImageView extends AppCompatImageView {
     /**
      * 初始化数据
      */
-    public void initData(List<SingerInfo> singerInfos, boolean askWifi) {
+    public void initData(List<SingerInfo> singerInfos) {
         if (mSingerInfo == null || mSingerInfo.size() == 0) {
             this.mSingerInfo = singerInfos;
-            start(askWifi);
+            start();
         }
     }
 
     /**
      * 开始
      */
-    private void start(boolean askWifi) {
+    private void start() {
         mUIHandler.post(mChangeRunnable);
     }
 

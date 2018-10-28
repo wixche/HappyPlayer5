@@ -230,22 +230,23 @@ public class AudioPlayerService extends Service {
      * 处理错误
      */
     private void handleError() {
-        ToastUtil.showTextToast(getApplicationContext(), "播放歌曲出错，1秒后播放下一首");
-
-
-        new Thread() {
-            @Override
-            public void run() {
-                try {
-                    Thread.sleep(1000);
-
-                    //播放完成，执行下一首操作
-                    AudioPlayerManager.newInstance(mContext).next();
-                } catch (InterruptedException e) {
-                    e.printStackTrace();
-                }
-            }
-        }.start();
+        ToastUtil.showTextToast(getApplicationContext(), "播放歌曲出错");
+//        ToastUtil.showTextToast(getApplicationContext(), "播放歌曲出错，1秒后播放下一首");
+//
+//
+//        new Thread() {
+//            @Override
+//            public void run() {
+//                try {
+//                    Thread.sleep(1000);
+//
+//                    //播放完成，执行下一首操作
+//                    AudioPlayerManager.newInstance(mContext).next();
+//                } catch (InterruptedException e) {
+//                    e.printStackTrace();
+//                }
+//            }
+//        }.start();
     }
 
     /**

@@ -111,7 +111,7 @@ public class SplashActivity extends BaseActivity {
             List<AudioInfo> audioInfos = MediaUtil.scanLocalMusic(getApplicationContext(), null);
             if (audioInfos != null && audioInfos.size() > 0) {
                 AudioInfoDB.addAudioInfos(getApplicationContext(), audioInfos);
-                configInfo.setAudioInfos(audioInfos);
+                configInfo.setAudioInfos(AudioInfoDB.getLocalAudios(getApplicationContext()));
             }
 
             PreferencesUtil.putBoolean(getApplicationContext(), Constants.IS_FRIST_KEY, false);
