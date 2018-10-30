@@ -187,6 +187,7 @@ public class ImageUtil {
                     if (httpReturnResult.isSuccessful()) {
                         Map<String, Object> returnResult = (Map<String, Object>) httpReturnResult.getResult();
                         List<SingerInfo> lists = (List<SingerInfo>) returnResult.get("rows");
+                        List<SingerInfo> listResult = new ArrayList<SingerInfo>();
                         if (lists != null) {
                             int maxSize = 3;
                             int size = lists.size() > maxSize ? maxSize : lists.size();
@@ -195,9 +196,11 @@ public class ImageUtil {
                                     SingerInfo singerInfo = lists.get(i);
                                     String imageUrl = singerInfo.getImageUrl();
                                     ImageUtil.loadSingerImage(context, asyncHandlerTask, singerInfo.getSingerName(), imageUrl, askWifi);
+
+                                    listResult.add(singerInfo);
                                 }
                             }
-                            return lists;
+                            return listResult;
                         }
                     }
 
