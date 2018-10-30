@@ -91,8 +91,9 @@ public class TransitionImageView extends AppCompatImageView {
                     transitionDrawable.startTransition(mDuration);
 
                     setVisibility(View.VISIBLE);
-                    mIndex++;
                 }
+
+                mIndex++;
 
                 mUIHandler.postDelayed(mChangeRunnable, 1000 * 10);
             }
