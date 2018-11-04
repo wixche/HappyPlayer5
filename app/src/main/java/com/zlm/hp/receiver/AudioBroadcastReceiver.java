@@ -21,7 +21,7 @@ public class AudioBroadcastReceiver {
     /**
      * audio的receiver的action
      */
-    private static final String AUDIO_RECEIVER_ACTION = "com.zlm.hp.receiver.audio.action";
+    private static final String RECEIVER_ACTION = "com.zlm.hp.receiver.audio.action";
 
     /**
      * code key
@@ -94,7 +94,7 @@ public class AudioBroadcastReceiver {
 
     public AudioBroadcastReceiver() {
         mAudioIntentFilter = new IntentFilter();
-        mAudioIntentFilter.addAction(AUDIO_RECEIVER_ACTION);
+        mAudioIntentFilter.addAction(RECEIVER_ACTION);
     }
 
     /**
@@ -128,7 +128,7 @@ public class AudioBroadcastReceiver {
      * @param bundleValue
      */
     public static void sendReceiver(Context context, int code, String bundleKey, Bundle bundleValue) {
-        Intent intent = new Intent(AUDIO_RECEIVER_ACTION);
+        Intent intent = new Intent(RECEIVER_ACTION);
         intent.putExtra(ACTION_CODE_KEY, code);
         if (!TextUtils.isEmpty(bundleKey) && bundleValue != null) {
             intent.putExtra(bundleKey, bundleValue);

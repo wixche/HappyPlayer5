@@ -44,7 +44,7 @@ public class FragmentReceiver {
     /**
      * fragment的receiver的action
      */
-    private static final String FRAGMENT_RECEIVER_ACTION = "com.zlm.hp.receiver.fragment.action";
+    private static final String RECEIVER_ACTION = "com.zlm.hp.receiver.fragment.action";
 
     /**
      *
@@ -57,7 +57,7 @@ public class FragmentReceiver {
 
     public FragmentReceiver(Context context) {
         mFragmentIntentFilter = new IntentFilter();
-        mFragmentIntentFilter.addAction(FRAGMENT_RECEIVER_ACTION);
+        mFragmentIntentFilter.addAction(RECEIVER_ACTION);
     }
 
     /**
@@ -91,7 +91,7 @@ public class FragmentReceiver {
      * @param bundleValue
      */
     public static void sendReceiver(Context context, int code, String bundleKey, Bundle bundleValue) {
-        Intent intent = new Intent(FRAGMENT_RECEIVER_ACTION);
+        Intent intent = new Intent(RECEIVER_ACTION);
         intent.putExtra(ACTION_CODE_KEY, code);
         if (!TextUtils.isEmpty(bundleKey) && bundleValue != null) {
             intent.putExtra(bundleKey, bundleValue);

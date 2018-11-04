@@ -381,7 +381,7 @@ public class HttpClient {
                 conn.setReadTimeout(READ_TIMEOUT);
                 conn.setInstanceFollowRedirects(false);
                 conn.setUseCaches(false);
-                conn.setAllowUserInteraction(false);
+                //conn.setAllowUserInteraction(false);
 
                 // 设置通用的请求属性
                 conn.setRequestProperty("Connection", "Keep-Alive");
