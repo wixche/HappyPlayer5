@@ -3,8 +3,6 @@ package com.zlm.hp.util;
 import android.content.Context;
 import android.net.ConnectivityManager;
 import android.net.NetworkInfo;
-import android.net.wifi.WifiInfo;
-import android.net.wifi.WifiManager;
 
 /**
  * @Description: 网络处理类
@@ -39,10 +37,8 @@ public class NetUtil {
      * @return
      */
     public static boolean isWifiConnected(Context context) {
-        WifiInfo wifiInfo = ((WifiManager) context.getSystemService(Context.WIFI_SERVICE)).getConnectionInfo();
         ConnectivityManager conMann = (ConnectivityManager) context.getSystemService(Context.CONNECTIVITY_SERVICE);
         NetworkInfo wifiNetworkInfo = conMann.getNetworkInfo(ConnectivityManager.TYPE_WIFI);
-        //避免ssid出现假连现象，这里对ssid进行了一个unknown ssid
-        return wifiNetworkInfo != null && wifiNetworkInfo.isConnected() && wifiNetworkInfo.isAvailable() && wifiNetworkInfo.getState() == NetworkInfo.State.CONNECTED && wifiInfo != null && !wifiInfo.getSSID().equals("<unknown ssid>");
+        return wifiNetworkInfo != null && wifiNetworkInfo.isConnected() && wifiNetworkInfo.isAvailable() && wifiNetworkInfo.getState() == NetworkInfo.State.CONNECTED;
     }
 }
