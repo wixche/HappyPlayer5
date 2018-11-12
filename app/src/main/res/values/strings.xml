@@ -86,8 +86,17 @@
 
     //播放模式
     <string name="mode_all">&#xe630;</string>
+    <string name="mode_all_text">顺序播放</string>
     <string name="mode_random">&#xe660;</string>
+    <string name="mode_random_text">随机播放</string>
     <string name="mode_single">&#xe62f;</string>
+    <string name="mode_single_text">单曲播放</string>
+
+    <string name="reset">还原了</string>
+    <string name="second">秒</string>
+    <string name="seek_lrc_warntip">请先播放歌曲</string>
+
+    <string name="unknow">未知</string>
 
     <string name="help_tip">Github：https://github.com/zhangliangming\n联系方式：316257874@qq.com\n声明：仅用于学习用途</string>
 

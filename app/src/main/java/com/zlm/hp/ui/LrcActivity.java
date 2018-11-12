@@ -7,6 +7,10 @@ import android.os.Bundle;
 import android.os.Message;
 import android.text.TextUtils;
 import android.view.View;
+import android.view.ViewStub;
+import android.view.ViewTreeObserver;
+import android.view.animation.Animation;
+import android.view.animation.TranslateAnimation;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.RelativeLayout;
@@ -19,6 +23,9 @@ import com.zlm.hp.constants.ConfigInfo;
 import com.zlm.hp.db.util.DownloadThreadInfoDB;
 import com.zlm.hp.entity.AudioInfo;
 import com.zlm.hp.lyrics.LyricsReader;
+import com.zlm.hp.lyrics.model.LyricsInfo;
+import com.zlm.hp.lyrics.model.LyricsTag;
+import com.zlm.hp.lyrics.utils.LyricsIOUtils;
 import com.zlm.hp.lyrics.widget.AbstractLrcView;
 import com.zlm.hp.lyrics.widget.ManyLyricsView;
 import com.zlm.hp.manager.AudioPlayerManager;
@@ -28,9 +35,14 @@ import com.zlm.hp.receiver.AudioBroadcastReceiver;
 import com.zlm.hp.util.ColorUtil;
 import com.zlm.hp.util.ImageUtil;
 import com.zlm.hp.util.ToastUtil;
+import com.zlm.hp.widget.ButtonRelativeLayout;
+import com.zlm.hp.widget.IconfontImageButtonTextView;
 import com.zlm.hp.widget.TransitionImageView;
+import com.zlm.libs.widget.CustomSeekBar;
 import com.zlm.libs.widget.MusicSeekBar;
 import com.zlm.libs.widget.RotateLayout;
+
+import java.util.Map;
 
 /**
  * @Description: 歌词界面
@@ -97,6 +109,14 @@ public class LrcActivity extends BaseActivity {
      * 歌手写真图片
      */
     private TransitionImageView mSingerImageView;
+
+    /**
+     * 更多按钮
+     */
+    private boolean isMoreMenuShowing = false;
+    private ViewStub mViewStubMoreMenu;
+    private RelativeLayout mMoreMenuPopLayout;
+    private LinearLayout mMoreMenuLL;
 
     /**
      * 音频广播
@@ -329,13 +349,422 @@ public class LrcActivity extends BaseActivity {
         });
         initPlayModeView(mConfigInfo.getPlayModel(), modeAllImg, modeRandomImg, modeSingleImg, false);
 
-        //
+        //播放列表
         RelativeLayout playListMenu = findViewById(R.id.playlistmenu);
         playListMenu.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
             }
         });
+
+        //更多菜单
+        IconfontImageButtonTextView moreMenuIIBTV = findViewById(R.id.more_menu);
+        moreMenuIIBTV.setConvert(true);
+        moreMenuIIBTV.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                if (mViewStubMoreMenu == null) {
+                    initMoreMenuView();
+                }
+                /**
+                 * 如果该界面还没初始化，则监听
+                 */
+                if (mMoreMenuPopLayout.getHeight() == 0) {
+                    mMoreMenuPopLayout.getViewTreeObserver().addOnGlobalLayoutListener(new ViewTreeObserver.OnGlobalLayoutListener() {
+                        @Override
+                        public void onGlobalLayout() {
+                            mMoreMenuPopLayout.getViewTreeObserver().removeOnGlobalLayoutListener(this);
+                            showMoreMenuView();
+                        }
+                    });
+
+                } else {
+                    showMoreMenuView();
+                }
+            }
+
+            /**
+             * 显示更多菜单按钮
+             */
+            private void showMoreMenuView() {
+                if (isMoreMenuShowing) return;
+
+                mMoreMenuPopLayout.setVisibility(View.VISIBLE);
+
+                TranslateAnimation translateAnimation = new TranslateAnimation(0, 0, mMoreMenuLL.getHeight(), 0);
+                translateAnimation.setDuration(250);//设置动画持续时间
+                translateAnimation.setFillAfter(true);
+                translateAnimation.setAnimationListener(new Animation.AnimationListener() {
+                    @Override
+                    public void onAnimationStart(Animation animation) {
+                        isMoreMenuShowing = true;
+                    }
+
+                    @Override
+                    public void onAnimationEnd(Animation animation) {
+                    }
+
+                    @Override
+                    public void onAnimationRepeat(Animation animation) {
+
+                    }
+                });
+
+                mMoreMenuLL.clearAnimation();
+                mMoreMenuLL.startAnimation(translateAnimation);
+
+            }
+
+            /**
+             * 初始化更多菜单
+             */
+            private void initMoreMenuView() {
+                mViewStubMoreMenu = findViewById(R.id.vs_more_menu);
+                mViewStubMoreMenu.inflate();
+
+                mMoreMenuPopLayout = findViewById(R.id.moreMenuPopLayout);
+                mMoreMenuPopLayout.setOnClickListener(new View.OnClickListener() {
+                    @Override
+                    public void onClick(View v) {
+                        hideMoreMenu();
+                    }
+                });
+
+                mMoreMenuLL = findViewById(R.id.menuLayout);
+
+                //字体
+                final CustomSeekBar fontSizeSB = findViewById(R.id.fontSizeSeekbar);
+                fontSizeSB.setMax(ConfigInfo.MAX_LRC_FONT_SIZE - ConfigInfo.MIN_LRC_FONT_SIZE);
+                fontSizeSB.setProgress((mConfigInfo.getLrcFontSize() - ConfigInfo.MIN_LRC_FONT_SIZE));
+                fontSizeSB.setBackgroundPaintColor(ColorUtil.parserColor(Color.WHITE, 50));
+                fontSizeSB.setProgressColor(Color.WHITE);
+                fontSizeSB.setThumbColor(Color.WHITE);
+                fontSizeSB.setOnChangeListener(new CustomSeekBar.OnChangeListener() {
+                    @Override
+                    public void onProgressChanged(CustomSeekBar customSeekBar) {
+
+                        int fontSize = fontSizeSB.getProgress() + ConfigInfo.MIN_LRC_FONT_SIZE;
+                        mManyLineLyricsView.setSize(fontSize, fontSize, true);
+                        mConfigInfo.setLrcFontSize(fontSize).save();
+
+
+                    }
+
+                    @Override
+                    public void onTrackingTouchStart(CustomSeekBar customSeekBar) {
+
+                    }
+
+                    @Override
+                    public void onTrackingTouchFinish(CustomSeekBar customSeekBar) {
+
+                    }
+                });
+
+                //字体减少
+                IconfontImageButtonTextView lyricDecreaseIIBTV = findViewById(R.id.lyric_decrease);
+                lyricDecreaseIIBTV.setConvert(true);
+                lyricDecreaseIIBTV.setOnClickListener(new View.OnClickListener() {
+                    @Override
+                    public void onClick(View v) {
+                        int curProgress = fontSizeSB.getProgress();
+                        curProgress -= 2;
+                        if (curProgress < 0) {
+                            curProgress = 0;
+                        }
+                        fontSizeSB.setProgress(curProgress);
+
+                        int fontSize = fontSizeSB.getProgress() + ConfigInfo.MIN_LRC_FONT_SIZE;
+                        mManyLineLyricsView.setSize(fontSize, fontSize, true);
+                        mConfigInfo.setLrcFontSize(fontSize).save();
+                    }
+                });
+
+
+                //字体增加
+                IconfontImageButtonTextView lyricIncreaseIIBTV = findViewById(R.id.lyric_increase);
+                lyricIncreaseIIBTV.setOnClickListener(new View.OnClickListener() {
+                    @Override
+                    public void onClick(View v) {
+                        int curProgress = fontSizeSB.getProgress();
+                        curProgress += 2;
+                        if (curProgress > fontSizeSB.getMax()) {
+                            curProgress = fontSizeSB.getMax();
+                        }
+                        fontSizeSB.setProgress(curProgress);
+
+                        int fontSize = fontSizeSB.getProgress() + ConfigInfo.MIN_LRC_FONT_SIZE;
+                        mManyLineLyricsView.setSize(fontSize, fontSize, true);
+                        mConfigInfo.setLrcFontSize(fontSize).save();
+                    }
+                });
+
+                //歌词颜色面板
+                ImageView[] colorPanel = new ImageView[ConfigInfo.LRC_COLORS_STRING.length];
+                final ImageView[] colorStatus = new ImageView[colorPanel.length];
+
+                int i = 0;
+                //
+                colorPanel[i] = findViewById(R.id.color_panel1);
+                colorPanel[i].setOnClickListener(new View.OnClickListener() {
+                    @Override
+                    public void onClick(View view) {
+                        int index = mConfigInfo.getLrcColorIndex();
+                        if (index != 0) {
+                            mConfigInfo.setLrcColorIndex(0).save();
+                            colorStatus[index].setVisibility(View.GONE);
+                            colorStatus[0].setVisibility(View.VISIBLE);
+
+                            int lrcColor = ColorUtil.parserColor(ConfigInfo.LRC_COLORS_STRING[mConfigInfo.getLrcColorIndex()]);
+                            mManyLineLyricsView.setPaintHLColor(new int[]{lrcColor, lrcColor}, true);
+                        }
+                    }
+                });
+                colorStatus[i] = findViewById(R.id.color_status1);
+
+                //
+                i++;
+                colorPanel[i] = findViewById(R.id.color_panel2);
+                colorPanel[i].setOnClickListener(new View.OnClickListener() {
+                    @Override
+                    public void onClick(View view) {
+                        int index = mConfigInfo.getLrcColorIndex();
+                        if (index != 1) {
+                            mConfigInfo.setLrcColorIndex(1).save();
+                            colorStatus[index].setVisibility(View.GONE);
+                            colorStatus[1].setVisibility(View.VISIBLE);
+
+
+                            int lrcColor = ColorUtil.parserColor(ConfigInfo.LRC_COLORS_STRING[mConfigInfo.getLrcColorIndex()]);
+                            mManyLineLyricsView.setPaintHLColor(new int[]{lrcColor, lrcColor}, true);
+
+                        }
+                    }
+                });
+                colorStatus[i] = findViewById(R.id.color_status2);
+
+                //
+                i++;
+                colorPanel[i] = findViewById(R.id.color_panel3);
+                colorPanel[i].setOnClickListener(new View.OnClickListener() {
+                    @Override
+                    public void onClick(View view) {
+                        int index = mConfigInfo.getLrcColorIndex();
+                        if (index != 2) {
+                            mConfigInfo.setLrcColorIndex(2).save();
+                            colorStatus[index].setVisibility(View.GONE);
+                            colorStatus[2].setVisibility(View.VISIBLE);
+
+                            int lrcColor = ColorUtil.parserColor(ConfigInfo.LRC_COLORS_STRING[mConfigInfo.getLrcColorIndex()]);
+                            mManyLineLyricsView.setPaintHLColor(new int[]{lrcColor, lrcColor}, true);
+                        }
+                    }
+                });
+                colorStatus[i] = findViewById(R.id.color_status3);
+
+                //
+                i++;
+                colorPanel[i] = findViewById(R.id.color_panel4);
+                colorPanel[i].setOnClickListener(new View.OnClickListener() {
+                    @Override
+                    public void onClick(View view) {
+                        int index = mConfigInfo.getLrcColorIndex();
+                        if (index != 3) {
+                            mConfigInfo.setLrcColorIndex(3).save();
+                            colorStatus[index].setVisibility(View.GONE);
+                            colorStatus[3].setVisibility(View.VISIBLE);
+
+                            int lrcColor = ColorUtil.parserColor(ConfigInfo.LRC_COLORS_STRING[mConfigInfo.getLrcColorIndex()]);
+                            mManyLineLyricsView.setPaintHLColor(new int[]{lrcColor, lrcColor}, true);
+                        }
+                    }
+                });
+                colorStatus[i] = findViewById(R.id.color_status4);
+
+                //
+                i++;
+                colorPanel[i] = findViewById(R.id.color_panel5);
+                colorPanel[i].setOnClickListener(new View.OnClickListener() {
+                    @Override
+                    public void onClick(View view) {
+                        int index = mConfigInfo.getLrcColorIndex();
+                        if (index != 4) {
+                            mConfigInfo.setLrcColorIndex(4).save();
+                            colorStatus[index].setVisibility(View.GONE);
+                            colorStatus[4].setVisibility(View.VISIBLE);
+
+                            int lrcColor = ColorUtil.parserColor(ConfigInfo.LRC_COLORS_STRING[mConfigInfo.getLrcColorIndex()]);
+                            mManyLineLyricsView.setPaintHLColor(new int[]{lrcColor, lrcColor}, true);
+                        }
+                    }
+                });
+                colorStatus[i] = findViewById(R.id.color_status5);
+
+                //
+                i++;
+                colorPanel[i] = findViewById(R.id.color_panel6);
+                colorPanel[i].setOnClickListener(new View.OnClickListener() {
+                    @Override
+                    public void onClick(View view) {
+                        int index = mConfigInfo.getLrcColorIndex();
+                        if (index != 5) {
+                            mConfigInfo.setLrcColorIndex(5).save();
+                            colorStatus[index].setVisibility(View.GONE);
+                            colorStatus[5].setVisibility(View.VISIBLE);
+
+                            int lrcColor = ColorUtil.parserColor(ConfigInfo.LRC_COLORS_STRING[mConfigInfo.getLrcColorIndex()]);
+                            mManyLineLyricsView.setPaintHLColor(new int[]{lrcColor, lrcColor}, true);
+                        }
+                    }
+                });
+                colorStatus[i] = findViewById(R.id.color_status6);
+
+                //
+                colorStatus[mConfigInfo.getLrcColorIndex()].setVisibility(View.VISIBLE);
+
+                //取消
+                LinearLayout moreMenuCancel = findViewById(R.id.more_menu_calcel);
+                moreMenuCancel.setOnClickListener(new View.OnClickListener() {
+                    @Override
+                    public void onClick(View view) {
+                        hideMoreMenu();
+                    }
+                });
+
+                //歌词进度减少按钮
+                ButtonRelativeLayout lrcProgressJianBtn = findViewById(R.id.lyric_progress_jian);
+                lrcProgressJianBtn.setDefFillColor(ColorUtil.parserColor(Color.WHITE, 20));
+                lrcProgressJianBtn.setPressedFillColor(ColorUtil.parserColor(Color.WHITE, 50));
+                lrcProgressJianBtn.setOnClickListener(new View.OnClickListener() {
+                    @Override
+                    public void onClick(View view) {
+                        if (mManyLineLyricsView.getLyricsReader() != null) {
+                            if (mManyLineLyricsView.getLrcStatus() == AbstractLrcView.LRCSTATUS_LRC) {
+                                if (mManyLineLyricsView.getLrcPlayerStatus() == AbstractLrcView.LRCPLAYERSTATUS_PLAY) {
+                                    mManyLineLyricsView.getLyricsReader().setOffset(mManyLineLyricsView.getLyricsReader().getOffset() + (-500));
+                                    ToastUtil.showTextToast(LrcActivity.this, (float) mManyLineLyricsView.getLyricsReader().getOffset() / 1000 + getString(R.string.second));
+
+                                    //保存歌词文件
+                                    saveLrcFile(mManyLineLyricsView.getLyricsReader().getLrcFilePath(), mManyLineLyricsView.getLyricsReader().getLyricsInfo(), mManyLineLyricsView.getLyricsReader().getPlayOffset());
+
+                                } else {
+                                    ToastUtil.showTextToast(LrcActivity.this, getString(R.string.seek_lrc_warntip));
+                                }
+                            }
+                        }
+                    }
+                });
+                //歌词进度重置
+                ButtonRelativeLayout resetProgressJianBtn = findViewById(R.id.lyric_progress_reset);
+                resetProgressJianBtn.setDefFillColor(ColorUtil.parserColor(Color.WHITE, 20));
+                resetProgressJianBtn.setPressedFillColor(ColorUtil.parserColor(Color.WHITE, 50));
+                resetProgressJianBtn.setOnClickListener(new View.OnClickListener() {
+                    @Override
+                    public void onClick(View view) {
+
+                        if (mManyLineLyricsView.getLyricsReader() != null) {
+
+                            if (mManyLineLyricsView.getLrcStatus() == AbstractLrcView.LRCSTATUS_LRC) {
+                                if (mManyLineLyricsView.getLrcPlayerStatus() == AbstractLrcView.LRCPLAYERSTATUS_PLAY) {
+                                    mManyLineLyricsView.getLyricsReader().setOffset(0);
+                                    ToastUtil.showTextToast(LrcActivity.this, getString(R.string.reset));
+
+                                    //保存歌词文件
+                                    saveLrcFile(mManyLineLyricsView.getLyricsReader().getLrcFilePath(), mManyLineLyricsView.getLyricsReader().getLyricsInfo(), mManyLineLyricsView.getLyricsReader().getPlayOffset());
+
+                                } else {
+                                    ToastUtil.showTextToast(LrcActivity.this, getString(R.string.seek_lrc_warntip));
+                                }
+
+                            }
+                        }
+                    }
+                });
+                //歌词进度增加
+                ButtonRelativeLayout lrcProgressJiaBtn = findViewById(R.id.lyric_progress_jia);
+                lrcProgressJiaBtn.setDefFillColor(ColorUtil.parserColor(Color.WHITE, 20));
+                lrcProgressJiaBtn.setPressedFillColor(ColorUtil.parserColor(Color.WHITE, 50));
+                lrcProgressJiaBtn.setOnClickListener(new View.OnClickListener() {
+                    @Override
+                    public void onClick(View view) {
+                        if (mManyLineLyricsView.getLyricsReader() != null) {
+
+                            if (mManyLineLyricsView.getLrcStatus() == AbstractLrcView.LRCSTATUS_LRC) {
+                                if (mManyLineLyricsView.getLrcPlayerStatus() == AbstractLrcView.LRCPLAYERSTATUS_PLAY) {
+                                    mManyLineLyricsView.getLyricsReader().setOffset(mManyLineLyricsView.getLyricsReader().getOffset() + (500));
+                                    ToastUtil.showTextToast(LrcActivity.this, (float) mManyLineLyricsView.getLyricsReader().getOffset() / 1000 + getString(R.string.second));
+                                    //保存歌词文件
+                                    saveLrcFile(mManyLineLyricsView.getLyricsReader().getLrcFilePath(), mManyLineLyricsView.getLyricsReader().getLyricsInfo(), mManyLineLyricsView.getLyricsReader().getPlayOffset());
+                                } else {
+                                    ToastUtil.showTextToast(LrcActivity.this, getString(R.string.seek_lrc_warntip));
+                                }
+
+                            }
+                        }
+                    }
+
+                });
+            }
+        });
+
+    }
+
+    /**
+     * @param lrcFilePath
+     * @param lyricsInfo
+     * @param playOffset
+     */
+    private void saveLrcFile(final String lrcFilePath, final LyricsInfo lyricsInfo, final long playOffset) {
+        new Thread() {
+
+            @Override
+            public void run() {
+
+                Map<String, Object> tags = lyricsInfo.getLyricsTags();
+
+                tags.put(LyricsTag.TAG_OFFSET, playOffset);
+                lyricsInfo.setLyricsTags(tags);
+
+
+                //保存修改的歌词文件
+                try {
+                    LyricsIOUtils.getLyricsFileWriter(lrcFilePath).writer(lyricsInfo, lrcFilePath);
+                } catch (Exception e) {
+
+                    e.printStackTrace();
+                }
+            }
+
+        }.start();
+    }
+
+    /**
+     * 隐藏更多菜单
+     */
+    private void hideMoreMenu() {
+        TranslateAnimation translateAnimation = new TranslateAnimation(0, 0, 0, mMoreMenuLL.getHeight());
+        translateAnimation.setDuration(250);//设置动画持续时间
+        translateAnimation.setFillAfter(true);
+        translateAnimation.setAnimationListener(new Animation.AnimationListener() {
+            @Override
+            public void onAnimationStart(Animation animation) {
+
+            }
+
+            @Override
+            public void onAnimationEnd(Animation animation) {
+                isMoreMenuShowing = false;
+                mMoreMenuPopLayout.setVisibility(View.INVISIBLE);
+            }
+
+            @Override
+            public void onAnimationRepeat(Animation animation) {
+
+            }
+        });
+        mMoreMenuLL.clearAnimation();
+        mMoreMenuLL.startAnimation(translateAnimation);
+
     }
 
     private void initReceiver() {
@@ -407,7 +836,7 @@ public class LrcActivity extends BaseActivity {
 
                     //加载歌词
                     String keyWords = "";
-                    if (initAudioInfo.getSingerName().equals("未知")) {
+                    if (initAudioInfo.getSingerName().equals(getString(R.string.unknow))) {
                         keyWords = initAudioInfo.getSongName();
                     } else {
                         keyWords = initAudioInfo.getTitle();
@@ -534,19 +963,19 @@ public class LrcActivity extends BaseActivity {
     private void initPlayModeView(int playMode, ImageView modeAllImg, ImageView modeRandomImg, ImageView modeSingleImg, boolean isTipShow) {
         if (playMode == 0) {
             if (isTipShow)
-                ToastUtil.showTextToast(LrcActivity.this, "顺序播放");
+                ToastUtil.showTextToast(LrcActivity.this, getString(R.string.mode_all_text));
             modeAllImg.setVisibility(View.VISIBLE);
             modeRandomImg.setVisibility(View.INVISIBLE);
             modeSingleImg.setVisibility(View.INVISIBLE);
         } else if (playMode == 1) {
             if (isTipShow)
-                ToastUtil.showTextToast(LrcActivity.this, "随机播放");
+                ToastUtil.showTextToast(LrcActivity.this, getString(R.string.mode_random_text));
             modeAllImg.setVisibility(View.INVISIBLE);
             modeRandomImg.setVisibility(View.VISIBLE);
             modeSingleImg.setVisibility(View.INVISIBLE);
         } else {
             if (isTipShow)
-                ToastUtil.showTextToast(LrcActivity.this, "单曲播放");
+                ToastUtil.showTextToast(LrcActivity.this, getString(R.string.mode_single_text));
             modeAllImg.setVisibility(View.INVISIBLE);
             modeRandomImg.setVisibility(View.INVISIBLE);
             modeSingleImg.setVisibility(View.VISIBLE);
@@ -557,6 +986,10 @@ public class LrcActivity extends BaseActivity {
 
     @Override
     public void onBackPressed() {
+        if(isMoreMenuShowing){
+            hideMoreMenu();
+            return;
+        }
         mRotateLayout.closeView();
     }
 

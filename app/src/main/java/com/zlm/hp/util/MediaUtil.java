@@ -8,6 +8,7 @@ import com.zlm.hp.audio.TrackInfo;
 import com.zlm.hp.audio.utils.AudioUtil;
 import com.zlm.hp.entity.AudioInfo;
 import com.zlm.hp.entity.StorageInfo;
+import com.zlm.hp.ui.R;
 
 import java.io.File;
 import java.util.ArrayList;
@@ -40,7 +41,7 @@ public class MediaUtil {
             filterFormatList.toArray(filterFormat);
             for (int i = 0; i < list.size(); i++) {
                 StorageInfo storageInfo = list.get(i);
-                scanLocalAudioFile(result, storageInfo.getPath(), filterFormat, operateListener);
+                scanLocalAudioFile(context,result, storageInfo.getPath(), filterFormat, operateListener);
             }
         }
         return result;
@@ -49,12 +50,13 @@ public class MediaUtil {
     /**
      * 扫描本地歌曲
      *
+     * @param context
      * @param result          扫描结果集合
      * @param path            路径
      * @param filterFormat    文件格式
      * @param operateListener 操作回调
      */
-    private static void scanLocalAudioFile(List<AudioInfo> result, String path, String[] filterFormat, OperateListener operateListener) {
+    private static void scanLocalAudioFile(Context context, List<AudioInfo> result, String path, String[] filterFormat, OperateListener operateListener) {
         File[] files = new File(path).listFiles();
         if (files != null && files.length > 0) {
             for (int i = 0; i < files.length; i++) {
@@ -66,14 +68,14 @@ public class MediaUtil {
 
                     for (int j = 0; j < filterFormat.length; j++) {
                         if (fileExt.equals(filterFormat[j])) {
-                            handleAudioFile(result, temp, operateListener);
+                            handleAudioFile(context,result, temp, operateListener);
                             break;
                         }
                     }
 
                 } else if (temp.isDirectory() && temp.getPath().indexOf("/.") == -1) // 忽略点文件（隐藏文件/文件夹）
                 {
-                    scanLocalAudioFile(result, temp.getPath(), filterFormat, operateListener);
+                    scanLocalAudioFile(context, result, temp.getPath(), filterFormat, operateListener);
                 }
             }
         }
@@ -82,11 +84,12 @@ public class MediaUtil {
     /**
      * 处理音频文件
      *
+     * @param context
      * @param result          扫描结果集合
      * @param audioFile       音频文件
      * @param operateListener 操作回调
      */
-    private static void handleAudioFile(List<AudioInfo> result, File audioFile, OperateListener operateListener) {
+    private static void handleAudioFile(Context context, List<AudioInfo> result, File audioFile, OperateListener operateListener) {
 
         //歌曲文件hash值
         String hash = MD5Util.getFileMd5(audioFile).toLowerCase();
@@ -97,7 +100,7 @@ public class MediaUtil {
             }
         }
         //
-        String singerName = "未知";
+        String singerName = context.getResources().getString(R.string.unknow);
         String fileName = FileUtil.getFileNameWithoutExt(audioFile);
         String songName = fileName;
         if (fileName.contains("-")) {

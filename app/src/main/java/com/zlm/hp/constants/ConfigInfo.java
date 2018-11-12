@@ -60,7 +60,7 @@ public class ConfigInfo implements Parcelable {
     /**
      * 最大字体大小
      */
-    public static final int MAX_LRC_FONT_SIZE = 50;
+    public static final int MAX_LRC_FONT_SIZE = 100;
 
     //歌词相关
     /**
