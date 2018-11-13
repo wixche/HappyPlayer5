@@ -244,7 +244,7 @@ public class LrcActivity extends BaseActivity {
 
         //进度条
         mMusicSeekBar = findViewById(R.id.lrcseekbar);
-        mMusicSeekBar.setTrackingTouchSleepTime(1000);
+        mMusicSeekBar.setTrackingTouchSleepTime(200);
         mMusicSeekBar.setOnMusicListener(new MusicSeekBar.OnMusicListener() {
             @Override
             public String getTimeText() {
@@ -645,13 +645,13 @@ public class LrcActivity extends BaseActivity {
                             if (mManyLineLyricsView.getLrcStatus() == AbstractLrcView.LRCSTATUS_LRC) {
                                 if (mManyLineLyricsView.getLrcPlayerStatus() == AbstractLrcView.LRCPLAYERSTATUS_PLAY) {
                                     mManyLineLyricsView.getLyricsReader().setOffset(mManyLineLyricsView.getLyricsReader().getOffset() + (-500));
-                                    ToastUtil.showTextToast(LrcActivity.this, (float) mManyLineLyricsView.getLyricsReader().getOffset() / 1000 + getString(R.string.second));
+                                    ToastUtil.showTextToast(mContext, (float) mManyLineLyricsView.getLyricsReader().getOffset() / 1000 + getString(R.string.second));
 
                                     //保存歌词文件
                                     saveLrcFile(mManyLineLyricsView.getLyricsReader().getLrcFilePath(), mManyLineLyricsView.getLyricsReader().getLyricsInfo(), mManyLineLyricsView.getLyricsReader().getPlayOffset());
 
                                 } else {
-                                    ToastUtil.showTextToast(LrcActivity.this, getString(R.string.seek_lrc_warntip));
+                                    ToastUtil.showTextToast(mContext, getString(R.string.seek_lrc_warntip));
                                 }
                             }
                         }
@@ -670,13 +670,13 @@ public class LrcActivity extends BaseActivity {
                             if (mManyLineLyricsView.getLrcStatus() == AbstractLrcView.LRCSTATUS_LRC) {
                                 if (mManyLineLyricsView.getLrcPlayerStatus() == AbstractLrcView.LRCPLAYERSTATUS_PLAY) {
                                     mManyLineLyricsView.getLyricsReader().setOffset(0);
-                                    ToastUtil.showTextToast(LrcActivity.this, getString(R.string.reset));
+                                    ToastUtil.showTextToast(mContext, getString(R.string.reset));
 
                                     //保存歌词文件
                                     saveLrcFile(mManyLineLyricsView.getLyricsReader().getLrcFilePath(), mManyLineLyricsView.getLyricsReader().getLyricsInfo(), mManyLineLyricsView.getLyricsReader().getPlayOffset());
 
                                 } else {
-                                    ToastUtil.showTextToast(LrcActivity.this, getString(R.string.seek_lrc_warntip));
+                                    ToastUtil.showTextToast(mContext, getString(R.string.seek_lrc_warntip));
                                 }
 
                             }
@@ -695,11 +695,11 @@ public class LrcActivity extends BaseActivity {
                             if (mManyLineLyricsView.getLrcStatus() == AbstractLrcView.LRCSTATUS_LRC) {
                                 if (mManyLineLyricsView.getLrcPlayerStatus() == AbstractLrcView.LRCPLAYERSTATUS_PLAY) {
                                     mManyLineLyricsView.getLyricsReader().setOffset(mManyLineLyricsView.getLyricsReader().getOffset() + (500));
-                                    ToastUtil.showTextToast(LrcActivity.this, (float) mManyLineLyricsView.getLyricsReader().getOffset() / 1000 + getString(R.string.second));
+                                    ToastUtil.showTextToast(mContext, (float) mManyLineLyricsView.getLyricsReader().getOffset() / 1000 + getString(R.string.second));
                                     //保存歌词文件
                                     saveLrcFile(mManyLineLyricsView.getLyricsReader().getLrcFilePath(), mManyLineLyricsView.getLyricsReader().getLyricsInfo(), mManyLineLyricsView.getLyricsReader().getPlayOffset());
                                 } else {
-                                    ToastUtil.showTextToast(LrcActivity.this, getString(R.string.seek_lrc_warntip));
+                                    ToastUtil.showTextToast(mContext, getString(R.string.seek_lrc_warntip));
                                 }
 
                             }
@@ -972,19 +972,19 @@ public class LrcActivity extends BaseActivity {
     private void initPlayModeView(int playMode, ImageView modeAllImg, ImageView modeRandomImg, ImageView modeSingleImg, boolean isTipShow) {
         if (playMode == 0) {
             if (isTipShow)
-                ToastUtil.showTextToast(LrcActivity.this, getString(R.string.mode_all_text));
+                ToastUtil.showTextToast(mContext, getString(R.string.mode_all_text));
             modeAllImg.setVisibility(View.VISIBLE);
             modeRandomImg.setVisibility(View.INVISIBLE);
             modeSingleImg.setVisibility(View.INVISIBLE);
         } else if (playMode == 1) {
             if (isTipShow)
-                ToastUtil.showTextToast(LrcActivity.this, getString(R.string.mode_random_text));
+                ToastUtil.showTextToast(mContext, getString(R.string.mode_random_text));
             modeAllImg.setVisibility(View.INVISIBLE);
             modeRandomImg.setVisibility(View.VISIBLE);
             modeSingleImg.setVisibility(View.INVISIBLE);
         } else {
             if (isTipShow)
-                ToastUtil.showTextToast(LrcActivity.this, getString(R.string.mode_single_text));
+                ToastUtil.showTextToast(mContext, getString(R.string.mode_single_text));
             modeAllImg.setVisibility(View.INVISIBLE);
             modeRandomImg.setVisibility(View.INVISIBLE);
             modeSingleImg.setVisibility(View.VISIBLE);

@@ -903,6 +903,7 @@ public class MainActivity extends BaseActivity {
      */
     private void releaseData() {
         AudioPlayerManager.newInstance(mContext).release();
+        ToastUtil.release();
     }
 
     /**

@@ -33,4 +33,11 @@ public class ToastUtil {
         toast.show();
     }
 
+    public static void release(){
+        if (toast != null) {
+            toast.cancel();
+            toast = null;
+        }
+    }
+
 }
