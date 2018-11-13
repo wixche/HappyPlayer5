@@ -231,6 +231,7 @@ public class AudioPlayerService extends Service {
      * 处理错误
      */
     private void handleError() {
+        releasePlayer();
         ToastUtil.showTextToast(getApplicationContext(), "播放歌曲出错");
 //        ToastUtil.showTextToast(getApplicationContext(), "播放歌曲出错，1秒后播放下一首");
 //
