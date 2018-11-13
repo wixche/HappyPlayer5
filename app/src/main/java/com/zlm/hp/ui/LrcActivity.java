@@ -190,6 +190,7 @@ public class LrcActivity extends BaseActivity {
 
     private void initView() {
         mRotateLayout = findViewById(R.id.rotateLayout);
+        mRotateLayout.setDragType(RotateLayout.LEFT_TO_RIGHT);
         mRotateLayout.setRotateLayoutListener(new RotateLayout.RotateLayoutListener() {
             @Override
             public void finishActivity() {
@@ -398,6 +399,7 @@ public class LrcActivity extends BaseActivity {
                     @Override
                     public void onAnimationStart(Animation animation) {
                         isMoreMenuShowing = true;
+                        mRotateLayout.setDragType(RotateLayout.NONE);
                     }
 
                     @Override
@@ -423,6 +425,7 @@ public class LrcActivity extends BaseActivity {
                 mViewStubMoreMenu.inflate();
 
                 mMoreMenuPopLayout = findViewById(R.id.moreMenuPopLayout);
+                mMoreMenuPopLayout.setVisibility(View.INVISIBLE);
                 mMoreMenuPopLayout.setOnClickListener(new View.OnClickListener() {
                     @Override
                     public void onClick(View v) {
@@ -755,6 +758,7 @@ public class LrcActivity extends BaseActivity {
             public void onAnimationEnd(Animation animation) {
                 isMoreMenuShowing = false;
                 mMoreMenuPopLayout.setVisibility(View.INVISIBLE);
+                mRotateLayout.setDragType(RotateLayout.LEFT_TO_RIGHT);
             }
 
             @Override
@@ -834,14 +838,21 @@ public class LrcActivity extends BaseActivity {
                     mMusicSeekBar.setProgress((int) initAudioInfo.getPlayProgress());
                     mMusicSeekBar.setSecondaryProgress(0);
 
-                    //加载歌词
-                    String keyWords = "";
-                    if (initAudioInfo.getSingerName().equals(getString(R.string.unknow))) {
-                        keyWords = initAudioInfo.getSongName();
-                    } else {
-                        keyWords = initAudioInfo.getTitle();
+
+                    LyricsReader oldLyricsReader = mManyLineLyricsView.getLyricsReader();
+                    if(oldLyricsReader == null || !oldLyricsReader.getHash().equals(initAudioInfo.getHash())){
+                        //加载歌词
+                        String keyWords = "";
+                        if (initAudioInfo.getSingerName().equals(getString(R.string.unknow))) {
+                            keyWords = initAudioInfo.getSongName();
+                        } else {
+                            keyWords = initAudioInfo.getTitle();
+                        }
+                        LyricsManager.newInstance(mContext).loadLyrics(keyWords, keyWords, initAudioInfo.getDuration() + "", initAudioInfo.getHash(), mConfigInfo.isWifi(), new AsyncHandlerTask(mUIHandler, mWorkerHandler), null);
+                        //加载中
+                        mManyLineLyricsView.initLrcData();
+                        mManyLineLyricsView.setLrcStatus(AbstractLrcView.LRCSTATUS_LOADING);
                     }
-                    LyricsManager.newInstance(mContext).loadLyrics(keyWords, keyWords, initAudioInfo.getDuration() + "", initAudioInfo.getHash(), mConfigInfo.isWifi(), new AsyncHandlerTask(mUIHandler, mWorkerHandler), null);
 
 
                     //加载歌手写真图片
@@ -849,9 +860,7 @@ public class LrcActivity extends BaseActivity {
                     ImageUtil.loadSingerImage(mContext, mSingerImageView, initAudioInfo.getSingerName(), mConfigInfo.isWifi(), new AsyncHandlerTask(mUIHandler, mWorkerHandler));
 
                 }
-                //加载中
-                mManyLineLyricsView.initLrcData();
-                mManyLineLyricsView.setLrcStatus(AbstractLrcView.LRCSTATUS_LOADING);
+
                 break;
             case AudioBroadcastReceiver.ACTION_CODE_PLAY:
                 if (mPauseBtn.getVisibility() != View.VISIBLE)

@@ -174,14 +174,6 @@
             android:layout_height="@dimen/lrc_bar_height"
             android:layout_alignParentBottom="true"></include>
 
-        <ViewStub
-            android:id="@+id/vs_more_menu"
-            android:layout_width="match_parent"
-            android:layout_height="match_parent"
-            android:layout_alignParentBottom="true"
-            android:layout="@layout/layout_lrc_more_menu"></ViewStub>
-
-
 
     </RelativeLayout>
 </LinearLayout>

@@ -64,11 +64,11 @@ dependencies {
     /**
      * 右滑动关闭
      */
-    implementation 'com.github.zhangliangming:SwipeBackLayout:v2.7'
+    implementation 'com.github.zhangliangming:SwipeBackLayout:v2.8'
     /**
      * 旋转界面
      */
-    implementation 'com.github.zhangliangming:RotateLayout:v2.7'
+    implementation 'com.github.zhangliangming:RotateLayout:v2.9'
     /**
      * 进度条
      */

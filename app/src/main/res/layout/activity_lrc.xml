@@ -24,6 +24,12 @@
 
             <include layout="@layout/layout_lrc"></include>
 
+            <ViewStub
+                android:id="@+id/vs_more_menu"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:layout_alignParentBottom="true"
+                android:layout="@layout/layout_lrc_more_menu"></ViewStub>
         </RelativeLayout>
     </LinearLayout>
 </com.zlm.libs.widget.RotateLayout>

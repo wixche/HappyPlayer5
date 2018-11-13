@@ -153,12 +153,12 @@ public class TransitionImageView extends AppCompatImageView {
      * 结束
      */
     public void resetData() {
+        release();
         if (mSingerInfo != null)
             mSingerInfo.clear();
         mIndex = 0;
         isFrist = true;
         setBackground(new BitmapDrawable());
-        mUIHandler.removeCallbacks(mChangeRunnable);
     }
 
     public void release() {

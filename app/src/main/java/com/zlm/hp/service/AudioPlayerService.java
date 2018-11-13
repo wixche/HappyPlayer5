@@ -18,6 +18,8 @@ import com.zlm.hp.receiver.AudioBroadcastReceiver;
 import com.zlm.hp.util.ResourceUtil;
 import com.zlm.hp.util.ToastUtil;
 
+import java.io.File;
+
 import tv.danmaku.ijk.media.player.IMediaPlayer;
 import tv.danmaku.ijk.media.player.IjkMediaPlayer;
 
@@ -145,11 +147,10 @@ public class AudioPlayerService extends Service {
     private void handleSong(final AudioInfo audioInfo) {
         this.mAudioInfo = audioInfo;
         try {
-            String filePath = null;
-            if (audioInfo.getType() == AudioInfo.TYPE_LOCAL) {
-                String fileName = audioInfo.getTitle();
-                filePath = ResourceUtil.getFilePath(mContext, ResourceConstants.PATH_AUDIO, fileName + "." + audioInfo.getFileExt());
-            } else {
+            String fileName = audioInfo.getTitle();
+            String filePath = ResourceUtil.getFilePath(mContext, ResourceConstants.PATH_AUDIO, fileName + "." + audioInfo.getFileExt());
+            File audioFile = new File(filePath);
+            if (!audioFile.exists()) {
                 filePath = ResourceUtil.getFilePath(mContext, ResourceConstants.PATH_CACHE_AUDIO, audioInfo.getHash() + ".temp");
             }
 
