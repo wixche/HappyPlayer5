@@ -181,6 +181,12 @@ public class AudioPlayerManager {
                     audioInfo.setFilePath(filePath);
                     AudioBroadcastReceiver.sendPlayLocalSongReceiver(mContext, audioInfo);
                 } else {
+                    filePath = ResourceUtil.getFilePath(mContext, ResourceConstants.PATH_CACHE_AUDIO, audioInfo.getHash() + ".temp");
+                    audioFile = new File(filePath);
+                    if (!audioFile.exists()) {
+                        //临时文件不存在，删除数据库中的数据
+                        DownloadThreadInfoDB.delete(mContext, audioInfo.getHash(), OnLineAudioManager.threadNum);
+                    }
                     mPlayStatus = PLAYINGNET;
                     int downloadedSize = DownloadThreadInfoDB.getDownloadedSize(mContext, audioInfo.getHash(), OnLineAudioManager.threadNum);
                     if (downloadedSize == audioInfo.getFileSize()) {
