@@ -108,15 +108,27 @@
                         android:clickable="true">
 
                         <TextView
+                            android:id="@+id/cache_text"
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
                             android:layout_alignParentLeft="true"
                             android:layout_centerVertical="true"
                             android:layout_marginLeft="10dp"
-                            android:layout_toLeftOf="@+id/cache_arrow"
                             android:text="@string/clear_cache_txt"
                             android:textColor="@color/textColor"
                             android:textSize="@dimen/title_size" />
+
+                        <TextView
+                            android:id="@+id/cache_size_text"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:layout_centerVertical="true"
+                            android:layout_marginLeft="10dp"
+                            android:layout_toLeftOf="@+id/cache_arrow"
+                            android:layout_toRightOf="@+id/cache_text"
+                            android:gravity="right"
+                            android:textColor="@color/defColor"
+                            android:textSize="@dimen/copyright_size" />
 
                         <ImageView
                             android:id="@+id/cache_arrow"

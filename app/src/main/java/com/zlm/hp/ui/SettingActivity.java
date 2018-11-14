@@ -1,5 +1,6 @@
 package com.zlm.hp.ui;
 
+import android.app.Dialog;
 import android.content.Intent;
 import android.os.Bundle;
 import android.os.Message;
@@ -7,10 +8,17 @@ import android.view.View;
 import android.widget.ImageView;
 import android.widget.TextView;
 
+import com.dou361.dialogui.DialogUIUtils;
+import com.dou361.dialogui.listener.DialogUIListener;
 import com.suke.widget.SwitchButton;
 import com.zlm.hp.constants.ConfigInfo;
+import com.zlm.hp.constants.ResourceConstants;
+import com.zlm.hp.util.FileUtil;
+import com.zlm.hp.util.ResourceUtil;
 import com.zlm.hp.widget.ListItemRelativeLayout;
 import com.zlm.libs.widget.SwipeBackLayout;
+
+import java.io.File;
 
 /**
  * @Description: 设置界面
@@ -35,9 +43,25 @@ public class SettingActivity extends BaseActivity {
     private SwitchButton mControlSwitchButton;
 
     /**
+     * 缓存大小
+     */
+    private long mCacheSize = 0;
+    private TextView mCacheSizeTv;
+
+    /**
+     * 加载窗口
+     */
+    private Dialog mLoadingDialog = null;
+
+    /**
      * 加载数据
      */
     private final int LOAD_DATA = 1;
+
+    /**
+     * 更新缓存数据
+     */
+    private final int UPDATE_CACHESIZE = 2;
     /**
      * 基本数据
      */
@@ -133,8 +157,54 @@ public class SettingActivity extends BaseActivity {
             }
         });
 
+        //缓存
+        mCacheSizeTv = findViewById(R.id.cache_size_text);
+        ListItemRelativeLayout cacheLR = findViewById(R.id.cache_lr);
+        cacheLR.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                String tipMsg = getString(R.string.clear_cache_tip);
+                DialogUIUtils.showMdAlert(SettingActivity.this, getString(R.string.tip_title), tipMsg, new DialogUIListener() {
+                    @Override
+                    public void onPositive() {
+                        clearAllCache();
+                    }
+
+                    @Override
+                    public void onNegative() {
+
+                    }
+
+                    @Override
+                    public void onCancle() {
+
+                    }
+                }).setCancelable(true, false).show();
+            }
+        });
+
         //加载数据
         mWorkerHandler.sendEmptyMessage(LOAD_DATA);
+    }
+
+    /**
+     * 清空所有缓存
+     */
+    private void clearAllCache() {
+
+        mWorkerHandler.sendEmptyMessage(UPDATE_CACHESIZE);
+        /**
+         * 加载框
+         *
+         * @param context          上下文
+         * @param msg              提示文本
+         * @param isVertical       true为竖直方向false为水平方向
+         * @param cancleable       true为可以取消false为不可取消
+         * @param outsideTouchable true为可以点击空白区域false为不可点击
+         * @param isWhiteBg        true为白色背景false为灰色背景
+         */
+        mLoadingDialog = DialogUIUtils.showLoading(SettingActivity.this, getString(R.string.loading_tip), false, false, false, true).show();
+
     }
 
     @Override
@@ -143,16 +213,34 @@ public class SettingActivity extends BaseActivity {
             case LOAD_DATA:
                 mControlSwitchButton.setChecked(mConfigInfo.isWire());
                 mHelloSwitchButton.setChecked(mConfigInfo.isSayHello());
+                mCacheSizeTv.setText(FileUtil.getFileSize(mCacheSize));
+                break;
+            case UPDATE_CACHESIZE:
+                if (mLoadingDialog != null)
+                    DialogUIUtils.dismiss(mLoadingDialog);
+                mCacheSizeTv.setText(FileUtil.getFileSize(mCacheSize));
                 break;
         }
     }
 
     @Override
     protected void handleWorkerMessage(Message msg) {
+        String cachePath = ResourceUtil.getFilePath(mContext, ResourceConstants.PATH_CACHE, "");
         switch (msg.what) {
             case LOAD_DATA:
                 mConfigInfo = ConfigInfo.obtain();
+
+
+                mCacheSize = FileUtil.getFolderSize(new File(cachePath));
+
                 mUIHandler.sendEmptyMessage(LOAD_DATA);
+
+                break;
+            case UPDATE_CACHESIZE:
+
+                FileUtil.deleteFolderFile(cachePath, false);
+                mCacheSize = FileUtil.getFolderSize(new File(cachePath));
+                mUIHandler.sendEmptyMessageDelayed(UPDATE_CACHESIZE, 500);
 
                 break;
         }

@@ -109,8 +109,8 @@ public class ZLog {
     /**
      * 输出配置信息
      */
-    public static void logBuildInfo(Context context,String codeLineInfo) {
-        ZLog.i(codeLineInfo, "==========Build==========",
+    public static void logBuildInfo(Context context, String codeLineInfo) {
+        ZLog.i(codeLineInfo, "\n==========Build==========",
                 "\r\nBuild.ID:", Build.ID,
                 "\r\nBuild.DISPLAY:", Build.DISPLAY,
                 "\r\nBuild.PRODUCT:", Build.PRODUCT,
@@ -129,7 +129,9 @@ public class ZLog {
                 "\r\nBuild.FINGERPRINT:", Build.FINGERPRINT,
                 "\r\nBuild.USER:", Build.USER,
                 "\r\nBuild.HOST:", Build.HOST,
-                "\r\nBuild.DeviceID:", ApkUtil.getUniquePsuedoID(context));
+                "\r\nBuild.DeviceID:", ApkUtil.getUniquePsuedoID(context),
+                "\r\nAPP.VERSION:", ApkUtil.getVersionName(context)
+        );
     }
 
     /**
