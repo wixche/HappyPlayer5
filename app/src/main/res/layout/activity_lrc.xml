@@ -39,6 +39,13 @@
                 android:layout_alignParentBottom="true"
                 android:layout="@layout/layout_lrc_songinfo"></ViewStub>
 
+            <ViewStub
+                android:id="@+id/vs_singer_list"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:layout_alignParentBottom="true"
+                android:layout="@layout/layout_lrc_singerlist"></ViewStub>
+
         </RelativeLayout>
     </LinearLayout>
 </com.zlm.libs.widget.RotateLayout>

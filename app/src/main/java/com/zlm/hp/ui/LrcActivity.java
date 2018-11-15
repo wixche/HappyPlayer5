@@ -5,6 +5,8 @@ import android.content.Intent;
 import android.graphics.Color;
 import android.os.Bundle;
 import android.os.Message;
+import android.support.v7.widget.LinearLayoutManager;
+import android.support.v7.widget.RecyclerView;
 import android.text.TextUtils;
 import android.view.View;
 import android.view.ViewStub;
@@ -17,6 +19,7 @@ import android.widget.RelativeLayout;
 import android.widget.TextView;
 
 import com.zlm.down.entity.DownloadTask;
+import com.zlm.hp.adapter.LrcPopSingerAdapter;
 import com.zlm.hp.async.AsyncHandlerTask;
 import com.zlm.hp.audio.utils.MediaUtil;
 import com.zlm.hp.constants.ConfigInfo;
@@ -117,7 +120,7 @@ public class LrcActivity extends BaseActivity {
     private boolean isMoreMenuPopShowing = false;
     private ViewStub mViewStubMoreMenu;
     private RelativeLayout mMoreMenuPopLayout;
-    private LinearLayout mMoreMenuPopLL;
+    private PlayListBGRelativeLayout mMoreMenuPopRL;
 
 
     /**
@@ -127,6 +130,16 @@ public class LrcActivity extends BaseActivity {
     private ViewStub mViewStubSongInfo;
     private RelativeLayout mSongInfoPopLayout;
     private PlayListBGRelativeLayout mSongInfoPopRL;
+
+
+    /**
+     * 歌手列表
+     */
+    private boolean isSingerListPopShowing = false;
+    private ViewStub mViewStubSingerList;
+    private RelativeLayout mSingerListPopLayout;
+    private PlayListBGRelativeLayout mSingerListPopRL;
+    private RecyclerView mSingerListRecyclerView;
 
     /**
      * 音频广播
@@ -404,7 +417,7 @@ public class LrcActivity extends BaseActivity {
 
         mMoreMenuPopLayout.setVisibility(View.VISIBLE);
 
-        TranslateAnimation translateAnimation = new TranslateAnimation(0, 0, mMoreMenuPopLL.getHeight(), 0);
+        TranslateAnimation translateAnimation = new TranslateAnimation(0, 0, mMoreMenuPopRL.getHeight(), 0);
         translateAnimation.setDuration(250);//设置动画持续时间
         translateAnimation.setFillAfter(true);
         translateAnimation.setAnimationListener(new Animation.AnimationListener() {
@@ -424,8 +437,8 @@ public class LrcActivity extends BaseActivity {
             }
         });
 
-        mMoreMenuPopLL.clearAnimation();
-        mMoreMenuPopLL.startAnimation(translateAnimation);
+        mMoreMenuPopRL.clearAnimation();
+        mMoreMenuPopRL.startAnimation(translateAnimation);
 
     }
 
@@ -436,6 +449,49 @@ public class LrcActivity extends BaseActivity {
         mViewStubMoreMenu = findViewById(R.id.vs_more_menu);
         mViewStubMoreMenu.inflate();
 
+        //歌手
+        ImageView singerImgV = findViewById(R.id.search_singer_pic);
+        singerImgV.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                final AudioInfo audioInfo = AudioPlayerManager.newInstance(mContext).getCurSong(mConfigInfo.getPlayHash());
+                if (audioInfo != null) {
+
+                    hideMoreMenuView();
+
+                    String singerName = audioInfo.getSingerName();
+                    //判断是否有多个歌手
+                    if (singerName.contains("、")) {
+
+                        String regex = "\\s*、\\s*";
+                        final String[] singerNameArray = singerName.split(regex);
+
+                        if (mViewStubSingerList == null) {
+                            initSingerListView();
+                        }
+                        /**
+                         * 如果该界面还没初始化，则监听
+                         */
+                        if (mSingerListPopRL.getHeight() == 0) {
+                            mSingerListPopRL.getViewTreeObserver().addOnGlobalLayoutListener(new ViewTreeObserver.OnGlobalLayoutListener() {
+                                @Override
+                                public void onGlobalLayout() {
+                                    mSingerListPopRL.getViewTreeObserver().removeOnGlobalLayoutListener(this);
+                                    showSingerListView(singerNameArray);
+                                }
+                            });
+
+                        } else {
+                            showSingerListView(singerNameArray);
+                        }
+
+                    } else {
+
+
+                    }
+                }
+            }
+        });
 
         //歌曲详情
         ImageView songinfoImgV = findViewById(R.id.songinfo);
@@ -469,7 +525,7 @@ public class LrcActivity extends BaseActivity {
             }
         });
 
-
+        //更多菜单
         mMoreMenuPopLayout = findViewById(R.id.moreMenuPopLayout);
         mMoreMenuPopLayout.setVisibility(View.INVISIBLE);
         mMoreMenuPopLayout.setOnClickListener(new View.OnClickListener() {
@@ -479,7 +535,7 @@ public class LrcActivity extends BaseActivity {
             }
         });
 
-        mMoreMenuPopLL = findViewById(R.id.menuLayout);
+        mMoreMenuPopRL = findViewById(R.id.menuLayout);
 
         //字体
         final CustomSeekBar fontSizeSB = findViewById(R.id.fontSizeSeekbar);
@@ -756,13 +812,109 @@ public class LrcActivity extends BaseActivity {
     }
 
     /**
+     * 显示歌手列表
+     *
+     * @param singerNameArray
+     */
+    private void showSingerListView(String[] singerNameArray) {
+        if (isSingerListPopShowing) return;
+
+        LrcPopSingerAdapter adapter = new LrcPopSingerAdapter(mContext, singerNameArray,mUIHandler,mWorkerHandler);
+        mSingerListRecyclerView.setAdapter(adapter);
+
+        mSingerListPopLayout.setVisibility(View.VISIBLE);
+
+        TranslateAnimation translateAnimation = new TranslateAnimation(0, 0, mSingerListPopRL.getHeight(), 0);
+        translateAnimation.setDuration(250);//设置动画持续时间
+        translateAnimation.setFillAfter(true);
+        translateAnimation.setAnimationListener(new Animation.AnimationListener() {
+            @Override
+            public void onAnimationStart(Animation animation) {
+                isSingerListPopShowing = true;
+                mRotateLayout.setDragType(RotateLayout.NONE);
+            }
+
+            @Override
+            public void onAnimationEnd(Animation animation) {
+            }
+
+            @Override
+            public void onAnimationRepeat(Animation animation) {
+
+            }
+        });
+
+        mSingerListPopRL.clearAnimation();
+        mSingerListPopRL.startAnimation(translateAnimation);
+    }
+
+    /**
+     * 初始化歌手列表
+     */
+    private void initSingerListView() {
+        mViewStubSingerList = findViewById(R.id.vs_singer_list);
+        mViewStubSingerList.inflate();
+
+        //歌曲详情
+        mSingerListPopLayout = findViewById(R.id.singerListPopLayout);
+        mSingerListPopLayout.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                hideSingerListView();
+            }
+        });
+
+        mSingerListRecyclerView = findViewById(R.id.singerlist_recyclerView);
+        mSingerListRecyclerView.setLayoutManager(new LinearLayoutManager(getApplicationContext()));
+        mSingerListPopRL = findViewById(R.id.pop_singerlist_parent);
+
+        //
+        LinearLayout cancelLL = findViewById(R.id.splcalcel);
+        cancelLL.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                hideSingerListView();
+            }
+        });
+    }
+
+    /**
+     * 隐藏歌手列表
+     */
+    private void hideSingerListView() {
+        TranslateAnimation translateAnimation = new TranslateAnimation(0, 0, 0, mSingerListPopRL.getHeight());
+        translateAnimation.setDuration(250);//设置动画持续时间
+        translateAnimation.setFillAfter(true);
+        translateAnimation.setAnimationListener(new Animation.AnimationListener() {
+            @Override
+            public void onAnimationStart(Animation animation) {
+
+            }
+
+            @Override
+            public void onAnimationEnd(Animation animation) {
+                isSingerListPopShowing = false;
+                mSingerListPopLayout.setVisibility(View.INVISIBLE);
+                mRotateLayout.setDragType(RotateLayout.LEFT_TO_RIGHT);
+            }
+
+            @Override
+            public void onAnimationRepeat(Animation animation) {
+
+            }
+        });
+        mSingerListPopRL.clearAnimation();
+        mSingerListPopRL.startAnimation(translateAnimation);
+    }
+
+    /**
      * 初始化歌曲详情窗口
      */
     private void initSongInfoView() {
         mViewStubSongInfo = findViewById(R.id.vs_songinfo);
         mViewStubSongInfo.inflate();
 
-        //
+        //歌曲详情
         mSongInfoPopLayout = findViewById(R.id.songinfoPopLayout);
         mSongInfoPopLayout.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -892,7 +1044,7 @@ public class LrcActivity extends BaseActivity {
      * 隐藏更多菜单
      */
     private void hideMoreMenuView() {
-        TranslateAnimation translateAnimation = new TranslateAnimation(0, 0, 0, mMoreMenuPopLL.getHeight());
+        TranslateAnimation translateAnimation = new TranslateAnimation(0, 0, 0, mMoreMenuPopRL.getHeight());
         translateAnimation.setDuration(250);//设置动画持续时间
         translateAnimation.setFillAfter(true);
         translateAnimation.setAnimationListener(new Animation.AnimationListener() {
@@ -913,8 +1065,8 @@ public class LrcActivity extends BaseActivity {
 
             }
         });
-        mMoreMenuPopLL.clearAnimation();
-        mMoreMenuPopLL.startAnimation(translateAnimation);
+        mMoreMenuPopRL.clearAnimation();
+        mMoreMenuPopRL.startAnimation(translateAnimation);
 
     }
 
