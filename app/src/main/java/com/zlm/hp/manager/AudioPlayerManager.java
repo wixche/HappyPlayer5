@@ -144,6 +144,21 @@ public class AudioPlayerManager {
     /**
      * 播放歌曲
      */
+    public synchronized void playOrPause() {
+        if (mPlayStatus == PLAYING) {
+            pause();
+            return;
+        }
+        ConfigInfo configInfo = ConfigInfo.obtain();
+        AudioInfo curAudioInfo = getCurSong(configInfo.getAudioInfos(), configInfo.getPlayHash());
+        if (curAudioInfo != null) {
+            play(curAudioInfo);
+        }
+    }
+
+    /**
+     * 播放歌曲
+     */
     private void play(AudioInfo audioInfo) {
         boolean isSeekTo = mPlayStatus == SEEKTO;
         boolean isInit = ((mPlayStatus != PAUSE) && !isSeekTo);
@@ -241,6 +256,8 @@ public class AudioPlayerManager {
      * 下一首
      */
     public synchronized void next() {
+        pause();
+
         //下一首时，说明现在播放停止了
         mPlayStatus = STOP;
 
@@ -253,7 +270,6 @@ public class AudioPlayerManager {
 
         if (playIndex == -1) {
 
-            pause();
             AudioBroadcastReceiver.sendNullReceiver(mContext);
 
             return;
@@ -290,7 +306,7 @@ public class AudioPlayerManager {
         }
 
         if (playIndex >= audioInfoList.size()) {
-            pause();
+
             AudioBroadcastReceiver.sendNullReceiver(mContext);
             return;
         }
@@ -301,7 +317,7 @@ public class AudioPlayerManager {
         }
 
         if (nextAudioInfo == null) {
-            pause();
+
             AudioBroadcastReceiver.sendNullReceiver(mContext);
         } else {
             play(nextAudioInfo);
@@ -313,6 +329,7 @@ public class AudioPlayerManager {
      * 上一首
      */
     public synchronized void pre() {
+        pause();
         //上一首时，说明现在播放停止了
         mPlayStatus = STOP;
 
@@ -325,7 +342,6 @@ public class AudioPlayerManager {
 
         if (playIndex == -1) {
 
-            pause();
             AudioBroadcastReceiver.sendNullReceiver(mContext);
 
             return;
@@ -366,7 +382,6 @@ public class AudioPlayerManager {
         }
 
         if (playIndex < 0) {
-            pause();
             AudioBroadcastReceiver.sendNullReceiver(mContext);
             return;
         }
@@ -377,7 +392,6 @@ public class AudioPlayerManager {
         }
 
         if (nextAudioInfo == null) {
-            pause();
             AudioBroadcastReceiver.sendNullReceiver(mContext);
         } else {
             play(nextAudioInfo);

@@ -51,13 +51,13 @@ public class FragmentReceiver {
      */
     private static final String ACTION_CODE_KEY = "com.zlm.hp.receiver.fragment.action.code.key";
 
-    private BroadcastReceiver mFragmentBroadcastReceiver;
-    private IntentFilter mFragmentIntentFilter;
+    private BroadcastReceiver mBroadcastReceiver;
+    private IntentFilter mIntentFilter;
     private FragmentReceiverListener mFragmentReceiverListener;
 
     public FragmentReceiver(Context context) {
-        mFragmentIntentFilter = new IntentFilter();
-        mFragmentIntentFilter.addAction(RECEIVER_ACTION);
+        mIntentFilter = new IntentFilter();
+        mIntentFilter.addAction(RECEIVER_ACTION);
     }
 
     /**
@@ -67,7 +67,7 @@ public class FragmentReceiver {
      */
     public void registerReceiver(Context context) {
 
-        mFragmentBroadcastReceiver = new BroadcastReceiver() {
+        mBroadcastReceiver = new BroadcastReceiver() {
             @Override
             public void onReceive(Context context, Intent intent) {
 
@@ -79,7 +79,7 @@ public class FragmentReceiver {
                 }
             }
         };
-        context.registerReceiver(mFragmentBroadcastReceiver, mFragmentIntentFilter);
+        context.registerReceiver(mBroadcastReceiver, mIntentFilter);
     }
 
     /**
@@ -143,8 +143,8 @@ public class FragmentReceiver {
      * 取消注册广播
      */
     public void unregisterReceiver(Context context) {
-        if (mFragmentBroadcastReceiver != null) {
-            context.unregisterReceiver(mFragmentBroadcastReceiver);
+        if (mBroadcastReceiver != null) {
+            context.unregisterReceiver(mBroadcastReceiver);
         }
     }
 

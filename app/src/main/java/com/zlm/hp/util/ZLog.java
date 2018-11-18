@@ -186,9 +186,10 @@ public class ZLog {
         } else if (TYPE_DEBUG.equals(type)) {
             if (isDebug) {
                 Log.d(mLogTag, sb.toString());
+            }else{
+                //不写入日志文件
+                return;
             }
-            //不写入日志文件
-            return;
         } else {
             Log.v(mLogTag, sb.toString());
         }

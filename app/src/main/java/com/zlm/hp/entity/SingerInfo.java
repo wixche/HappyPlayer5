@@ -42,8 +42,14 @@ public class SingerInfo implements Parcelable {
      */
     private String imageUrl;
 
+    /**
+     *
+     */
+    private String createTime;
+
     public SingerInfo() {
     }
+
 
     protected SingerInfo(Parcel in) {
         classId = in.readString();
@@ -51,6 +57,22 @@ public class SingerInfo implements Parcelable {
         singerId = in.readString();
         singerName = in.readString();
         imageUrl = in.readString();
+        createTime = in.readString();
+    }
+
+    @Override
+    public void writeToParcel(Parcel dest, int flags) {
+        dest.writeString(classId);
+        dest.writeString(className);
+        dest.writeString(singerId);
+        dest.writeString(singerName);
+        dest.writeString(imageUrl);
+        dest.writeString(createTime);
+    }
+
+    @Override
+    public int describeContents() {
+        return 0;
     }
 
     public static final Creator<SingerInfo> CREATOR = new Creator<SingerInfo>() {
@@ -64,6 +86,22 @@ public class SingerInfo implements Parcelable {
             return new SingerInfo[size];
         }
     };
+
+    public String getClassId() {
+        return classId;
+    }
+
+    public void setClassId(String classId) {
+        this.classId = classId;
+    }
+
+    public String getClassName() {
+        return className;
+    }
+
+    public void setClassName(String className) {
+        this.className = className;
+    }
 
     public String getSingerId() {
         return singerId;
@@ -89,33 +127,11 @@ public class SingerInfo implements Parcelable {
         this.imageUrl = imageUrl;
     }
 
-    public String getClassId() {
-        return classId;
+    public String getCreateTime() {
+        return createTime;
     }
 
-    public void setClassId(String classId) {
-        this.classId = classId;
-    }
-
-    public String getClassName() {
-        return className;
-    }
-
-    public void setClassName(String className) {
-        this.className = className;
-    }
-
-    @Override
-    public int describeContents() {
-        return 0;
-    }
-
-    @Override
-    public void writeToParcel(Parcel dest, int flags) {
-        dest.writeString(classId);
-        dest.writeString(className);
-        dest.writeString(singerId);
-        dest.writeString(singerName);
-        dest.writeString(imageUrl);
+    public void setCreateTime(String createTime) {
+        this.createTime = createTime;
     }
 }

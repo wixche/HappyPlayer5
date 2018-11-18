@@ -46,8 +46,6 @@ public class TransitionImageView extends AppCompatImageView {
      */
     private int mDuration = 500;
 
-    private boolean isFrist = true;
-
     /**
      * 切换图片操作
      */
@@ -79,8 +77,11 @@ public class TransitionImageView extends AppCompatImageView {
                     Bitmap preBitmap = ImageUtil.getBitmapFromCache(preImageUrl.hashCode() + "");
 
 
-                    if (preBitmap == null || (isFrist && mIndex == 0)) {
-                        drawables[0] = new BitmapDrawable(curBitmap);
+                    if (preBitmap == null) {
+                        if (mIndex == 0)
+                            drawables[0] = new BitmapDrawable();
+                        else
+                            drawables[0] = new BitmapDrawable(curBitmap);
                     } else {
                         drawables[0] = new BitmapDrawable(preBitmap);
                     }
@@ -93,9 +94,13 @@ public class TransitionImageView extends AppCompatImageView {
                     setVisibility(View.VISIBLE);
                 }
 
-                mIndex++;
+                if (mIndex == 0) {
+                    mUIHandler.postDelayed(mChangeRunnable, 1000);
+                } else {
+                    mUIHandler.postDelayed(mChangeRunnable, 1000 * 10);
+                }
 
-                mUIHandler.postDelayed(mChangeRunnable, 1000 * 10);
+                mIndex++;
             }
         }
     };
@@ -136,8 +141,10 @@ public class TransitionImageView extends AppCompatImageView {
      * 初始化数据
      */
     public void initData(List<SingerInfo> singerInfos) {
-        if (mSingerInfo == null || mSingerInfo.size() == 0) {
+        if (mSingerInfo == null || mSingerInfo.size() == 1) {
             this.mSingerInfo = singerInfos;
+
+            addNullImage();
             start();
         }
     }
@@ -153,19 +160,27 @@ public class TransitionImageView extends AppCompatImageView {
      * 结束
      */
     public void resetData() {
-        release();
         if (mSingerInfo != null)
             mSingerInfo.clear();
+        addNullImage();
+        release();
         mIndex = 0;
-        isFrist = true;
-        setBackground(new BitmapDrawable());
+    }
+
+    private void addNullImage() {
+        if (mSingerInfo == null) return;
+        SingerInfo singerInfo = new SingerInfo();
+        singerInfo.setImageUrl("");
+        mSingerInfo.add(0, singerInfo);
+
     }
 
     public void release() {
+
         //移除队列任务
         if (mUIHandler != null) {
             mUIHandler.removeCallbacksAndMessages(null);
         }
-
+        setBackground(new BitmapDrawable());
     }
 }

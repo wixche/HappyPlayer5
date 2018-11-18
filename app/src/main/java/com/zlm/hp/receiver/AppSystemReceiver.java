@@ -43,12 +43,12 @@ public class AppSystemReceiver {
 
 
     private BroadcastReceiver mBroadcastReceiver;
-    private IntentFilter mAudioIntentFilter;
+    private IntentFilter mIntentFilter;
     private AppSystemReceiverListener mReceiverListener;
 
     public AppSystemReceiver() {
-        mAudioIntentFilter = new IntentFilter();
-        mAudioIntentFilter.addAction(RECEIVER_ACTION);
+        mIntentFilter = new IntentFilter();
+        mIntentFilter.addAction(RECEIVER_ACTION);
     }
 
     /**
@@ -70,7 +70,7 @@ public class AppSystemReceiver {
                 }
             }
         };
-        context.registerReceiver(mBroadcastReceiver, mAudioIntentFilter);
+        context.registerReceiver(mBroadcastReceiver, mIntentFilter);
     }
 
     /**

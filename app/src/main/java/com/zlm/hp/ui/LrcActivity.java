@@ -56,6 +56,11 @@ import java.util.Map;
 public class LrcActivity extends BaseActivity {
 
     /**
+     *
+     */
+    public static final int RESULT_SINGER_RELOAD = 1000;
+
+    /**
      * 旋转布局界面
      */
     private RotateLayout mRotateLayout;
@@ -154,6 +159,11 @@ public class LrcActivity extends BaseActivity {
      */
     private final int LOAD_DATA = 0;
 
+    /**
+     * 歌手写真重新加载
+     */
+    private final int MESSAGE_CODE_SINGER_RELOAD = 1;
+
     @Override
     protected int setContentLayoutResID() {
         return R.layout.activity_lrc;
@@ -180,10 +190,12 @@ public class LrcActivity extends BaseActivity {
 
     @Override
     protected void handleUIMessage(Message msg) {
+
+        AudioInfo audioInfo = AudioPlayerManager.newInstance(mContext).getCurSong(mConfigInfo.getPlayHash());
+
         switch (msg.what) {
             case LOAD_DATA:
 
-                AudioInfo audioInfo = AudioPlayerManager.newInstance(mContext).getCurSong(mConfigInfo.getPlayHash());
                 Intent intent = new Intent();
                 if (audioInfo != null) {
 
@@ -202,12 +214,26 @@ public class LrcActivity extends BaseActivity {
                 }
 
                 break;
+
+            case MESSAGE_CODE_SINGER_RELOAD:
+
+                if (audioInfo != null) {
+                    ImageUtil.release();
+
+                    mSingerImageView.setTag(null);
+                    //加载歌手写真图片
+                    ImageUtil.loadSingerImage(mContext, mSingerImageView, audioInfo.getSingerName(), mConfigInfo.isWifi(), new AsyncHandlerTask(mUIHandler, mWorkerHandler));
+                }
+
+                break;
         }
     }
 
     @Override
     protected void handleWorkerMessage(Message msg) {
+        switch (msg.what) {
 
+        }
     }
 
 
@@ -487,6 +513,7 @@ public class LrcActivity extends BaseActivity {
 
                     } else {
 
+                        showSearchSingerView(singerName);
 
                     }
                 }
@@ -819,7 +846,13 @@ public class LrcActivity extends BaseActivity {
     private void showSingerListView(String[] singerNameArray) {
         if (isSingerListPopShowing) return;
 
-        LrcPopSingerAdapter adapter = new LrcPopSingerAdapter(mContext, singerNameArray,mUIHandler,mWorkerHandler);
+        LrcPopSingerAdapter adapter = new LrcPopSingerAdapter(mContext, singerNameArray, mUIHandler, mWorkerHandler, new PopSingerListener() {
+            @Override
+            public void search(String singerName) {
+                hideSingerListView();
+                showSearchSingerView(singerName);
+            }
+        });
         mSingerListRecyclerView.setAdapter(adapter);
 
         mSingerListPopLayout.setVisibility(View.VISIBLE);
@@ -846,6 +879,19 @@ public class LrcActivity extends BaseActivity {
 
         mSingerListPopRL.clearAnimation();
         mSingerListPopRL.startAnimation(translateAnimation);
+    }
+
+    /**
+     * 打开歌手搜索界面
+     *
+     * @param singerName
+     */
+    private void showSearchSingerView(String singerName) {
+        Intent intent = new Intent(LrcActivity.this, SearchSingerActivity.class);
+        intent.putExtra("singerName", singerName);
+        startActivityForResult(intent, RESULT_SINGER_RELOAD);
+        //
+        overridePendingTransition(0, 0);
     }
 
     /**
@@ -1303,6 +1349,12 @@ public class LrcActivity extends BaseActivity {
             hideSongInfoView();
             return;
         }
+
+        if (isSingerListPopShowing) {
+            hideSingerListView();
+            return;
+        }
+
         mRotateLayout.closeView();
     }
 
@@ -1323,5 +1375,17 @@ public class LrcActivity extends BaseActivity {
             mAudioBroadcastReceiver.unregisterReceiver(mContext);
         }
 
+    }
+
+    @Override
+    protected void onActivityResult(int requestCode, int resultCode, Intent data) {
+        super.onActivityResult(requestCode, resultCode, data);
+        if (requestCode == RESULT_SINGER_RELOAD) {
+            mUIHandler.sendEmptyMessage(MESSAGE_CODE_SINGER_RELOAD);
+        }
+    }
+
+    public interface PopSingerListener {
+        public void search(String singerName);
     }
 }

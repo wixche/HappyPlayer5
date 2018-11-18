@@ -46,7 +46,7 @@
                         android:layout_below="@+id/search_singer_pic"
                         android:layout_marginTop="5dp"
                         android:gravity="center_horizontal"
-                        android:text="写真搜索"
+                        android:text="@string/search_singer_text"
                         android:textColor="#fff"
                         android:textSize="13dp" />
 
@@ -74,7 +74,7 @@
                         android:layout_below="@+id/search_lrc"
                         android:layout_marginTop="5dp"
                         android:gravity="center_horizontal"
-                        android:text="歌词搜索"
+                        android:text="@string/search_lrc_text"
                         android:textColor="#fff"
                         android:textSize="13dp" />
 
@@ -101,7 +101,7 @@
                         android:layout_below="@+id/songinfo"
                         android:layout_marginTop="5dp"
                         android:gravity="center_horizontal"
-                        android:text="歌曲详情"
+                        android:text="@string/song_info_text"
                         android:textColor="#fff"
                         android:textSize="13dp" />
                 </RelativeLayout>
@@ -127,7 +127,7 @@
                         android:layout_below="@+id/makelrc"
                         android:layout_marginTop="5dp"
                         android:gravity="center_horizontal"
-                        android:text="制作歌词"
+                        android:text="@string/make_lrc_text"
                         android:textColor="#fff"
                         android:textSize="13dp" />
                 </RelativeLayout>
@@ -151,7 +151,7 @@
                     android:layout_marginLeft="10dp"
                     android:layout_weight="1"
                     android:gravity="center_vertical"
-                    android:text="歌词进度"
+                    android:text="@string/lrc_progress_text"
                     android:textColor="#fff"
                     android:textSize="13dp"></TextView>
 
@@ -258,7 +258,7 @@
                     android:layout_gravity="center_vertical"
                     android:layout_marginLeft="10dp"
                     android:gravity="center_vertical"
-                    android:text="字体大小"
+                    android:text="@string/font_size_text"
                     android:textColor="#fff"
                     android:textSize="13dp"></TextView>
 
@@ -316,7 +316,7 @@
                     android:layout_gravity="center_vertical"
                     android:layout_marginLeft="10dp"
                     android:gravity="center_vertical"
-                    android:text="字体颜色"
+                    android:text="@string/font_color_text"
                     android:textColor="#fff"
                     android:textSize="13dp"></TextView>
 
@@ -496,7 +496,7 @@
                     android:layout_height="match_parent"
                     android:layout_gravity="center_vertical"
                     android:gravity="center_vertical|center_horizontal"
-                    android:text="取消"
+                    android:text="@string/title_cancel"
                     android:textColor="#fff"
                     android:textSize="13dp"></TextView>
             </LinearLayout>

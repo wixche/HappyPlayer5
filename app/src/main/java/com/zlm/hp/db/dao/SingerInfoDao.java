@@ -27,6 +27,7 @@ public class SingerInfoDao extends AbstractDao<SingerInfo, Void> {
         public final static Property SingerId = new Property(0, String.class, "singerId", false, "SINGER_ID");
         public final static Property SingerName = new Property(1, String.class, "singerName", false, "SINGER_NAME");
         public final static Property ImageUrl = new Property(2, String.class, "imageUrl", false, "IMAGE_URL");
+        public final static Property CreateTime = new Property(3, String.class, "createTime", false, "CREATE_TIME");
     }
 
 
@@ -44,7 +45,8 @@ public class SingerInfoDao extends AbstractDao<SingerInfo, Void> {
         db.execSQL("CREATE TABLE " + constraint + "\"SINGER_INFO\" (" + //
                 "\"SINGER_ID\" TEXT," + // 0: singerId
                 "\"SINGER_NAME\" TEXT," + // 1: singerName
-                "\"IMAGE_URL\" TEXT);"); // 2: imageUrl
+                "\"IMAGE_URL\" TEXT," + // 2: imageUrl
+                "\"CREATE_TIME\" TEXT);"); // 3: createTime
     }
 
     /** Drops the underlying database table. */
@@ -71,6 +73,11 @@ public class SingerInfoDao extends AbstractDao<SingerInfo, Void> {
         if (imageUrl != null) {
             stmt.bindString(3, imageUrl);
         }
+ 
+        String createTime = entity.getCreateTime();
+        if (createTime != null) {
+            stmt.bindString(4, createTime);
+        }
     }
 
     @Override
@@ -91,6 +98,11 @@ public class SingerInfoDao extends AbstractDao<SingerInfo, Void> {
         if (imageUrl != null) {
             stmt.bindString(3, imageUrl);
         }
+ 
+        String createTime = entity.getCreateTime();
+        if (createTime != null) {
+            stmt.bindString(4, createTime);
+        }
     }
 
     @Override
@@ -110,6 +122,7 @@ public class SingerInfoDao extends AbstractDao<SingerInfo, Void> {
         entity.setSingerId(cursor.isNull(offset + 0) ? null : cursor.getString(offset + 0));
         entity.setSingerName(cursor.isNull(offset + 1) ? null : cursor.getString(offset + 1));
         entity.setImageUrl(cursor.isNull(offset + 2) ? null : cursor.getString(offset + 2));
+        entity.setCreateTime(cursor.isNull(offset + 3) ? null : cursor.getString(offset + 3));
      }
     
     @Override

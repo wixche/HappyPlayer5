@@ -22,6 +22,7 @@ public class HttpReturnResult implements Parcelable {
     public static final String ERROR_MEMORY = "内存空间不足";
     public static final String ERROR_FILE_ZERO = "文件长度为0";
     public static final String ERROR_MSG_NULLURL = "地址不存在";
+    public static final String ERROR_MSG_NULLDATA = "数据为空";
     /**
      * http状态码
      */

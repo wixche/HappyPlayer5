@@ -1185,7 +1185,7 @@ public class KuGouAndKuWoHttpClient extends APIHttpClient {
 
                         @Override
                         public int compare(SingerInfo o1, SingerInfo o2) {
-                            return o1.getImageUrl().compareTo(o2.getImageUrl());
+                            return o2.getImageUrl().compareTo(o1.getImageUrl());
                         }
                     });
 

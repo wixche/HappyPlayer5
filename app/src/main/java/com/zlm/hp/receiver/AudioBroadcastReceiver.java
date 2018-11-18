@@ -88,13 +88,13 @@ public class AudioBroadcastReceiver {
      */
     public static final int ACTION_CODE_LRCLOADED = 9;
 
-    private BroadcastReceiver mAudioBroadcastReceiver;
-    private IntentFilter mAudioIntentFilter;
-    private AudioReceiverListener mAudioReceiverListener;
+    private BroadcastReceiver mBroadcastReceiver;
+    private IntentFilter mIntentFilter;
+    private AudioReceiverListener mReceiverListener;
 
     public AudioBroadcastReceiver() {
-        mAudioIntentFilter = new IntentFilter();
-        mAudioIntentFilter.addAction(RECEIVER_ACTION);
+        mIntentFilter = new IntentFilter();
+        mIntentFilter.addAction(RECEIVER_ACTION);
     }
 
     /**
@@ -104,19 +104,19 @@ public class AudioBroadcastReceiver {
      */
     public void registerReceiver(Context context) {
 
-        mAudioBroadcastReceiver = new BroadcastReceiver() {
+        mBroadcastReceiver = new BroadcastReceiver() {
             @Override
             public void onReceive(Context context, Intent intent) {
 
-                if (mAudioReceiverListener != null) {
+                if (mReceiverListener != null) {
                     int code = intent.getIntExtra(ACTION_CODE_KEY, -1);
                     if (code != -1) {
-                        mAudioReceiverListener.onReceive(context, intent, code);
+                        mReceiverListener.onReceive(context, intent, code);
                     }
                 }
             }
         };
-        context.registerReceiver(mAudioBroadcastReceiver, mAudioIntentFilter);
+        context.registerReceiver(mBroadcastReceiver, mIntentFilter);
     }
 
     /**
@@ -265,8 +265,8 @@ public class AudioBroadcastReceiver {
      * 取消注册广播
      */
     public void unregisterReceiver(Context context) {
-        if (mAudioBroadcastReceiver != null) {
-            context.unregisterReceiver(mAudioBroadcastReceiver);
+        if (mBroadcastReceiver != null) {
+            context.unregisterReceiver(mBroadcastReceiver);
         }
     }
 
@@ -275,6 +275,6 @@ public class AudioBroadcastReceiver {
     }
 
     public void setReceiverListener(AudioReceiverListener audioReceiverListener) {
-        this.mAudioReceiverListener = audioReceiverListener;
+        this.mReceiverListener = audioReceiverListener;
     }
 }

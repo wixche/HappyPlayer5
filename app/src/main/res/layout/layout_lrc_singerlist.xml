@@ -28,7 +28,7 @@
                 android:layout_centerVertical="true"
                 android:layout_gravity="center_vertical|center"
                 android:singleLine="true"
-                android:text="请选择歌手"
+                android:text="@string/select_singer_text"
                 android:textColor="#fff"
                 android:textSize="15dp" />
 
@@ -82,7 +82,7 @@
                 android:layout_height="match_parent"
                 android:layout_gravity="center_vertical"
                 android:gravity="center_vertical|center_horizontal"
-                android:text="取消"
+                android:text="@string/title_cancel"
                 android:textColor="#fff"
                 android:textSize="13dp"></TextView>
         </LinearLayout>

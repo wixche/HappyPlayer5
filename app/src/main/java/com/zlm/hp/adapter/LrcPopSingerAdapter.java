@@ -11,6 +11,7 @@ import android.widget.TextView;
 import com.zlm.hp.async.AsyncHandlerTask;
 import com.zlm.hp.constants.ConfigInfo;
 import com.zlm.hp.handler.WeakRefHandler;
+import com.zlm.hp.ui.LrcActivity;
 import com.zlm.hp.ui.R;
 import com.zlm.hp.util.ImageUtil;
 import com.zlm.hp.widget.PopListItemRelativeLayout;
@@ -24,12 +25,14 @@ public class LrcPopSingerAdapter extends RecyclerView.Adapter<RecyclerView.ViewH
     private String[] mDatas;
     private WeakRefHandler mUIHandler;
     private WeakRefHandler mWorkerHandler;
+    private LrcActivity.PopSingerListener mPopSingerListener;
 
-    public LrcPopSingerAdapter(Context context, String[] datas, WeakRefHandler uiHandler, WeakRefHandler workerHandler) {
+    public LrcPopSingerAdapter(Context context, String[] datas, WeakRefHandler uiHandler, WeakRefHandler workerHandler, LrcActivity.PopSingerListener popSingerListener) {
         this.mContext = context;
         this.mDatas = datas;
         this.mUIHandler = uiHandler;
         this.mWorkerHandler = workerHandler;
+        this.mPopSingerListener = popSingerListener;
     }
 
     @Override
@@ -67,8 +70,9 @@ public class LrcPopSingerAdapter extends RecyclerView.Adapter<RecyclerView.ViewH
         viewHolder.getListItemRelativeLayout().setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-
-
+                if (mPopSingerListener != null) {
+                    mPopSingerListener.search(singerName);
+                }
             }
         });
     }

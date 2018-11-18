@@ -55,7 +55,8 @@
             android:enabled="true"
             android:exported="true" />
 
-        <activity android:name=".LrcActivity"></activity>
+        <activity android:name=".LrcActivity" />
+        <activity android:name=".SearchSingerActivity"></activity>
     </application>
 
 </manifest>

@@ -27,7 +27,7 @@
                 android:layout_centerVertical="true"
                 android:layout_gravity="center_vertical|center"
                 android:singleLine="true"
-                android:text="歌曲信息"
+                android:text="@string/song_info_text"
                 android:textColor="#fff"
                 android:textSize="15dp" />
 
@@ -70,7 +70,7 @@
                         android:layout_gravity="center_vertical|center"
                         android:layout_marginLeft="15dp"
                         android:singleLine="true"
-                        android:text="歌手："
+                        android:text="@string/singer_text"
                         android:textColor="#fff"
                         android:textSize="15dp" />
 
@@ -84,7 +84,7 @@
                         android:layout_marginLeft="15dp"
                         android:marqueeRepeatLimit="marquee_forever"
                         android:singleLine="true"
-                        android:text="歌手名称"
+                        android:text=""
                         android:textColor="#fff"
                         android:textSize="15dp" />
 
@@ -104,7 +104,7 @@
                         android:layout_gravity="center_vertical|center"
                         android:layout_marginLeft="15dp"
                         android:singleLine="true"
-                        android:text="格式："
+                        android:text="@string/fileext_text"
                         android:textColor="#fff"
                         android:textSize="15dp" />
 
@@ -117,7 +117,7 @@
                         android:layout_gravity="center_vertical|center"
                         android:layout_marginLeft="15dp"
                         android:singleLine="true"
-                        android:text="mp3"
+                        android:text=""
                         android:textColor="#fff"
                         android:textSize="15dp" />
 
@@ -144,7 +144,7 @@
                         android:layout_gravity="center_vertical|center"
                         android:layout_marginLeft="15dp"
                         android:singleLine="true"
-                        android:text="时长："
+                        android:text="@string/time_text"
                         android:textColor="#fff"
                         android:textSize="15dp" />
 
@@ -158,7 +158,7 @@
                         android:layout_marginLeft="15dp"
                         android:marqueeRepeatLimit="marquee_forever"
                         android:singleLine="true"
-                        android:text="00:00"
+                        android:text=""
                         android:textColor="#fff"
                         android:textSize="15dp" />
 
@@ -178,7 +178,7 @@
                         android:layout_gravity="center_vertical|center"
                         android:layout_marginLeft="15dp"
                         android:singleLine="true"
-                        android:text="大小："
+                        android:text="@string/filesize_text"
                         android:textColor="#fff"
                         android:textSize="15dp" />
 
@@ -191,7 +191,7 @@
                         android:layout_gravity="center_vertical|center"
                         android:layout_marginLeft="15dp"
                         android:singleLine="true"
-                        android:text="0.00MB"
+                        android:text=""
                         android:textColor="#fff"
                         android:textSize="15dp" />
 
@@ -223,7 +223,7 @@
                 android:layout_height="match_parent"
                 android:layout_gravity="center_vertical"
                 android:gravity="center_vertical|center_horizontal"
-                android:text="取消"
+                android:text="@string/title_cancel"
                 android:textColor="#fff"
                 android:textSize="13dp"></TextView>
         </LinearLayout>

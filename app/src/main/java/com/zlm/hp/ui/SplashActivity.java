@@ -53,7 +53,7 @@ public class SplashActivity extends BaseActivity {
     /**
      * 动画
      */
-    private Animation mAnimation = null ;
+    private Animation mAnimation = null;
 
 
     @Override
@@ -70,8 +70,8 @@ public class SplashActivity extends BaseActivity {
     protected void initViews(Bundle savedInstanceState) {
 
         mIconImg = findViewById(R.id.icon_img);
-        mAnimation = AnimationUtils.loadAnimation(getApplicationContext(),R.anim. balloonscale);
-        mIconImg.setAnimation(mAnimation );
+        mAnimation = AnimationUtils.loadAnimation(getApplicationContext(), R.anim.balloonscale);
+        mIconImg.setAnimation(mAnimation);
         mAnimation.start();
 
         mWorkerHandler.sendEmptyMessage(LOADTATA);
@@ -111,7 +111,13 @@ public class SplashActivity extends BaseActivity {
             List<AudioInfo> audioInfos = MediaUtil.scanLocalMusic(getApplicationContext(), null);
             if (audioInfos != null && audioInfos.size() > 0) {
                 AudioInfoDB.addAudioInfos(getApplicationContext(), audioInfos);
-                configInfo.setAudioInfos(AudioInfoDB.getLocalAudios(getApplicationContext()));
+                List<AudioInfo> localAudioInfos = AudioInfoDB.getLocalAudios(getApplicationContext());
+                if (localAudioInfos != null && localAudioInfos.size() > 0) {
+                    AudioInfo audioInfo = localAudioInfos.get(0);
+                    configInfo.setPlayHash(audioInfo.getHash());
+                    configInfo.save();
+                }
+                configInfo.setAudioInfos(localAudioInfos);
             }
 
             PreferencesUtil.putBoolean(getApplicationContext(), Constants.IS_FRIST_KEY, false);

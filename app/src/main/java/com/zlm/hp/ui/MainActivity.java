@@ -5,6 +5,7 @@ import android.content.Intent;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.graphics.drawable.BitmapDrawable;
+import android.os.Build;
 import android.os.Bundle;
 import android.os.Message;
 import android.support.v4.app.Fragment;
@@ -43,6 +44,8 @@ import com.zlm.hp.manager.OnLineAudioManager;
 import com.zlm.hp.receiver.AppSystemReceiver;
 import com.zlm.hp.receiver.AudioBroadcastReceiver;
 import com.zlm.hp.receiver.FragmentReceiver;
+import com.zlm.hp.receiver.PhoneReceiver;
+import com.zlm.hp.receiver.PhoneV4Receiver;
 import com.zlm.hp.service.AudioPlayerService;
 import com.zlm.hp.util.AppBarUtil;
 import com.zlm.hp.util.AppOpsUtils;
@@ -184,6 +187,16 @@ public class MainActivity extends BaseActivity {
      * app系统广播
      */
     private AppSystemReceiver mAppSystemReceiver;
+
+    /**
+     * 线控 5.0以下
+     */
+    private PhoneV4Receiver mPhoneV4Receiver;
+
+    /**
+     * 线控 5.0以上
+     */
+    private PhoneReceiver mPhoneReceiver;
 
 
     @Override
@@ -411,6 +424,15 @@ public class MainActivity extends BaseActivity {
             }
         });
         mAppSystemReceiver.registerReceiver(mContext);
+
+        //线控
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
+            mPhoneReceiver = new PhoneReceiver(mContext);
+            mPhoneReceiver.registerReceiver(mContext);
+        } else {
+            mPhoneV4Receiver = new PhoneV4Receiver(mContext);
+            mPhoneV4Receiver.registerReceiver(mContext);
+        }
     }
 
     /**
@@ -902,6 +924,7 @@ public class MainActivity extends BaseActivity {
      * 释放数据
      */
     private void releaseData() {
+        ImageUtil.release();
         AudioPlayerManager.newInstance(mContext).release();
         ToastUtil.release();
     }
@@ -920,6 +943,16 @@ public class MainActivity extends BaseActivity {
 
         if (mAppSystemReceiver != null) {
             mAppSystemReceiver.unregisterReceiver(mContext);
+        }
+
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
+            if (mPhoneReceiver != null) {
+                mPhoneReceiver.unregisterReceiver(mContext);
+            }
+        } else {
+            if (mPhoneV4Receiver != null) {
+                mPhoneV4Receiver.unregisterReceiver(mContext);
+            }
         }
     }
 }

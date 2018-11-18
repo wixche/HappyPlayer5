@@ -12,6 +12,7 @@ import android.widget.ImageView;
 
 import com.zlm.hp.async.AsyncHandlerTask;
 import com.zlm.hp.constants.ResourceConstants;
+import com.zlm.hp.db.util.SingerInfoDB;
 import com.zlm.hp.entity.SingerInfo;
 import com.zlm.hp.http.APIHttpClient;
 import com.zlm.hp.http.HttpClient;
@@ -26,6 +27,7 @@ import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.List;
 import java.util.Map;
 
@@ -178,15 +180,33 @@ public class ImageUtil {
         final List<SingerInfo> returnResult = new ArrayList<SingerInfo>();
         for (int i = 0; i < singerNameArray.length; i++) {
             final String searchSingerName = singerNameArray[i];
+            //数据库中获取图片
+            List<SingerInfo> listResult = SingerInfoDB.getAllSingerImage(context,searchSingerName);
+            if(listResult != null && listResult.size() > 0){
 
-            asyncHandlerTask.execute(new AsyncHandlerTask.Task<List<SingerInfo>>() {
+                for (int j = 0; j < listResult.size(); j++) {
+                    SingerInfo singerInfo = listResult.get(j);
+                    String imageUrl = singerInfo.getImageUrl();
+
+                    ZLog.d(new CodeLineUtil().getCodeLineInfo(), "loadSingerImage db imageUrl ->" + imageUrl);
+                    ImageUtil.loadSingerImage(context, asyncHandlerTask, singerInfo.getSingerName(), imageUrl, askWifi);
+
+                }
+
+                returnResult.addAll(listResult);
+                startSingerImage(singerImageView,returnResult);
+                continue;
+            }
+
+            //网络获取歌手图片
+            asyncHandlerTask.execute(new AsyncHandlerTask.Task<Void>() {
                 @Override
-                protected List<SingerInfo> doInBackground() {
+                protected Void doInBackground() {
                     APIHttpClient apiHttpClient = HttpUtil.getHttpClient();
                     HttpReturnResult httpReturnResult = apiHttpClient.getSingerPicList(context, searchSingerName, askWifi);
                     if (httpReturnResult.isSuccessful()) {
-                        Map<String, Object> returnResult = (Map<String, Object>) httpReturnResult.getResult();
-                        List<SingerInfo> lists = (List<SingerInfo>) returnResult.get("rows");
+                        Map<String, Object> mapResult = (Map<String, Object>) httpReturnResult.getResult();
+                        List<SingerInfo> lists = (List<SingerInfo>) mapResult.get("rows");
                         List<SingerInfo> listResult = new ArrayList<SingerInfo>();
                         if (lists != null) {
                             int maxSize = 3;
@@ -195,28 +215,36 @@ public class ImageUtil {
                                 for (int i = 0; i < size; i++) {
                                     SingerInfo singerInfo = lists.get(i);
                                     String imageUrl = singerInfo.getImageUrl();
+
+                                    ZLog.d(new CodeLineUtil().getCodeLineInfo(), "loadSingerImage http url imageUrl ->" + imageUrl);
                                     ImageUtil.loadSingerImage(context, asyncHandlerTask, singerInfo.getSingerName(), imageUrl, askWifi);
+
+                                    singerInfo.setCreateTime(DateUtil.parseDateToString(new Date()));
+                                    SingerInfoDB.add(context,singerInfo);
 
                                     listResult.add(singerInfo);
                                 }
                             }
-                            return listResult;
+                        }
+                        //
+                        if (listResult != null && listResult.size() > 0) {
+                            returnResult.addAll(listResult);
+                            startSingerImage(singerImageView, returnResult);
                         }
                     }
-
                     return null;
-                }
-
-                @Override
-                protected void onPostExecute(List<SingerInfo> result) {
-                    super.onPostExecute(result);
-                    if (result != null && result.size() > 0) {
-                        returnResult.addAll(result);
-                        singerImageView.initData(returnResult);
-                    }
                 }
             });
         }
+    }
+
+    /**
+     *
+     * @param singerImageView
+     * @param returnResult
+     */
+    private static void startSingerImage(TransitionImageView singerImageView, List<SingerInfo> returnResult) {
+        singerImageView.initData(returnResult);
     }
 
     /**
@@ -488,6 +516,12 @@ public class ImageUtil {
      */
     public static Bitmap getBitmapFromCache(String key) {
         return mImageCache.get(key);
+    }
+
+    public static void release(){
+        if(mImageCache != null){
+            mImageCache = getImageCache();
+        }
     }
 
     private interface LoadImgUrlCallBack {
