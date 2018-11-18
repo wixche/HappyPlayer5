@@ -177,66 +177,114 @@ public class ImageUtil {
         }
         singerImageView.setTag(key);
 
-        final List<SingerInfo> returnResult = new ArrayList<SingerInfo>();
-
-
         //网络获取歌手图片
         final String[] finalSingerNameArray = singerNameArray;
         asyncHandlerTask.execute(new AsyncHandlerTask.Task<Void>() {
             @Override
             protected Void doInBackground() {
 
+                List<SingerInfo> returnResult = new ArrayList<SingerInfo>();
+                List<List<SingerInfo>> tempReturnResult = new ArrayList<List<SingerInfo>>();
+                List<String> singerNames = new ArrayList<String>();
                 for (int i = 0; i < finalSingerNameArray.length; i++) {
-                    final String searchSingerName = finalSingerNameArray[i];
-                    //数据库中获取图片
-                    List<SingerInfo> listResult = SingerInfoDB.getAllSingerImage(context, searchSingerName);
-                    if (listResult != null && listResult.size() > 0) {
+                    String singerName = finalSingerNameArray[i];
+                    //                    //数据库中获取图片
+                    List<SingerInfo> dbListResult = SingerInfoDB.getAllSingerImage(context, singerName);
+                    if (dbListResult != null && dbListResult.size() > 0) {
+                        singerNames.add(singerName);
+                        tempReturnResult.add(dbListResult);
 
-                        for (int j = 0; j < listResult.size(); j++) {
-                            SingerInfo singerInfo = listResult.get(j);
-                            String imageUrl = singerInfo.getImageUrl();
-
-                            ZLog.d(new CodeLineUtil().getCodeLineInfo(), "loadSingerImage db imageUrl ->" + imageUrl);
-                            ImageUtil.loadSingerImage(context, asyncHandlerTask, singerInfo.getSingerName(), imageUrl, askWifi);
-
-                        }
-
-                        returnResult.addAll(listResult);
-                        startSingerImage(singerImageView, returnResult);
                         continue;
                     }
 
                     APIHttpClient apiHttpClient = HttpUtil.getHttpClient();
-                    HttpReturnResult httpReturnResult = apiHttpClient.getSingerPicList(context, searchSingerName, askWifi);
+                    HttpReturnResult httpReturnResult = apiHttpClient.getSingerPicList(context, singerName, askWifi);
                     if (httpReturnResult.isSuccessful()) {
                         Map<String, Object> mapResult = (Map<String, Object>) httpReturnResult.getResult();
                         List<SingerInfo> lists = (List<SingerInfo>) mapResult.get("rows");
-                        listResult = new ArrayList<SingerInfo>();
+                        List<SingerInfo> listResult = new ArrayList<SingerInfo>();
                         if (lists != null) {
                             int maxSize = 3;
                             int size = lists.size() > maxSize ? maxSize : lists.size();
                             if (size > 0) {
                                 for (int k = 0; k < size; k++) {
                                     SingerInfo singerInfo = lists.get(k);
-                                    String imageUrl = singerInfo.getImageUrl();
-
-                                    ZLog.d(new CodeLineUtil().getCodeLineInfo(), "loadSingerImage http url imageUrl ->" + imageUrl);
-                                    ImageUtil.loadSingerImage(context, asyncHandlerTask, singerInfo.getSingerName(), imageUrl, askWifi);
 
                                     singerInfo.setCreateTime(DateUtil.parseDateToString(new Date()));
                                     SingerInfoDB.add(context, singerInfo);
 
                                     listResult.add(singerInfo);
                                 }
+                                singerNames.add(singerName);
+                                tempReturnResult.add(listResult);
                             }
-                        }
-                        //
-                        if (listResult != null && listResult.size() > 0) {
-                            returnResult.addAll(listResult);
-                            startSingerImage(singerImageView, returnResult);
                         }
                     }
                 }
+
+                ///
+                addAndSortData(returnResult, tempReturnResult, singerNames);
+
+                for (int j = 0; j < returnResult.size(); j++) {
+                    SingerInfo singerInfo = returnResult.get(j);
+                    String imageUrl = singerInfo.getImageUrl();
+                    ZLog.d(new CodeLineUtil().getCodeLineInfo(), "loadSingerImage singerName ->" + singerInfo.getSingerName());
+                    ImageUtil.loadSingerImage(context, asyncHandlerTask, singerInfo.getSingerName(), imageUrl, askWifi);
+                }
+
+                startSingerImage(singerImageView, returnResult);
+
+//                for (int i = 0; i < finalSingerNameArray.length; i++) {
+//                    final String searchSingerName = finalSingerNameArray[i];
+//                    //数据库中获取图片
+//                    List<SingerInfo> listResult = SingerInfoDB.getAllSingerImage(context, searchSingerName);
+//                    if (listResult != null && listResult.size() > 0) {
+//
+//                        for (int j = 0; j < listResult.size(); j++) {
+//                            SingerInfo singerInfo = listResult.get(j);
+//                            String imageUrl = singerInfo.getImageUrl();
+//
+//                            ZLog.d(new CodeLineUtil().getCodeLineInfo(), "loadSingerImage db imageUrl ->" + imageUrl);
+//                            ImageUtil.loadSingerImage(context, asyncHandlerTask, singerInfo.getSingerName(), imageUrl, askWifi);
+//
+//                        }
+//
+//                        returnResult.addAll(listResult);
+//                        startSingerImage(singerImageView, returnResult);
+//                        continue;
+//                    }
+//
+//                    APIHttpClient apiHttpClient = HttpUtil.getHttpClient();
+//                    HttpReturnResult httpReturnResult = apiHttpClient.getSingerPicList(context, searchSingerName, askWifi);
+//                    if (httpReturnResult.isSuccessful()) {
+//                        Map<String, Object> mapResult = (Map<String, Object>) httpReturnResult.getResult();
+//                        List<SingerInfo> lists = (List<SingerInfo>) mapResult.get("rows");
+//                        listResult = new ArrayList<SingerInfo>();
+//                        if (lists != null) {
+//                            int maxSize = 3;
+//                            int size = lists.size() > maxSize ? maxSize : lists.size();
+//                            if (size > 0) {
+//                                for (int k = 0; k < size; k++) {
+//                                    SingerInfo singerInfo = lists.get(k);
+//                                    String imageUrl = singerInfo.getImageUrl();
+//
+//                                    ZLog.d(new CodeLineUtil().getCodeLineInfo(), "loadSingerImage http url imageUrl ->" + imageUrl);
+//                                    ImageUtil.loadSingerImage(context, asyncHandlerTask, singerInfo.getSingerName(), imageUrl, askWifi);
+//
+//                                    singerInfo.setCreateTime(DateUtil.parseDateToString(new Date()));
+//                                    SingerInfoDB.add(context, singerInfo);
+//
+//                                    listResult.add(singerInfo);
+//                                }
+//                            }
+//                        }
+//                        //
+//                        if (listResult != null && listResult.size() > 0) {
+//                            returnResult.addAll(listResult);
+//                            startSingerImage(singerImageView, returnResult);
+//                        }
+//                    }
+//                }
                 return null;
             }
         });
@@ -244,10 +292,48 @@ public class ImageUtil {
     }
 
     /**
+     * 添加和排序数据
+     *
+     * @param returnResult
+     * @param tempReturnResult
+     * @param singerNames
+     */
+    private static void addAndSortData(List<SingerInfo> returnResult, List<List<SingerInfo>> tempReturnResult, List<String> singerNames) {
+        for (int i = 0; i < singerNames.size(); i++) {
+            if (i == 0) {
+                returnResult.addAll(tempReturnResult.get(i));
+            } else {
+                String tag = singerNames.get(i - 1);
+                List<SingerInfo> tempList = tempReturnResult.get(i);
+
+                boolean flag = tempList.size() - returnResult.size() > 0 ? true : false;
+                int minSize = tempList.size() > returnResult.size() ? returnResult.size() : tempList.size();
+                int modSize = Math.abs(tempList.size() - returnResult.size());
+                int z = 0;
+                for (int j = 0; j < minSize; j++) {
+                    for (; z < returnResult.size(); z++) {
+                        SingerInfo temp = returnResult.get(z);
+                        if (temp.getSingerName().equals(tag)) {
+                            returnResult.add(++z, tempList.get(j));
+                            break;
+                        }
+                    }
+                }
+                if (flag) {
+                    for (int k = modSize; k < tempList.size(); k++) {
+                        returnResult.add(tempList.get(k));
+                    }
+                }
+            }
+        }
+    }
+
+    /**
      * @param singerImageView
      * @param returnResult
      */
-    private static void startSingerImage(TransitionImageView singerImageView, List<SingerInfo> returnResult) {
+    private static void startSingerImage(TransitionImageView
+                                                 singerImageView, List<SingerInfo> returnResult) {
         singerImageView.initData(returnResult);
     }
 
@@ -259,7 +345,8 @@ public class ImageUtil {
      * @param singerName
      * @return
      */
-    public static void loadSingerImage(final Context context, AsyncHandlerTask asyncHandlerTask, String singerName, final String imageUrl, final boolean askWifi) {
+    public static void loadSingerImage(final Context context, AsyncHandlerTask
+            asyncHandlerTask, String singerName, final String imageUrl, final boolean askWifi) {
         final String filePath = ResourceUtil.getFilePath(context, ResourceConstants.PATH_SINGER, singerName + File.separator + imageUrl.hashCode() + ".jpg");
         final String key = imageUrl.hashCode() + "";
         asyncHandlerTask.execute(new AsyncHandlerTask.Task() {
@@ -280,7 +367,9 @@ public class ImageUtil {
      * @author: zhangliangming
      * @date: 2018-10-05 16:37
      */
-    private static Bitmap loadImageFormCache(Context context, String filePath, String imageUrl, String key, int width, int height, boolean askWifi, LoadImgUrlCallBack loadImgUrlCallBack) {
+    private static Bitmap loadImageFormCache(Context context, String filePath, String
+            imageUrl, String key, int width, int height, boolean askWifi, LoadImgUrlCallBack
+                                                     loadImgUrlCallBack) {
         Bitmap bitmap = null;
         if (mImageCache.get(key) != null) {
             bitmap = mImageCache.get(key);
@@ -302,7 +391,8 @@ public class ImageUtil {
      * @author: zhangliangming
      * @date: 2018-10-05 15:18
      */
-    private static Bitmap loadImageFormFile(Context context, String filePath, String imageUrl, int width, int height, boolean askWifi, LoadImgUrlCallBack loadImgUrlCallBack) {
+    private static Bitmap loadImageFormFile(Context context, String filePath, String imageUrl,
+                                            int width, int height, boolean askWifi, LoadImgUrlCallBack loadImgUrlCallBack) {
         Bitmap bitmap = readBitmapFromFile(filePath, width, height);
         if (bitmap == null) {
             bitmap = loadImageFormUrl(context, imageUrl, width, height, askWifi, loadImgUrlCallBack);
@@ -321,7 +411,8 @@ public class ImageUtil {
      * @author: zhangliangming
      * @date: 2018-10-05 15:19
      */
-    private static Bitmap loadImageFormUrl(Context context, String imageUrl, int width, int height, boolean askWifi, LoadImgUrlCallBack loadImgUrlCallBack) {
+    private static Bitmap loadImageFormUrl(Context context, String imageUrl, int width,
+                                           int height, boolean askWifi, LoadImgUrlCallBack loadImgUrlCallBack) {
         if (askWifi) {
             if (!NetUtil.isWifiConnected(context)) {
                 return null;
@@ -422,7 +513,8 @@ public class ImageUtil {
      * @param height
      * @return
      */
-    private static Bitmap readBitmapFromResource(Resources resources, int resourcesId, int width, int height) {
+    private static Bitmap readBitmapFromResource(Resources resources, int resourcesId,
+                                                 int width, int height) {
         InputStream ins = resources.openRawResource(resourcesId);
         BitmapFactory.Options options = new BitmapFactory.Options();
         options.inJustDecodeBounds = true;
