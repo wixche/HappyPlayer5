@@ -178,49 +178,53 @@ public class ImageUtil {
         singerImageView.setTag(key);
 
         final List<SingerInfo> returnResult = new ArrayList<SingerInfo>();
-        for (int i = 0; i < singerNameArray.length; i++) {
-            final String searchSingerName = singerNameArray[i];
-            //数据库中获取图片
-            List<SingerInfo> listResult = SingerInfoDB.getAllSingerImage(context,searchSingerName);
-            if(listResult != null && listResult.size() > 0){
 
-                for (int j = 0; j < listResult.size(); j++) {
-                    SingerInfo singerInfo = listResult.get(j);
-                    String imageUrl = singerInfo.getImageUrl();
 
-                    ZLog.d(new CodeLineUtil().getCodeLineInfo(), "loadSingerImage db imageUrl ->" + imageUrl);
-                    ImageUtil.loadSingerImage(context, asyncHandlerTask, singerInfo.getSingerName(), imageUrl, askWifi);
+        //网络获取歌手图片
+        final String[] finalSingerNameArray = singerNameArray;
+        asyncHandlerTask.execute(new AsyncHandlerTask.Task<Void>() {
+            @Override
+            protected Void doInBackground() {
 
-                }
+                for (int i = 0; i < finalSingerNameArray.length; i++) {
+                    final String searchSingerName = finalSingerNameArray[i];
+                    //数据库中获取图片
+                    List<SingerInfo> listResult = SingerInfoDB.getAllSingerImage(context, searchSingerName);
+                    if (listResult != null && listResult.size() > 0) {
 
-                returnResult.addAll(listResult);
-                startSingerImage(singerImageView,returnResult);
-                continue;
-            }
+                        for (int j = 0; j < listResult.size(); j++) {
+                            SingerInfo singerInfo = listResult.get(j);
+                            String imageUrl = singerInfo.getImageUrl();
 
-            //网络获取歌手图片
-            asyncHandlerTask.execute(new AsyncHandlerTask.Task<Void>() {
-                @Override
-                protected Void doInBackground() {
+                            ZLog.d(new CodeLineUtil().getCodeLineInfo(), "loadSingerImage db imageUrl ->" + imageUrl);
+                            ImageUtil.loadSingerImage(context, asyncHandlerTask, singerInfo.getSingerName(), imageUrl, askWifi);
+
+                        }
+
+                        returnResult.addAll(listResult);
+                        startSingerImage(singerImageView, returnResult);
+                        continue;
+                    }
+
                     APIHttpClient apiHttpClient = HttpUtil.getHttpClient();
                     HttpReturnResult httpReturnResult = apiHttpClient.getSingerPicList(context, searchSingerName, askWifi);
                     if (httpReturnResult.isSuccessful()) {
                         Map<String, Object> mapResult = (Map<String, Object>) httpReturnResult.getResult();
                         List<SingerInfo> lists = (List<SingerInfo>) mapResult.get("rows");
-                        List<SingerInfo> listResult = new ArrayList<SingerInfo>();
+                        listResult = new ArrayList<SingerInfo>();
                         if (lists != null) {
                             int maxSize = 3;
                             int size = lists.size() > maxSize ? maxSize : lists.size();
                             if (size > 0) {
-                                for (int i = 0; i < size; i++) {
-                                    SingerInfo singerInfo = lists.get(i);
+                                for (int k = 0; k < size; k++) {
+                                    SingerInfo singerInfo = lists.get(k);
                                     String imageUrl = singerInfo.getImageUrl();
 
                                     ZLog.d(new CodeLineUtil().getCodeLineInfo(), "loadSingerImage http url imageUrl ->" + imageUrl);
                                     ImageUtil.loadSingerImage(context, asyncHandlerTask, singerInfo.getSingerName(), imageUrl, askWifi);
 
                                     singerInfo.setCreateTime(DateUtil.parseDateToString(new Date()));
-                                    SingerInfoDB.add(context,singerInfo);
+                                    SingerInfoDB.add(context, singerInfo);
 
                                     listResult.add(singerInfo);
                                 }
@@ -232,14 +236,14 @@ public class ImageUtil {
                             startSingerImage(singerImageView, returnResult);
                         }
                     }
-                    return null;
                 }
-            });
-        }
+                return null;
+            }
+        });
+
     }
 
     /**
-     *
      * @param singerImageView
      * @param returnResult
      */
@@ -518,8 +522,8 @@ public class ImageUtil {
         return mImageCache.get(key);
     }
 
-    public static void release(){
-        if(mImageCache != null){
+    public static void release() {
+        if (mImageCache != null) {
             mImageCache = getImageCache();
         }
     }
