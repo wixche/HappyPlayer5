@@ -5,6 +5,7 @@ import android.os.Message;
 import android.support.v7.widget.LinearLayoutManager;
 import android.view.View;
 import android.widget.ImageView;
+import android.widget.RelativeLayout;
 import android.widget.TextView;
 
 import com.github.jdsjlzx.interfaces.OnLoadMoreListener;
@@ -185,6 +186,11 @@ public class SongFragment extends BaseFragment {
                 mRecyclerView.setLoadMoreEnabled(false);
                 break;
         }
+
+        //显示标题视图
+        RelativeLayout titleRL = mainView.findViewById(R.id.title_view);
+        titleRL.setVisibility(View.VISIBLE);
+
         TextView titleView = mainView.findViewById(R.id.title);
         titleView.setText(title);
         //返回

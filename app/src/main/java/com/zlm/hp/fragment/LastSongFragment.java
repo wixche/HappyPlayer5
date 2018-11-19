@@ -71,6 +71,11 @@ public class LastSongFragment extends BaseFragment {
     }
 
     @Override
+    protected void preInitStatusBar() {
+        setAddStatusBarView(false);
+    }
+
+    @Override
     protected int setContentLayoutResID() {
         return R.layout.fragment_last_song;
     }

@@ -4,18 +4,6 @@
     android:layout_height="match_parent"
     android:orientation="vertical">
 
-    <View
-        android:id="@+id/status_bar_view"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:visibility="gone" />
-
-    <include
-        android:id="@+id/title_view"
-        layout="@layout/layout_title"
-        android:layout_width="match_parent"
-        android:layout_height="@dimen/title_height" />
-
     <com.github.jdsjlzx.recyclerview.LRecyclerView
         android:id="@+id/recyclerView"
         android:layout_width="match_parent"

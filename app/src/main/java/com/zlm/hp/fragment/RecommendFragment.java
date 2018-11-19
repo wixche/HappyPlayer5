@@ -65,6 +65,11 @@ public class RecommendFragment extends BaseFragment {
     }
 
     @Override
+    protected void preInitStatusBar() {
+        setAddStatusBarView(false);
+    }
+
+    @Override
     protected void initViews(View mainView, Bundle savedInstanceState) {
         initView(mainView);
         //showLoadingView();

@@ -64,6 +64,11 @@ public abstract class BaseFragment extends Fragment {
     private final int SHOWCONTENTVIEW = 1001;
     private final int SHOWNONETVIEW = 1002;
 
+    /**
+     * 是否添加
+     */
+    private boolean isAddStatusBarView = true;
+
 
     /**
      * 内容布局
@@ -154,7 +159,9 @@ public abstract class BaseFragment extends Fragment {
         mContentContainer.inflate();
         mContentContainer.setVisibility(View.GONE);
 
-        initStatusBar(mainView);
+        if (isAddStatusBarView) {
+            initStatusBar(mainView);
+        }
         initLoadingView(mainView);
         initNoNetView(mainView);
 
@@ -339,6 +346,10 @@ public abstract class BaseFragment extends Fragment {
         }
         if (mNetContainer != null)
             mNetContainer.setVisibility(View.GONE);
+    }
+
+    public void setAddStatusBarView(boolean addStatusBarView) {
+        isAddStatusBarView = addStatusBarView;
     }
 
     /**
