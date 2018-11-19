@@ -16,15 +16,21 @@ import android.widget.TextView;
 
 import com.zlm.hp.adapter.SearchSingerAdapter;
 import com.zlm.hp.constants.ConfigInfo;
+import com.zlm.hp.db.util.SingerInfoDB;
 import com.zlm.hp.entity.SingerInfo;
 import com.zlm.hp.http.APIHttpClient;
 import com.zlm.hp.http.HttpReturnResult;
+import com.zlm.hp.receiver.AudioBroadcastReceiver;
+import com.zlm.hp.util.DateUtil;
 import com.zlm.hp.util.HttpUtil;
+import com.zlm.hp.util.ImageUtil;
 import com.zlm.hp.util.ToastUtil;
+import com.zlm.hp.widget.ButtonRelativeLayout;
 import com.zlm.hp.widget.IconfontTextView;
 import com.zlm.libs.widget.SwipeBackLayout;
 
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.List;
 import java.util.Map;
 
@@ -44,6 +50,8 @@ public class SearchSingerActivity extends BaseActivity {
      * 歌手名称
      */
     private String mSingerName;
+
+    private String mHash;
 
     /**
      * 加载中布局
@@ -67,6 +75,10 @@ public class SearchSingerActivity extends BaseActivity {
     private RecyclerView mRecyclerView;
     private SearchSingerAdapter mAdapter;
     private List<SingerInfo> mDatas;
+    private List<SingerInfo> mSelectDatas;
+    private List<SingerInfo> mOldDatas;
+
+    private ButtonRelativeLayout mSureBtn;
 
     /**
      *
@@ -81,6 +93,7 @@ public class SearchSingerActivity extends BaseActivity {
     @Override
     protected void initViews(Bundle savedInstanceState) {
 
+        mHash = getIntent().getStringExtra("hash");
         mSingerName = getIntent().getStringExtra("singerName");
         if (TextUtils.isEmpty(mSingerName)) {
             mSingerName = getString(R.string.search_singer_text);
@@ -91,7 +104,7 @@ public class SearchSingerActivity extends BaseActivity {
 
             @Override
             public void finishActivity() {
-                SearchSingerActivity.this.setResult(LrcActivity.RESULT_SINGER_RELOAD);
+
                 finish();
                 overridePendingTransition(0, 0);
             }
@@ -115,6 +128,15 @@ public class SearchSingerActivity extends BaseActivity {
         gridLayoutManager.setOrientation(LinearLayoutManager.VERTICAL);
         // 设置布局管理器
         mRecyclerView.setLayoutManager(gridLayoutManager);
+        mSureBtn = findViewById(R.id.surebtn);
+        mSureBtn.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+
+                reloadSingerImage();
+
+            }
+        });
 
         //
         mLoadingContainer = findViewById(R.id.loading);
@@ -128,6 +150,50 @@ public class SearchSingerActivity extends BaseActivity {
         showLoadingView();
 
         mWorkerHandler.sendEmptyMessageDelayed(MESSAGE_CODE_LOADDATA, 500);
+    }
+
+    /**
+     * 重新加载歌手写真数据
+     */
+    private void reloadSingerImage() {
+        List<SingerInfo> newSelecSingerInfos = mAdapter.getSelectDatas();
+        if (newSelecSingerInfos != null) {
+            if (mOldDatas != null && mOldDatas.size() > 0) {
+                for (int i = 0; i < mOldDatas.size(); i++) {
+                    SingerInfo singerInfo = mOldDatas.get(i);
+                    if (contains(newSelecSingerInfos, singerInfo)) continue;
+                    SingerInfoDB.delete(mContext, singerInfo.getImageUrl());
+                    ImageUtil.remove(singerInfo.getImageUrl().hashCode() + "");
+                }
+            }
+            for (int i = 0; i < newSelecSingerInfos.size(); i++) {
+                SingerInfo singerInfo = newSelecSingerInfos.get(i);
+                if (!SingerInfoDB.isExists(mContext, singerInfo.getImageUrl())) {
+                    singerInfo.setCreateTime(DateUtil.parseDateToString(new Date()));
+                    SingerInfoDB.add(mContext, singerInfo);
+                }
+            }
+
+            //发重新加载数据广播
+            AudioBroadcastReceiver.sendReloadSingerImgReceiver(mContext, mHash);
+        }
+        mSwipeBackLayout.closeView();
+    }
+
+    /**
+     * @param singerInfo
+     * @return
+     */
+    private boolean contains(List<SingerInfo> singerInfos, SingerInfo singerInfo) {
+        if (singerInfos != null && singerInfos.size() > 0) {
+            for (int i = 0; i < singerInfos.size(); i++) {
+                SingerInfo temp = singerInfos.get(i);
+                if (temp.getImageUrl().equals(singerInfo.getImageUrl())) {
+                    return true;
+                }
+            }
+        }
+        return false;
     }
 
     /**
@@ -145,11 +211,11 @@ public class SearchSingerActivity extends BaseActivity {
         switch (msg.what) {
             case MESSAGE_CODE_LOADDATA:
 
-                if(mDatas == null || mDatas.size() == 0){
-                    ToastUtil.showTextToast(mContext,HttpReturnResult.ERROR_MSG_NULLDATA);
+                if (mDatas == null || mDatas.size() == 0) {
+                    ToastUtil.showTextToast(mContext, HttpReturnResult.ERROR_MSG_NULLDATA);
                 }
 
-                mAdapter = new SearchSingerAdapter(mContext, mDatas,mUIHandler,mWorkerHandler);
+                mAdapter = new SearchSingerAdapter(mContext, mDatas, mSelectDatas, mUIHandler, mWorkerHandler);
                 mRecyclerView.setAdapter(mAdapter);
                 showContentView();
 
@@ -169,9 +235,13 @@ public class SearchSingerActivity extends BaseActivity {
                 if (httpReturnResult.isSuccessful()) {
                     Map<String, Object> mapResult = (Map<String, Object>) httpReturnResult.getResult();
                     mDatas = (List<SingerInfo>) mapResult.get("rows");
-                }else{
+                } else {
                     mDatas = new ArrayList<SingerInfo>();
                 }
+
+                //数据库数据
+                mSelectDatas = SingerInfoDB.getAllSingerImage(mContext, mSingerName);
+                mOldDatas = SingerInfoDB.getAllSingerImage(mContext, mSingerName);
 
                 mUIHandler.sendEmptyMessage(MESSAGE_CODE_LOADDATA);
 

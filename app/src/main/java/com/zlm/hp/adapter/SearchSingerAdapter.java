@@ -10,16 +10,13 @@ import android.widget.RelativeLayout;
 
 import com.zlm.hp.async.AsyncHandlerTask;
 import com.zlm.hp.constants.ResourceConstants;
-import com.zlm.hp.db.util.SingerInfoDB;
 import com.zlm.hp.entity.SingerInfo;
 import com.zlm.hp.handler.WeakRefHandler;
 import com.zlm.hp.ui.R;
-import com.zlm.hp.util.DateUtil;
 import com.zlm.hp.util.ImageUtil;
 import com.zlm.hp.util.ResourceUtil;
 
 import java.io.File;
-import java.util.Date;
 import java.util.List;
 
 /**
@@ -31,13 +28,15 @@ public class SearchSingerAdapter extends RecyclerView.Adapter<RecyclerView.ViewH
     private List<SingerInfo> mDatas;
     private WeakRefHandler mUIHandler;
     private WeakRefHandler mWorkerHandler;
+    private List<SingerInfo> mSelectDatas;
 
 
-    public SearchSingerAdapter(Context context, List<SingerInfo> datas, WeakRefHandler uiHandler, WeakRefHandler workerHandler) {
+    public SearchSingerAdapter(Context context, List<SingerInfo> datas, List<SingerInfo> selectDatas, WeakRefHandler uiHandler, WeakRefHandler workerHandler) {
         this.mContext = context;
         this.mDatas = datas;
         this.mUIHandler = uiHandler;
         this.mWorkerHandler = workerHandler;
+        this.mSelectDatas = selectDatas;
     }
 
     @Override
@@ -67,7 +66,7 @@ public class SearchSingerAdapter extends RecyclerView.Adapter<RecyclerView.ViewH
     private void reshViewHolder(final int position, final SearchSingerViewHolder viewHolder, final SingerInfo singerInfo) {
         String filePath = ResourceUtil.getFilePath(mContext, ResourceConstants.PATH_SINGER, (singerInfo.getSingerName() + File.separator + singerInfo.getImageUrl().hashCode() + ".jpg"));
         ImageUtil.loadImage(mContext, filePath, singerInfo.getImageUrl(), true, viewHolder.getSingPicImg(), 720, 1080, new AsyncHandlerTask(mUIHandler, mWorkerHandler), null);
-        if (SingerInfoDB.isExists(mContext, singerInfo.getImageUrl())) {
+        if (contains(singerInfo)) {
             viewHolder.getSelectedImg().setVisibility(View.VISIBLE);
             viewHolder.getUnSelectImg().setVisibility(View.INVISIBLE);
         } else {
@@ -82,19 +81,56 @@ public class SearchSingerAdapter extends RecyclerView.Adapter<RecyclerView.ViewH
                     viewHolder.getSelectedImg().setVisibility(View.INVISIBLE);
                     viewHolder.getUnSelectImg().setVisibility(View.VISIBLE);
 
-                    SingerInfoDB.delete(mContext, singerInfo.getImageUrl());
+                    delete(singerInfo);
+
                 } else {
                     viewHolder.getSelectedImg().setVisibility(View.VISIBLE);
                     viewHolder.getUnSelectImg().setVisibility(View.INVISIBLE);
-
-                    if (!SingerInfoDB.isExists(mContext, singerInfo.getImageUrl())) {
-
-                        singerInfo.setCreateTime(DateUtil.parseDateToString(new Date()));
-                        SingerInfoDB.add(mContext, singerInfo);
+                    if (!contains(singerInfo)) {
+                        mSelectDatas.add(singerInfo);
                     }
                 }
             }
         });
+    }
+
+    /**
+     * @param singerInfo
+     */
+    private void delete(SingerInfo singerInfo) {
+        if (mSelectDatas != null && mSelectDatas.size() > 0) {
+            for (int i = 0; i < mSelectDatas.size(); i++) {
+                SingerInfo temp = mSelectDatas.get(i);
+                if (temp.getImageUrl().equals(singerInfo.getImageUrl())) {
+                    mSelectDatas.remove(i);
+                    break;
+                }
+            }
+        }
+    }
+
+    /**
+     * @param singerInfo
+     * @return
+     */
+    private boolean contains(SingerInfo singerInfo) {
+        if (mSelectDatas != null && mSelectDatas.size() > 0) {
+            for (int i = 0; i < mSelectDatas.size(); i++) {
+                SingerInfo temp = mSelectDatas.get(i);
+                if (temp.getImageUrl().equals(singerInfo.getImageUrl())) {
+                    return true;
+                }
+            }
+        }
+        return false;
+    }
+
+    /**
+     *
+     * @return
+     */
+    public List<SingerInfo> getSelectDatas() {
+        return mSelectDatas;
     }
 
     @Override

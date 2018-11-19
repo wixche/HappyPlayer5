@@ -229,6 +229,7 @@ public class ImageUtil {
                     SingerInfo singerInfo = returnResult.get(j);
                     String imageUrl = singerInfo.getImageUrl();
                     ZLog.d(new CodeLineUtil().getCodeLineInfo(), "loadSingerImage singerName ->" + singerInfo.getSingerName());
+                    ZLog.d(new CodeLineUtil().getCodeLineInfo(), "loadSingerImage imageUrl ->" + singerInfo.getImageUrl());
                     ImageUtil.loadSingerImage(context, asyncHandlerTask, singerInfo.getSingerName(), imageUrl, askWifi);
                 }
 
@@ -612,6 +613,15 @@ public class ImageUtil {
      */
     public static Bitmap getBitmapFromCache(String key) {
         return mImageCache.get(key);
+    }
+
+    /**
+     * @param key
+     */
+    public static void remove(String key) {
+        if (mImageCache != null) {
+            mImageCache.remove(key);
+        }
     }
 
     public static void release() {

@@ -62,7 +62,37 @@
                         android:id="@+id/recyclerView"
                         android:layout_width="match_parent"
                         android:layout_height="match_parent"
+                        android:layout_above="@+id/bottomlayout"
                         android:overScrollMode="never"></android.support.v7.widget.RecyclerView>
+
+                    <LinearLayout
+                        android:id="@+id/bottomlayout"
+                        android:layout_width="match_parent"
+                        android:layout_height="55dp"
+                        android:layout_alignParentBottom="true"
+                        android:orientation="vertical">
+
+
+                        <com.zlm.hp.widget.ButtonRelativeLayout
+                            android:id="@+id/surebtn"
+                            android:layout_width="match_parent"
+                            android:layout_height="match_parent"
+                            android:layout_centerHorizontal="true"
+                            android:layout_margin="10dp"
+                            android:clickable="true">
+
+                            <TextView
+
+                                android:layout_width="wrap_content"
+                                android:layout_height="match_parent"
+                                android:layout_centerHorizontal="true"
+                                android:layout_margin="8dp"
+                                android:text="确定"
+                                android:textColor="#fff" />
+
+
+                        </com.zlm.hp.widget.ButtonRelativeLayout>
+                    </LinearLayout>
                 </RelativeLayout>
             </RelativeLayout>
 

@@ -15,6 +15,10 @@ public class RankInfo implements Parcelable{
      */
     private String rankId;
     /**
+     *
+     */
+    private String rankType = "";
+    /**
      * 排行榜名称
      */
     private String rankName;
@@ -28,19 +32,21 @@ public class RankInfo implements Parcelable{
 
     }
 
-    public RankInfo(String rankId, String rankName) {
+    public RankInfo(String rankId, String rankName,String rankType) {
         this.rankId = rankId;
         this.rankName = rankName;
+        this.rankType = rankType;
     }
 
     public static RankInfo newDefRankInfo(){
-        return new RankInfo("6666","酷狗飙升榜");
+        return new RankInfo("6666","2","酷狗飙升榜");
     }
 
     protected RankInfo(Parcel in) {
         rankId = in.readString();
         rankName = in.readString();
         imageUrl = in.readString();
+        rankType = in.readString();
     }
 
     @Override
@@ -48,6 +54,7 @@ public class RankInfo implements Parcelable{
         dest.writeString(rankId);
         dest.writeString(rankName);
         dest.writeString(imageUrl);
+        dest.writeString(rankType);
     }
 
     @Override
@@ -89,5 +96,13 @@ public class RankInfo implements Parcelable{
 
     public void setImageUrl(String imageUrl) {
         this.imageUrl = imageUrl;
+    }
+
+    public String getRankType() {
+        return rankType;
+    }
+
+    public void setRankType(String rankType) {
+        this.rankType = rankType;
     }
 }

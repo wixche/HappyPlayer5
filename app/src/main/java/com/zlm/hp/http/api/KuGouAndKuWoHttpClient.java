@@ -448,17 +448,29 @@ public class KuGouAndKuWoHttpClient extends APIHttpClient {
      * @return
      */
     @Override
-    public HttpReturnResult rankSongList(Context context, String rankid, int page, int pagesize, boolean askWifi) {
+    public HttpReturnResult rankSongList(Context context, String rankid, String rankType, int page, int pagesize, boolean askWifi) {
         HttpReturnResult httpReturnResult = checkNetWork(context, askWifi);
         if (httpReturnResult != null) return httpReturnResult;
         httpReturnResult = new HttpReturnResult();
 
-        String url = "http://m.kugou.com/rank/info";
+        String url = "http://mobilecdn.kugou.com/api/v3/rank/song";
         Map<String, String> params = new HashMap<String, String>();
+        params.put("plat", "0");
+        params.put("version", "8352");
+        params.put("with_res_tag", "1");
+        params.put("ranktype", rankType);
         params.put("rankid", rankid);
-        params.put("json", "true");
         params.put("page", page + "");
         params.put("pagesize", pagesize + "");
+
+//        String url = "http://m.kugou.com/rank/info";
+//        Map<String, String> params = new HashMap<String, String>();
+//        params.put("rankid", rankid);
+//        params.put("ranktype", rankType);
+//        params.put("json", "true");
+//        params.put("page", page + "");
+//        params.put("pagesize", pagesize + "");
+
         HttpClient.Result result = new HttpClient().get(url, null, params);
         httpReturnResult.setStatus(result.getHttpCode());
 
@@ -466,15 +478,26 @@ public class KuGouAndKuWoHttpClient extends APIHttpClient {
 
             String dataResult = result.getDataString();
 
+
+            //new
+            dataResult = dataResult.substring(dataResult.indexOf("{"),
+                    dataResult.lastIndexOf("}") + 1);
+
+
             ZLog.d(new CodeLineUtil().getCodeLineInfo(), "rankSongList result ->" + dataResult);
             JSONObject jsonNode = null;
             try {
                 jsonNode = new JSONObject(dataResult);
 
                 Map<String, Object> returnResult = new HashMap<String, Object>();
-                JSONObject songsJsonNode = jsonNode.getJSONObject("songs");
+                //new
+                JSONObject songsJsonNode = jsonNode.getJSONObject("data");
+                //JSONObject songsJsonNode = jsonNode.getJSONObject("songs");
                 returnResult.put("total", songsJsonNode.optInt("total", 0));
-                JSONArray listJsonNode = songsJsonNode.getJSONArray("list");
+                //JSONArray listJsonNode = songsJsonNode.getJSONArray("list");
+
+                //new
+                JSONArray listJsonNode = songsJsonNode.getJSONArray("info");
                 List<AudioInfo> lists = new ArrayList<AudioInfo>();
                 for (int i = 0; i < listJsonNode.length(); i++) {
 

@@ -108,6 +108,23 @@ public class ConfigInfo implements Parcelable {
     private List<AudioInfo> audioInfos;
 
     /**
+     * 显示翻译歌词
+     */
+    public static final int EXTRALRCSTATUS_SHOWTRANSLATELRC = 0;
+    /**
+     * 显示音译歌词
+     */
+    public static final int EXTRALRCSTATUS_SHOWTRANSLITERATIONLRC = 1;
+    /**
+     * 只显示默认歌词
+     */
+    public static final int EXTRALRCSTATUS_NOSHOWEXTRALRC = 2;
+    /**
+     * 默认只显示默认歌词
+     */
+    private int extraLrcStatus = EXTRALRCSTATUS_NOSHOWEXTRALRC;
+
+    /**
      * 桌面歌词未读颜色
      */
     public static int DESKTOP_LRC_NOREAD_COLORS[][] = {{
@@ -397,6 +414,15 @@ public class ConfigInfo implements Parcelable {
 
     public ConfigInfo setPlayModel(int playModel) {
         this.playModel = playModel;
+        return this;
+    }
+
+    public int getExtraLrcStatus() {
+        return extraLrcStatus;
+    }
+
+    public ConfigInfo setExtraLrcStatus(int extraLrcStatus) {
+        this.extraLrcStatus = extraLrcStatus;
         return this;
     }
 

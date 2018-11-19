@@ -4,6 +4,7 @@ import android.content.Context;
 import android.content.Intent;
 import android.graphics.Color;
 import android.os.Bundle;
+import android.os.Handler;
 import android.os.Message;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
@@ -54,11 +55,6 @@ import java.util.Map;
  * @date: 2018-10-16 19:43
  **/
 public class LrcActivity extends BaseActivity {
-
-    /**
-     *
-     */
-    public static final int RESULT_SINGER_RELOAD = 1000;
 
     /**
      * 旋转布局界面
@@ -145,6 +141,130 @@ public class LrcActivity extends BaseActivity {
     private RelativeLayout mSingerListPopLayout;
     private PlayListBGRelativeLayout mSingerListPopRL;
     private RecyclerView mSingerListRecyclerView;
+
+    //、、、、、、、、、、、、、、、、、、、、、、、、、翻译和音译歌词、、、、、、、、、、、、、、、、、、、、、、、、、、、
+    //翻译歌词
+    private ImageView mHideTranslateImg;
+    private ImageView mShowTranslateImg;
+    //音译歌词
+    private ImageView mHideTransliterationImg;
+    private ImageView mShowTransliterationImg;
+
+    //翻译歌词/音译歌词
+    private ImageView mShowTTToTranslateImg;
+    private ImageView mShowTTToTransliterationImg;
+    private ImageView mHideTTImg;
+
+    private final int HASTRANSLATELRC = 0;
+    private final int HASTRANSLITERATIONLRC = 1;
+    private final int HASTRANSLATEANDTRANSLITERATIONLRC = 2;
+    private final int NOEXTRALRC = 3;
+
+    private Handler mExtraLrcTypeHandler = new Handler() {
+        @Override
+        public void handleMessage(Message msg) {
+            super.handleMessage(msg);
+            switch (msg.what) {
+                case NOEXTRALRC:
+
+                    //翻译歌词
+                    mHideTranslateImg.setVisibility(View.INVISIBLE);
+                    mShowTranslateImg.setVisibility(View.INVISIBLE);
+                    //音译歌词
+                    mHideTransliterationImg.setVisibility(View.INVISIBLE);
+                    mShowTransliterationImg.setVisibility(View.INVISIBLE);
+
+                    //翻译歌词/音译歌词
+                    mShowTTToTranslateImg.setVisibility(View.INVISIBLE);
+                    mShowTTToTransliterationImg.setVisibility(View.INVISIBLE);
+                    mHideTTImg.setVisibility(View.INVISIBLE);
+
+
+                    break;
+                case HASTRANSLATEANDTRANSLITERATIONLRC:
+
+
+                    //翻译歌词
+                    mHideTranslateImg.setVisibility(View.INVISIBLE);
+                    mShowTranslateImg.setVisibility(View.INVISIBLE);
+                    //音译歌词
+                    mHideTransliterationImg.setVisibility(View.INVISIBLE);
+                    mShowTransliterationImg.setVisibility(View.INVISIBLE);
+
+
+                    //翻译歌词/音译歌词
+                    int lrcShowType = (int) msg.obj;
+                    if (lrcShowType == ConfigInfo.EXTRALRCSTATUS_SHOWTRANSLATELRC) {
+                        mShowTTToTranslateImg.setVisibility(View.INVISIBLE);
+                        mShowTTToTransliterationImg.setVisibility(View.VISIBLE);
+                        mHideTTImg.setVisibility(View.INVISIBLE);
+                    } else if (lrcShowType == ConfigInfo.EXTRALRCSTATUS_SHOWTRANSLITERATIONLRC) {
+                        mShowTTToTranslateImg.setVisibility(View.INVISIBLE);
+                        mShowTTToTransliterationImg.setVisibility(View.INVISIBLE);
+                        mHideTTImg.setVisibility(View.VISIBLE);
+                    } else {
+                        mShowTTToTranslateImg.setVisibility(View.VISIBLE);
+                        mShowTTToTransliterationImg.setVisibility(View.INVISIBLE);
+                        mHideTTImg.setVisibility(View.INVISIBLE);
+
+                    }
+
+
+                    break;
+                case HASTRANSLITERATIONLRC:
+
+                    //翻译歌词
+                    mHideTranslateImg.setVisibility(View.INVISIBLE);
+                    mShowTranslateImg.setVisibility(View.INVISIBLE);
+
+
+                    //音译歌词
+                    if (msg.obj == null) {
+                        mHideTransliterationImg.setVisibility(View.VISIBLE);
+                        mShowTransliterationImg.setVisibility(View.INVISIBLE);
+                    } else {
+                        mShowTransliterationImg.setVisibility(View.VISIBLE);
+                        mHideTransliterationImg.setVisibility(View.INVISIBLE);
+                    }
+
+                    //翻译歌词/音译歌词
+                    mShowTTToTranslateImg.setVisibility(View.INVISIBLE);
+                    mShowTTToTransliterationImg.setVisibility(View.INVISIBLE);
+                    mHideTTImg.setVisibility(View.INVISIBLE);
+
+                    break;
+                case HASTRANSLATELRC:
+
+
+                    //翻译歌词
+
+                    if (msg.obj == null) {
+                        mHideTranslateImg.setVisibility(View.VISIBLE);
+                        mShowTranslateImg.setVisibility(View.INVISIBLE);
+                    } else {
+                        mShowTranslateImg.setVisibility(View.VISIBLE);
+                        mHideTranslateImg.setVisibility(View.INVISIBLE);
+                    }
+
+                    //音译歌词
+                    mHideTransliterationImg.setVisibility(View.INVISIBLE);
+                    mShowTransliterationImg.setVisibility(View.INVISIBLE);
+
+                    //翻译歌词/音译歌词
+                    mShowTTToTranslateImg.setVisibility(View.INVISIBLE);
+                    mShowTTToTransliterationImg.setVisibility(View.INVISIBLE);
+                    mHideTTImg.setVisibility(View.INVISIBLE);
+
+
+                    break;
+
+            }
+
+        }
+    };
+
+    //、、、、、、、、、、、、、、、、、、、、、、、、、翻译和音译歌词、、、、、、、、、、、、、、、、、、、、、、、、、、、
+
 
     /**
      * 音频广播
@@ -287,6 +407,180 @@ public class LrcActivity extends BaseActivity {
         int lrcColor = ColorUtil.parserColor(ConfigInfo.LRC_COLORS_STRING[mConfigInfo.getLrcColorIndex()]);
         mManyLineLyricsView.setPaintHLColor(new int[]{lrcColor, lrcColor}, false);
         mManyLineLyricsView.setPaintColor(new int[]{Color.WHITE, Color.WHITE}, false);
+
+
+        //翻译歌词
+        mHideTranslateImg = findViewById(R.id.hideTranslateImg);
+        mHideTranslateImg.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                mHideTranslateImg.setVisibility(View.INVISIBLE);
+                mShowTranslateImg.setVisibility(View.VISIBLE);
+
+
+                if (mManyLineLyricsView.getLrcStatus() == AbstractLrcView.LRCSTATUS_LRC) {
+                    mManyLineLyricsView.setExtraLrcStatus(AbstractLrcView.EXTRALRCSTATUS_NOSHOWEXTRALRC);
+                }
+
+                mConfigInfo.setExtraLrcStatus(ConfigInfo.EXTRALRCSTATUS_NOSHOWEXTRALRC);
+
+            }
+        });
+        mShowTranslateImg = findViewById(R.id.showTranslateImg);
+        mShowTranslateImg.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                mHideTranslateImg.setVisibility(View.VISIBLE);
+                mShowTranslateImg.setVisibility(View.INVISIBLE);
+
+                if (mManyLineLyricsView.getLrcStatus() == AbstractLrcView.LRCSTATUS_LRC) {
+                    mManyLineLyricsView.setExtraLrcStatus(AbstractLrcView.EXTRALRCSTATUS_SHOWTRANSLATELRC);
+
+                }
+
+                mConfigInfo.setExtraLrcStatus(ConfigInfo.EXTRALRCSTATUS_SHOWTRANSLATELRC);
+
+            }
+        });
+        //音译歌词
+        mHideTransliterationImg = findViewById(R.id.hideTransliterationImg);
+        mHideTransliterationImg.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                mHideTransliterationImg.setVisibility(View.INVISIBLE);
+                mShowTransliterationImg.setVisibility(View.VISIBLE);
+
+                if (mManyLineLyricsView.getLrcStatus() == AbstractLrcView.LRCSTATUS_LRC) {
+                    mManyLineLyricsView.setExtraLrcStatus(AbstractLrcView.EXTRALRCSTATUS_NOSHOWEXTRALRC);
+                }
+
+                mConfigInfo.setExtraLrcStatus(ConfigInfo.EXTRALRCSTATUS_NOSHOWEXTRALRC);
+
+            }
+        });
+        mShowTransliterationImg = findViewById(R.id.showTransliterationImg);
+        mShowTransliterationImg.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                mHideTransliterationImg.setVisibility(View.VISIBLE);
+                mShowTransliterationImg.setVisibility(View.INVISIBLE);
+
+                if (mManyLineLyricsView.getLrcStatus() == AbstractLrcView.LRCSTATUS_LRC) {
+                    mManyLineLyricsView.setExtraLrcStatus(AbstractLrcView.EXTRALRCSTATUS_SHOWTRANSLITERATIONLRC);
+                }
+
+                mConfigInfo.setExtraLrcStatus(ConfigInfo.EXTRALRCSTATUS_SHOWTRANSLITERATIONLRC);
+            }
+        });
+
+        //翻译歌词/音译歌词
+        mShowTTToTranslateImg = findViewById(R.id.showTTToTranslateImg);
+        mShowTTToTranslateImg.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                mShowTTToTranslateImg.setVisibility(View.INVISIBLE);
+                mShowTTToTransliterationImg.setVisibility(View.VISIBLE);
+                mHideTTImg.setVisibility(View.INVISIBLE);
+
+                if (mManyLineLyricsView.getLrcStatus() == AbstractLrcView.LRCSTATUS_LRC) {
+                    mManyLineLyricsView.setExtraLrcStatus(AbstractLrcView.EXTRALRCSTATUS_SHOWTRANSLATELRC);
+                }
+
+                mConfigInfo.setExtraLrcStatus(ConfigInfo.EXTRALRCSTATUS_SHOWTRANSLATELRC);
+            }
+        });
+        mShowTTToTransliterationImg = findViewById(R.id.showTTToTransliterationImg);
+        mShowTTToTransliterationImg.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                mShowTTToTranslateImg.setVisibility(View.INVISIBLE);
+                mShowTTToTransliterationImg.setVisibility(View.INVISIBLE);
+                mHideTTImg.setVisibility(View.VISIBLE);
+
+                if (mManyLineLyricsView.getLrcStatus() == AbstractLrcView.LRCSTATUS_LRC) {
+                    mManyLineLyricsView.setExtraLrcStatus(AbstractLrcView.EXTRALRCSTATUS_SHOWTRANSLITERATIONLRC);
+                }
+
+                mConfigInfo.setExtraLrcStatus(ConfigInfo.EXTRALRCSTATUS_SHOWTRANSLITERATIONLRC);
+            }
+        });
+        mHideTTImg = findViewById(R.id.hideTTImg);
+        mHideTTImg.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                mShowTTToTranslateImg.setVisibility(View.VISIBLE);
+                mShowTTToTransliterationImg.setVisibility(View.INVISIBLE);
+                mHideTTImg.setVisibility(View.INVISIBLE);
+
+                if (mManyLineLyricsView.getLrcStatus() == AbstractLrcView.LRCSTATUS_LRC) {
+                    mManyLineLyricsView.setExtraLrcStatus(AbstractLrcView.EXTRALRCSTATUS_NOSHOWEXTRALRC);
+                }
+
+                mConfigInfo.setExtraLrcStatus(ConfigInfo.EXTRALRCSTATUS_NOSHOWEXTRALRC);
+            }
+        });
+
+        //
+        mManyLineLyricsView.setExtraLyricsListener(new AbstractLrcView.ExtraLyricsListener() {
+            @Override
+            public void extraLrcCallback() {
+                if (mManyLineLyricsView.getLyricsReader() == null) {
+                    return;
+                }
+                int extraLrcType = mManyLineLyricsView.getExtraLrcType();
+                if (extraLrcType == AbstractLrcView.EXTRALRCTYPE_NOLRC) {
+                    mExtraLrcTypeHandler.sendEmptyMessage(NOEXTRALRC);
+                } else if (extraLrcType == AbstractLrcView.EXTRALRCTYPE_TRANSLATELRC) {
+                    if (mConfigInfo.getExtraLrcStatus() == ConfigInfo.EXTRALRCSTATUS_SHOWTRANSLATELRC) {
+                        mExtraLrcTypeHandler.sendEmptyMessage(HASTRANSLATELRC);
+                        mManyLineLyricsView.setExtraLrcStatus(AbstractLrcView.EXTRALRCSTATUS_SHOWTRANSLATELRC);
+                    } else {
+                        Message msg = Message.obtain();
+                        msg.what = HASTRANSLATELRC;
+                        msg.obj = "";
+                        mExtraLrcTypeHandler.sendMessage(msg);
+                        mManyLineLyricsView.setExtraLrcStatus(AbstractLrcView.EXTRALRCSTATUS_NOSHOWEXTRALRC);
+                    }
+                } else if (extraLrcType == AbstractLrcView.EXTRALRCTYPE_TRANSLITERATIONLRC) {
+
+                    if (mConfigInfo.getExtraLrcStatus() == ConfigInfo.EXTRALRCSTATUS_SHOWTRANSLITERATIONLRC) {
+                        mExtraLrcTypeHandler.sendEmptyMessage(HASTRANSLITERATIONLRC);
+                        mManyLineLyricsView.setExtraLrcStatus(AbstractLrcView.EXTRALRCSTATUS_SHOWTRANSLITERATIONLRC);
+                    } else {
+                        Message msg = Message.obtain();
+                        msg.what = HASTRANSLITERATIONLRC;
+                        msg.obj = "";
+                        mExtraLrcTypeHandler.sendMessage(msg);
+                        mManyLineLyricsView.setExtraLrcStatus(AbstractLrcView.EXTRALRCSTATUS_NOSHOWEXTRALRC);
+                    }
+
+                } else if (extraLrcType == AbstractLrcView.EXTRALRCTYPE_BOTH) {
+                    if (mConfigInfo.getExtraLrcStatus() == ConfigInfo.EXTRALRCSTATUS_SHOWTRANSLITERATIONLRC) {
+
+                        Message msg = Message.obtain();
+                        msg.what = HASTRANSLATEANDTRANSLITERATIONLRC;
+                        msg.obj = ConfigInfo.EXTRALRCSTATUS_SHOWTRANSLITERATIONLRC;
+                        mExtraLrcTypeHandler.sendMessage(msg);
+                        mManyLineLyricsView.setExtraLrcStatus(AbstractLrcView.EXTRALRCSTATUS_SHOWTRANSLITERATIONLRC);
+                    } else if (mConfigInfo.getExtraLrcStatus() == ConfigInfo.EXTRALRCSTATUS_SHOWTRANSLATELRC) {
+                        Message msg = Message.obtain();
+                        msg.what = HASTRANSLATEANDTRANSLITERATIONLRC;
+                        msg.obj = ConfigInfo.EXTRALRCSTATUS_SHOWTRANSLATELRC;
+                        mExtraLrcTypeHandler.sendMessage(msg);
+                        mManyLineLyricsView.setExtraLrcStatus(AbstractLrcView.EXTRALRCSTATUS_SHOWTRANSLATELRC);
+
+                    } else {
+                        Message msg = Message.obtain();
+                        msg.what = HASTRANSLATEANDTRANSLITERATIONLRC;
+                        msg.obj = ConfigInfo.EXTRALRCSTATUS_NOSHOWEXTRALRC;
+                        mExtraLrcTypeHandler.sendMessage(msg);
+                        mManyLineLyricsView.setExtraLrcStatus(AbstractLrcView.EXTRALRCSTATUS_NOSHOWEXTRALRC);
+
+                    }
+                }
+            }
+        });
+
 
         mSongProgressTv = findViewById(R.id.songProgress);
         mSongDurationTv = findViewById(R.id.songDuration);
@@ -503,17 +797,17 @@ public class LrcActivity extends BaseActivity {
                                 @Override
                                 public void onGlobalLayout() {
                                     mSingerListPopRL.getViewTreeObserver().removeOnGlobalLayoutListener(this);
-                                    showSingerListView(singerNameArray);
+                                    showSingerListView(singerNameArray, audioInfo.getHash());
                                 }
                             });
 
                         } else {
-                            showSingerListView(singerNameArray);
+                            showSingerListView(singerNameArray, audioInfo.getHash());
                         }
 
                     } else {
 
-                        showSearchSingerView(singerName);
+                        showSearchSingerView(singerName, audioInfo.getHash());
 
                     }
                 }
@@ -843,14 +1137,14 @@ public class LrcActivity extends BaseActivity {
      *
      * @param singerNameArray
      */
-    private void showSingerListView(String[] singerNameArray) {
+    private void showSingerListView(String[] singerNameArray, final String hash) {
         if (isSingerListPopShowing) return;
 
         LrcPopSingerAdapter adapter = new LrcPopSingerAdapter(mContext, singerNameArray, mUIHandler, mWorkerHandler, new PopSingerListener() {
             @Override
             public void search(String singerName) {
                 hideSingerListView();
-                showSearchSingerView(singerName);
+                showSearchSingerView(singerName, hash);
             }
         });
         mSingerListRecyclerView.setAdapter(adapter);
@@ -886,10 +1180,11 @@ public class LrcActivity extends BaseActivity {
      *
      * @param singerName
      */
-    private void showSearchSingerView(String singerName) {
+    private void showSearchSingerView(String singerName, String hash) {
         Intent intent = new Intent(LrcActivity.this, SearchSingerActivity.class);
+        intent.putExtra("hash", hash);
         intent.putExtra("singerName", singerName);
-        startActivityForResult(intent, RESULT_SINGER_RELOAD);
+        startActivity(intent);
         //
         overridePendingTransition(0, 0);
     }
@@ -1303,6 +1598,15 @@ public class LrcActivity extends BaseActivity {
                     }
                 }
                 break;
+
+            case AudioBroadcastReceiver.ACTION_CODE_RELOADSINGERIMG:
+                Bundle singerReloadBundle = intent.getBundleExtra(AudioBroadcastReceiver.ACTION_BUNDLEKEY);
+                String singerHash = singerReloadBundle.getString(AudioBroadcastReceiver.ACTION_DATA_KEY);
+                AudioInfo curSingerAudioInfo = AudioPlayerManager.newInstance(mContext).getCurSong(mConfigInfo.getPlayHash());
+                if (curSingerAudioInfo != null && curSingerAudioInfo.getHash().equals(singerHash)) {
+                    mUIHandler.sendEmptyMessage(MESSAGE_CODE_SINGER_RELOAD);
+                }
+                break;
         }
     }
 
@@ -1375,14 +1679,6 @@ public class LrcActivity extends BaseActivity {
             mAudioBroadcastReceiver.unregisterReceiver(mContext);
         }
 
-    }
-
-    @Override
-    protected void onActivityResult(int requestCode, int resultCode, Intent data) {
-        super.onActivityResult(requestCode, resultCode, data);
-        if (requestCode == RESULT_SINGER_RELOAD) {
-            mUIHandler.sendEmptyMessage(MESSAGE_CODE_SINGER_RELOAD);
-        }
     }
 
     public interface PopSingerListener {

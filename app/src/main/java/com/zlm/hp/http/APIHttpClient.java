@@ -82,7 +82,7 @@ public abstract class APIHttpClient {
      * @param askWifi
      * @return
      */
-    public abstract HttpReturnResult rankSongList(Context context, String rankid, int page, int pagesize, boolean askWifi);
+    public abstract HttpReturnResult rankSongList(Context context, String rankid, String ranktype, int page, int pagesize, boolean askWifi);
 
 
     /**

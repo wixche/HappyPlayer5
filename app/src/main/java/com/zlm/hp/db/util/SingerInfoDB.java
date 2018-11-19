@@ -44,7 +44,7 @@ public class SingerInfoDB {
      */
     public static List<SingerInfo> getAllSingerImage(Context context, String singerName) {
         try {
-            List<SingerInfo> singerInfos = DBHelper.getInstance(context).getDaoSession().getSingerInfoDao().queryBuilder().where(new WhereCondition.StringCondition(SingerInfoDao.Properties.SingerName.columnName + "=?", singerName)).orderDesc(SingerInfoDao.Properties.CreateTime, SingerInfoDao.Properties.ImageUrl).list();
+            List<SingerInfo> singerInfos = DBHelper.getInstance(context).getDaoSession().getSingerInfoDao().queryBuilder().where(new WhereCondition.StringCondition(SingerInfoDao.Properties.SingerName.columnName + "=?", singerName)).orderDesc(SingerInfoDao.Properties.CreateTime).list();
             return singerInfos;
         } catch (Exception e) {
             e.printStackTrace();
@@ -75,6 +75,23 @@ public class SingerInfoDB {
         }
         return false;
 
+    }
+
+    /**
+     * 删除
+     */
+    public static boolean deleteBySingerName(Context context, String singerName) {
+        try {
+            String sql = "DELETE FROM ";
+            sql += SingerInfoDao.TABLENAME;
+            sql += " where " + SingerInfoDao.Properties.SingerName.columnName + "=?";
+            String args[] = {singerName};
+            DBHelper.getInstance(context).getWritableDatabase().execSQL(sql, args);
+            return true;
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+        return false;
     }
 
     /**

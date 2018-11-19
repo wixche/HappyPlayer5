@@ -88,6 +88,11 @@ public class AudioBroadcastReceiver {
      */
     public static final int ACTION_CODE_LRCLOADED = 9;
 
+    /**
+     * 重新加载歌手写真
+     */
+    public static final int ACTION_CODE_RELOADSINGERIMG = 10;
+
     private BroadcastReceiver mBroadcastReceiver;
     private IntentFilter mIntentFilter;
     private AudioReceiverListener mReceiverListener;
@@ -258,6 +263,18 @@ public class AudioBroadcastReceiver {
         Bundle bundle = new Bundle();
         bundle.putString(ACTION_DATA_KEY, hash);
         sendReceiver(context, ACTION_CODE_LRCLOADED, ACTION_BUNDLEKEY, bundle);
+    }
+
+    /**
+     *
+     *
+     * @param context
+     * @param hash
+     */
+    public static void sendReloadSingerImgReceiver(Context context, String hash) {
+        Bundle bundle = new Bundle();
+        bundle.putString(ACTION_DATA_KEY, hash);
+        sendReceiver(context, ACTION_CODE_RELOADSINGERIMG, ACTION_BUNDLEKEY, bundle);
     }
 
 

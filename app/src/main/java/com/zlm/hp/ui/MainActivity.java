@@ -316,6 +316,9 @@ public class MainActivity extends BaseActivity {
                         mArtistImageView.setImageDrawable(new BitmapDrawable(bitmap));
                         mArtistImageView.setTag("");
 
+                        //重置额外歌词状态
+                        mConfigInfo.setExtraLrcStatus(ConfigInfo.EXTRALRCSTATUS_NOSHOWEXTRALRC);
+
                         break;
                     case AudioBroadcastReceiver.ACTION_CODE_INIT:
                         Bundle initBundle = intent.getBundleExtra(AudioBroadcastReceiver.ACTION_BUNDLEKEY);

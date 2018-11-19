@@ -301,7 +301,7 @@ public class SongFragment extends BaseFragment {
             case SONG_TYPE_RECOMMEND:
 
                 RankInfo rankInfo = bundle.getParcelable(DATA_KEY);
-                httpReturnResult = apiHttpClient.rankSongList(mContext, rankInfo.getRankId(), page, mPageSize, configInfo.isWifi());
+                httpReturnResult = apiHttpClient.rankSongList(mContext, rankInfo.getRankId(),rankInfo.getRankType(), page, mPageSize, configInfo.isWifi());
 
                 break;
             case SONG_TYPE_SPECIAL:
@@ -347,7 +347,7 @@ public class SongFragment extends BaseFragment {
 
                 RankInfo rankInfo = bundle.getParcelable(DATA_KEY);
                 ;
-                httpReturnResult = apiHttpClient.rankSongList(mContext, rankInfo.getRankId(), mPage, mPageSize, configInfo.isWifi());
+                httpReturnResult = apiHttpClient.rankSongList(mContext, rankInfo.getRankId(),rankInfo.getRankType(), mPage, mPageSize, configInfo.isWifi());
 
                 break;
             case SONG_TYPE_SPECIAL:
