@@ -9,6 +9,7 @@ import android.os.Handler;
 import android.os.Looper;
 import android.os.Message;
 import android.support.v7.widget.AppCompatImageView;
+import android.text.TextUtils;
 import android.util.AttributeSet;
 import android.view.View;
 
@@ -34,7 +35,7 @@ public class TransitionImageView extends AppCompatImageView {
     /**
      * 图片下载路径
      */
-    private List<SingerInfo> mSingerInfo;
+    private List<SingerInfo> mSingerInfos;
 
     /**
      * 当前图片索引
@@ -52,19 +53,19 @@ public class TransitionImageView extends AppCompatImageView {
     private Runnable mChangeRunnable = new Runnable() {
         @Override
         public void run() {
-            if (mSingerInfo != null && mSingerInfo.size() > 0) {
+            if (mSingerInfos != null && mSingerInfos.size() > 0) {
 
                 Drawable[] drawables = new Drawable[2];
 
                 int curIndex = mIndex;
-                int urlSize = mSingerInfo.size();
+                int urlSize = mSingerInfos.size();
                 if (curIndex >= urlSize) {
                     curIndex = 0;
                     mIndex = 0;
                 }
 
 
-                String curImageUrl = mSingerInfo.get(curIndex).getImageUrl();
+                String curImageUrl = mSingerInfos.get(curIndex).getImageUrl();
                 Bitmap curBitmap = ImageUtil.getBitmapFromCache(curImageUrl.hashCode() + "");
                 if (curBitmap != null) {
 
@@ -73,15 +74,12 @@ public class TransitionImageView extends AppCompatImageView {
                         preIndex = urlSize - 1;
                     }
 
-                    String preImageUrl = mSingerInfo.get(preIndex).getImageUrl();
+                    String preImageUrl = mSingerInfos.get(preIndex).getImageUrl();
                     Bitmap preBitmap = ImageUtil.getBitmapFromCache(preImageUrl.hashCode() + "");
 
 
                     if (preBitmap == null) {
-                        if (mIndex == 0)
-                            drawables[0] = new BitmapDrawable();
-                        else
-                            drawables[0] = new BitmapDrawable(curBitmap);
+                        drawables[0] = new BitmapDrawable(curBitmap);
                     } else {
                         drawables[0] = new BitmapDrawable(preBitmap);
                     }
@@ -91,10 +89,18 @@ public class TransitionImageView extends AppCompatImageView {
                     setBackground(transitionDrawable);
                     transitionDrawable.startTransition(mDuration);
 
-                    setVisibility(View.VISIBLE);
+                    if (getVisibility() != View.VISIBLE)
+                        setVisibility(View.VISIBLE);
+
+                    //如果当前上一个地址为空，则移除第0个空白占位元素
+                    if (TextUtils.isEmpty(preImageUrl) && preIndex == 0) {
+                        mSingerInfos.remove(0);
+                        mIndex--;
+                    }
                 }
 
-                if (mIndex == 0) {
+                //如果是第一次第一张
+                if (mIndex == 0 && TextUtils.isEmpty(curImageUrl)) {
                     mUIHandler.postDelayed(mChangeRunnable, 1000);
                 } else {
                     mUIHandler.postDelayed(mChangeRunnable, 1000 * 10);
@@ -141,8 +147,8 @@ public class TransitionImageView extends AppCompatImageView {
      * 初始化数据
      */
     public void initData(List<SingerInfo> singerInfos) {
-        if (mSingerInfo == null || mSingerInfo.size() == 1) {
-            this.mSingerInfo = singerInfos;
+        if (mSingerInfos == null || mSingerInfos.size() == 1) {
+            this.mSingerInfos = singerInfos;
 
             addNullImage();
             start();
@@ -160,18 +166,18 @@ public class TransitionImageView extends AppCompatImageView {
      * 结束
      */
     public void resetData() {
-        if (mSingerInfo != null)
-            mSingerInfo.clear();
+        if (mSingerInfos != null)
+            mSingerInfos.clear();
         addNullImage();
         release();
         mIndex = 0;
     }
 
     private void addNullImage() {
-        if (mSingerInfo == null) return;
+        if (mSingerInfos == null) return;
         SingerInfo singerInfo = new SingerInfo();
         singerInfo.setImageUrl("");
-        mSingerInfo.add(0, singerInfo);
+        mSingerInfos.add(0, singerInfo);
 
     }
 
