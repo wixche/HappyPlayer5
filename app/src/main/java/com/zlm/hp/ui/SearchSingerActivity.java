@@ -75,8 +75,8 @@ public class SearchSingerActivity extends BaseActivity {
     private RecyclerView mRecyclerView;
     private SearchSingerAdapter mAdapter;
     private List<SingerInfo> mDatas;
-    private List<SingerInfo> mSelectDatas;
-    private List<SingerInfo> mOldDatas;
+    private List<SingerInfo> mSelectDatas = new ArrayList<SingerInfo>();
+    private List<SingerInfo> mOldDatas = new ArrayList<SingerInfo>();
 
     private ButtonRelativeLayout mSureBtn;
 
@@ -125,9 +125,10 @@ public class SearchSingerActivity extends BaseActivity {
         //
         mRecyclerView = findViewById(R.id.recyclerView);
         GridLayoutManager gridLayoutManager = new GridLayoutManager(getApplication(), 2);
-        gridLayoutManager.setOrientation(LinearLayoutManager.VERTICAL);
+        gridLayoutManager.setOrientation(GridLayoutManager.VERTICAL);
         // 设置布局管理器
         mRecyclerView.setLayoutManager(gridLayoutManager);
+
         mSureBtn = findViewById(R.id.surebtn);
         mSureBtn.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -217,6 +218,8 @@ public class SearchSingerActivity extends BaseActivity {
 
                 mAdapter = new SearchSingerAdapter(mContext, mDatas, mSelectDatas, mUIHandler, mWorkerHandler);
                 mRecyclerView.setAdapter(mAdapter);
+                mAdapter.notifyDataSetChanged();
+
                 showContentView();
 
                 break;
@@ -240,8 +243,11 @@ public class SearchSingerActivity extends BaseActivity {
                 }
 
                 //数据库数据
-                mSelectDatas = SingerInfoDB.getAllSingerImage(mContext, mSingerName);
-                mOldDatas = SingerInfoDB.getAllSingerImage(mContext, mSingerName);
+                List<SingerInfo> temp = SingerInfoDB.getAllSingerImage(mContext, mSingerName);
+                if (temp != null) {
+                    mSelectDatas.addAll(temp);
+                    mOldDatas.addAll(temp);
+                }
 
                 mUIHandler.sendEmptyMessage(MESSAGE_CODE_LOADDATA);
 
@@ -253,9 +259,9 @@ public class SearchSingerActivity extends BaseActivity {
      * 显示内容窗口
      */
     private void showContentView() {
-        mLoadingContainer.setVisibility(View.GONE);
         mLoadImgView.clearAnimation();
         mContentContainer.setVisibility(View.VISIBLE);
+        mLoadingContainer.setVisibility(View.GONE);
     }
 
     @Override

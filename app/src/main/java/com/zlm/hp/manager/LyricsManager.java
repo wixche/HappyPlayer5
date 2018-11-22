@@ -56,7 +56,7 @@ public class LyricsManager {
 
                 try {
 
-                    if (!mLyricsReaderCache.containsKey(hash)) {
+                    if (getLyricsReader(hash) == null) {
                         if (lrcFile != null && lrcFile.exists()) {
                             LyricsReader lyricsReader = new LyricsReader();
                             lyricsReader.setHash(hash);

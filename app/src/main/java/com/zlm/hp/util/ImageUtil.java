@@ -1,8 +1,6 @@
 package com.zlm.hp.util;
 
 import android.content.Context;
-import android.content.res.AssetManager;
-import android.content.res.Resources;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.graphics.drawable.BitmapDrawable;
@@ -21,11 +19,13 @@ import com.zlm.hp.ui.R;
 import com.zlm.hp.widget.TransitionImageView;
 
 import java.io.BufferedOutputStream;
+import java.io.ByteArrayOutputStream;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
+import java.io.OutputStream;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
@@ -93,7 +93,20 @@ public class ImageUtil {
                 return null;
             }
         };
-        loadImage(context, filePath, null, askWifi, imageView, width, height, asyncHandlerTask, loadImgUrlCallBack, imageLoadCallBack);
+        loadImage(context, R.mipmap.bpz, filePath, null, askWifi, imageView, width, height, asyncHandlerTask, loadImgUrlCallBack, imageLoadCallBack);
+    }
+
+    /**
+     * 加载歌手写真
+     *
+     * @param context
+     * @param filePath
+     * @param imageUrl
+     * @param imageView
+     * @param asyncHandlerTask
+     */
+    public static void loadSingerPic(final Context context, final String filePath, final String imageUrl, final boolean askWifi, final ImageView imageView, final int width, final int height, AsyncHandlerTask asyncHandlerTask, final ImageLoadCallBack imageLoadCallBack) {
+        loadImage(context, R.mipmap.picture_manager_default, filePath, imageUrl, askWifi, imageView, width, height, asyncHandlerTask, null, imageLoadCallBack);
     }
 
     /**
@@ -106,7 +119,7 @@ public class ImageUtil {
      * @param asyncHandlerTask
      */
     public static void loadImage(final Context context, final String filePath, final String imageUrl, final boolean askWifi, final ImageView imageView, final int width, final int height, AsyncHandlerTask asyncHandlerTask, final ImageLoadCallBack imageLoadCallBack) {
-        loadImage(context, filePath, imageUrl, askWifi, imageView, width, height, asyncHandlerTask, null, imageLoadCallBack);
+        loadImage(context, R.mipmap.bpz, filePath, imageUrl, askWifi, imageView, width, height, asyncHandlerTask, null, imageLoadCallBack);
     }
 
 
@@ -119,14 +132,14 @@ public class ImageUtil {
      * @param imageView
      * @param asyncHandlerTask
      */
-    private static void loadImage(final Context context, final String filePath, final String imageUrl, final boolean askWifi, final ImageView imageView, final int width, final int height, AsyncHandlerTask asyncHandlerTask, final LoadImgUrlCallBack loadImgUrlCallBack, final ImageLoadCallBack imageLoadCallBack) {
+    private static void loadImage(final Context context, int resourceId, final String filePath, final String imageUrl, final boolean askWifi, final ImageView imageView, final int width, final int height, AsyncHandlerTask asyncHandlerTask, final LoadImgUrlCallBack loadImgUrlCallBack, final ImageLoadCallBack imageLoadCallBack) {
         final String key = filePath.hashCode() + "";
         //如果当前的图片与上一次一样，则不操作
         if (imageView.getTag() != null && imageView.getTag().equals(key)) {
             return;
         }
 
-        Bitmap bitmap = BitmapFactory.decodeResource(context.getResources(), R.mipmap.bpz);
+        Bitmap bitmap = BitmapFactory.decodeResource(context.getResources(), resourceId);
         imageView.setImageDrawable(new BitmapDrawable(bitmap));
 
         imageView.setTag(key);
@@ -450,27 +463,23 @@ public class ImageUtil {
      */
     private static Bitmap readBitmapFromFile(String filePath, int width, int height) {
         try {
-            FileInputStream fis = new FileInputStream(filePath);
             BitmapFactory.Options options = new BitmapFactory.Options();
-            options.inJustDecodeBounds = true;
-            BitmapFactory.decodeFileDescriptor(fis.getFD(), null, options);
-            float srcWidth = options.outWidth;
-            float srcHeight = options.outHeight;
-            int inSampleSize = 1;
-
-            if (srcHeight > height || srcWidth > width) {
-                if (srcWidth > srcHeight) {
-                    inSampleSize = Math.round(srcHeight / height);
-                } else {
-                    inSampleSize = Math.round(srcWidth / width);
-                }
-            }
-
             options.inJustDecodeBounds = false;
-            options.inSampleSize = inSampleSize;
 
-            return BitmapFactory.decodeFileDescriptor(fis.getFD(), null, options);
-        } catch (Exception ex) {
+            /** 这里是获取手机屏幕的分辨率用来处理 图片 溢出问题的。begin */
+
+            int displaypixels = width / 2 * height / 2;
+
+            options.inSampleSize = computeSampleSize(options, -1, displaypixels);
+            options.inJustDecodeBounds = false;
+            try {
+                Bitmap bmp = BitmapFactory.decodeFile(filePath, options);
+                return bmp;
+            } catch (OutOfMemoryError err) {
+                err.printStackTrace();
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
         }
         return null;
     }
@@ -484,58 +493,25 @@ public class ImageUtil {
      * @return
      */
     private static Bitmap readBitmapFromInputStream(InputStream ins, int width, int height) {
-        BitmapFactory.Options options = new BitmapFactory.Options();
-        options.inJustDecodeBounds = true;
-        BitmapFactory.decodeStream(ins, null, options);
-        float srcWidth = options.outWidth;
-        float srcHeight = options.outHeight;
-        int inSampleSize = 1;
+        try {
+            int displaypixels = width / 2 * height / 2;
+            byte[] bytes = getBytes(ins);
+            BitmapFactory.Options opts = new BitmapFactory.Options();
+            // 这3句是处理图片溢出的begin( 如果不需要处理溢出直接 opts.inSampleSize=1;)
+            opts.inJustDecodeBounds = true;
+            BitmapFactory.decodeByteArray(bytes, 0, bytes.length, opts);
+            opts.inSampleSize = computeSampleSize(opts, -1, displaypixels);
+            // end
+            opts.inJustDecodeBounds = false;
+            Bitmap bitmap = BitmapFactory
+                    .decodeByteArray(bytes, 0, bytes.length, opts);
+            ins.close();
 
-        if (srcHeight > height || srcWidth > width) {
-            if (srcWidth > srcHeight) {
-                inSampleSize = Math.round(srcHeight / height);
-            } else {
-                inSampleSize = Math.round(srcWidth / width);
-            }
+            return bitmap;
+        } catch (Exception e) {
+            e.printStackTrace();
         }
-
-        options.inJustDecodeBounds = false;
-        options.inSampleSize = inSampleSize;
-
-        return BitmapFactory.decodeStream(ins, null, options);
-    }
-
-    /**
-     * 从资源文件中获取图片
-     *
-     * @param resources
-     * @param resourcesId
-     * @param width
-     * @param height
-     * @return
-     */
-    private static Bitmap readBitmapFromResource(Resources resources, int resourcesId,
-                                                 int width, int height) {
-        InputStream ins = resources.openRawResource(resourcesId);
-        BitmapFactory.Options options = new BitmapFactory.Options();
-        options.inJustDecodeBounds = true;
-        BitmapFactory.decodeStream(ins, null, options);
-        float srcWidth = options.outWidth;
-        float srcHeight = options.outHeight;
-        int inSampleSize = 1;
-
-        if (srcHeight > height || srcWidth > width) {
-            if (srcWidth > srcHeight) {
-                inSampleSize = Math.round(srcHeight / height);
-            } else {
-                inSampleSize = Math.round(srcWidth / width);
-            }
-        }
-
-        options.inJustDecodeBounds = false;
-        options.inSampleSize = inSampleSize;
-
-        return BitmapFactory.decodeStream(ins, null, options);
+        return null;
     }
 
     /**
@@ -547,44 +523,85 @@ public class ImageUtil {
      * @return
      */
     private static Bitmap readBitmapFromByteArray(byte[] data, int width, int height) {
-        BitmapFactory.Options options = new BitmapFactory.Options();
-        options.inJustDecodeBounds = true;
-        BitmapFactory.decodeByteArray(data, 0, data.length, options);
-        float srcWidth = options.outWidth;
-        float srcHeight = options.outHeight;
-        int inSampleSize = 1;
-
-        if (srcHeight > height || srcWidth > width) {
-            if (srcWidth > srcHeight) {
-                inSampleSize = Math.round(srcHeight / height);
-            } else {
-                inSampleSize = Math.round(srcWidth / width);
-            }
-        }
-
-        options.inJustDecodeBounds = false;
-        options.inSampleSize = inSampleSize;
-
-        return BitmapFactory.decodeByteArray(data, 0, data.length, options);
-    }
-
-    /**
-     * 获取缩放后的本地图片
-     *
-     * @param filePath 文件路径
-     * @return
-     */
-    private static Bitmap readBitmapFromAssetsFile(Context context, String filePath) {
-        Bitmap image = null;
-        AssetManager am = context.getResources().getAssets();
         try {
-            InputStream is = am.open(filePath);
-            image = BitmapFactory.decodeStream(is);
-            is.close();
-        } catch (IOException e) {
+
+            int displaypixels = width / 2 * height / 2;
+            BitmapFactory.Options opts = new BitmapFactory.Options();
+            // 这3句是处理图片溢出的begin( 如果不需要处理溢出直接 opts.inSampleSize=1;)
+            opts.inJustDecodeBounds = true;
+            BitmapFactory.decodeByteArray(data, 0, data.length, opts);
+            opts.inSampleSize = computeSampleSize(opts, -1, displaypixels);
+            // end
+            opts.inJustDecodeBounds = false;
+            Bitmap bitmap = BitmapFactory
+                    .decodeByteArray(data, 0, data.length, opts);
+
+            return bitmap;
+        } catch (Exception e) {
             e.printStackTrace();
         }
-        return image;
+        return null;
+    }
+
+
+    private static byte[] getBytes(InputStream input) throws IOException {
+        ByteArrayOutputStream result = new ByteArrayOutputStream();
+        copy(input, result);
+        result.close();
+        return result.toByteArray();
+    }
+
+    private static void copy(InputStream input, OutputStream output) throws IOException {
+        copy(input, output, 2048);
+    }
+
+    private static void copy(InputStream input, OutputStream output, int bufferSize) throws IOException {
+        byte[] buf = new byte[bufferSize];
+
+        for (int bytesRead = input.read(buf); bytesRead != -1; bytesRead = input.read(buf)) {
+            output.write(buf, 0, bytesRead);
+        }
+
+        output.flush();
+    }
+
+    private static int computeSampleSize(BitmapFactory.Options options,
+                                         int minSideLength, int maxNumOfPixels) {
+        int initialSize = computeInitialSampleSize(options, minSideLength,
+                maxNumOfPixels);
+
+        int roundedSize;
+        if (initialSize <= 8) {
+            roundedSize = 1;
+            while (roundedSize < initialSize) {
+                roundedSize <<= 1;
+            }
+        } else {
+            roundedSize = (initialSize + 7) / 8 * 8;
+        }
+
+        return roundedSize;
+    }
+
+    private static int computeInitialSampleSize(BitmapFactory.Options options,
+                                                int minSideLength, int maxNumOfPixels) {
+        double w = options.outWidth;
+        double h = options.outHeight;
+        int lowerBound = (maxNumOfPixels == -1) ? 1 : (int) Math.ceil(Math
+                .sqrt(w * h / maxNumOfPixels));
+        int upperBound = (minSideLength == -1) ? 128 : (int) Math.min(
+                Math.floor(w / minSideLength), Math.floor(h / minSideLength));
+        if (upperBound < lowerBound) {
+            // return the larger one when there is no overlapping zone.
+            return lowerBound;
+        }
+        if ((maxNumOfPixels == -1) && (minSideLength == -1)) {
+            return 1;
+        } else if (minSideLength == -1) {
+            return lowerBound;
+        } else {
+            return upperBound;
+        }
     }
 
     /**
@@ -599,7 +616,7 @@ public class ImageUtil {
             File desFile = new File(filePath);
             FileOutputStream fos = new FileOutputStream(desFile);
             BufferedOutputStream bos = new BufferedOutputStream(fos);
-            b.compress(Bitmap.CompressFormat.PNG, quality, bos);
+            b.compress(Bitmap.CompressFormat.JPEG, quality, bos);
             bos.flush();
             bos.close();
         } catch (IOException e) {

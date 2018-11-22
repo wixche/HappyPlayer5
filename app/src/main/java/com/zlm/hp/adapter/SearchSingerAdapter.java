@@ -65,7 +65,7 @@ public class SearchSingerAdapter extends RecyclerView.Adapter<RecyclerView.ViewH
      */
     private void reshViewHolder(final int position, final SearchSingerViewHolder viewHolder, final SingerInfo singerInfo) {
         String filePath = ResourceUtil.getFilePath(mContext, ResourceConstants.PATH_SINGER, (singerInfo.getSingerName() + File.separator + singerInfo.getImageUrl().hashCode() + ".jpg"));
-        ImageUtil.loadImage(mContext, filePath, singerInfo.getImageUrl(), true, viewHolder.getSingPicImg(), 720, 1080, new AsyncHandlerTask(mUIHandler, mWorkerHandler), null);
+        ImageUtil.loadSingerPic(mContext, filePath, singerInfo.getImageUrl(), true, viewHolder.getSingPicImg(), 720, 1080, new AsyncHandlerTask(mUIHandler, mWorkerHandler), null);
         if (contains(singerInfo)) {
             viewHolder.getSelectedImg().setVisibility(View.VISIBLE);
             viewHolder.getUnSelectImg().setVisibility(View.INVISIBLE);
@@ -136,6 +136,11 @@ public class SearchSingerAdapter extends RecyclerView.Adapter<RecyclerView.ViewH
     @Override
     public int getItemCount() {
         return mDatas.size();
+    }
+
+    @Override
+    public int getItemViewType(int position) {
+        return super.getItemViewType(position);
     }
 
     /////////////////////////////////////////////////////
