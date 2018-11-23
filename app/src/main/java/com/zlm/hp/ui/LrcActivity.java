@@ -1186,7 +1186,7 @@ public class LrcActivity extends BaseActivity {
         intent.putExtra("singerName", singerName);
         startActivity(intent);
         //
-        overridePendingTransition(0, 0);
+        overridePendingTransition(R.anim.in_from_bottom, 0);
     }
 
     /**

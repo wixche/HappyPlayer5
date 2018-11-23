@@ -8,7 +8,7 @@
     <ImageView
         android:id="@+id/backImg"
         android:layout_width="@dimen/title_img_size"
-        android:layout_height="@dimen/title_img_size"
+        android:layout_height="27dp"
         android:layout_centerVertical="true"
         android:layout_marginLeft="5dp"
         android:background="@drawable/back_button"

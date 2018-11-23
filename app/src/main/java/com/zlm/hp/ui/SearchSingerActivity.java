@@ -3,7 +3,6 @@ package com.zlm.hp.ui;
 import android.os.Bundle;
 import android.os.Message;
 import android.support.v7.widget.GridLayoutManager;
-import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.text.TextUtils;
 import android.view.View;
@@ -27,7 +26,6 @@ import com.zlm.hp.util.ImageUtil;
 import com.zlm.hp.util.ToastUtil;
 import com.zlm.hp.widget.ButtonRelativeLayout;
 import com.zlm.hp.widget.IconfontTextView;
-import com.zlm.libs.widget.SwipeBackLayout;
 
 import java.util.ArrayList;
 import java.util.Date;
@@ -40,11 +38,6 @@ import java.util.Map;
  * @date: 2018-11-18 18:12
  **/
 public class SearchSingerActivity extends BaseActivity {
-
-    /**
-     *
-     */
-    private SwipeBackLayout mSwipeBackLayout;
 
     /**
      * 歌手名称
@@ -99,16 +92,6 @@ public class SearchSingerActivity extends BaseActivity {
             mSingerName = getString(R.string.search_singer_text);
         }
 
-        mSwipeBackLayout = findViewById(R.id.swipeback_layout);
-        mSwipeBackLayout.setSwipeBackLayoutListener(new SwipeBackLayout.SwipeBackLayoutListener() {
-
-            @Override
-            public void finishActivity() {
-
-                finish();
-                overridePendingTransition(0, 0);
-            }
-        });
 
         TextView titleView = findViewById(R.id.title);
         titleView.setText(mSingerName);
@@ -118,7 +101,7 @@ public class SearchSingerActivity extends BaseActivity {
         backImg.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                mSwipeBackLayout.closeView();
+                closeActivity();
             }
         });
 
@@ -178,7 +161,7 @@ public class SearchSingerActivity extends BaseActivity {
             //发重新加载数据广播
             AudioBroadcastReceiver.sendReloadSingerImgReceiver(mContext, mHash);
         }
-        mSwipeBackLayout.closeView();
+        closeActivity();
     }
 
     /**
@@ -264,9 +247,13 @@ public class SearchSingerActivity extends BaseActivity {
         mLoadingContainer.setVisibility(View.GONE);
     }
 
-    @Override
-    public void onBackPressed() {
-        mSwipeBackLayout.closeView();
+    private void closeActivity() {
+        finish();
+        overridePendingTransition(0, R.anim.out_to_bottom);
     }
 
+    @Override
+    public void onBackPressed() {
+        closeActivity();
+    }
 }
