@@ -7,6 +7,8 @@ import com.zlm.hp.constants.ResourceConstants;
 import com.zlm.hp.entity.LrcInfo;
 import com.zlm.hp.http.HttpReturnResult;
 import com.zlm.hp.lyrics.LyricsReader;
+import com.zlm.hp.lyrics.model.LyricsInfo;
+import com.zlm.hp.lyrics.utils.LyricsIOUtils;
 import com.zlm.hp.lyrics.utils.LyricsUtils;
 import com.zlm.hp.receiver.AudioBroadcastReceiver;
 import com.zlm.hp.util.HttpUtil;
@@ -91,6 +93,34 @@ public class LyricsManager {
                 AudioBroadcastReceiver.sendLrcLoadedReceiver(mContext, hash);
             }
         });
+    }
+
+    /**
+     * 设置歌词读取器
+     *
+     * @param key
+     * @param lyricsReader
+     */
+    public void setLyricsReader(String key, LyricsReader lyricsReader) {
+        if (mLyricsReaderCache.containsKey(key)) {
+            mLyricsReaderCache.remove(key);
+        }
+        mLyricsReaderCache.put(key, new SoftReference<LyricsReader>(lyricsReader));
+        //保存歌词文件
+        saveLrcFile(lyricsReader.getLrcFilePath(), lyricsReader.getLyricsInfo());
+    }
+
+    /**
+     * @param lrcFilePath
+     * @param lyricsInfo
+     */
+    private void saveLrcFile(String lrcFilePath, LyricsInfo lyricsInfo) {
+        //保存修改的歌词文件
+        try {
+            LyricsIOUtils.getLyricsFileWriter(lrcFilePath).writer(lyricsInfo, lrcFilePath);
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
     }
 
     /**

@@ -53,7 +53,8 @@
         <service android:name="com.zlm.hp.service.AudioPlayerService" />
 
         <activity android:name=".LrcActivity" />
-        <activity android:name=".SearchSingerActivity"></activity>
+        <activity android:name=".SearchSingerActivity" />
+        <activity android:name=".SearchLrcActivity"></activity>
     </application>
 
 </manifest>

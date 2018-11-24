@@ -108,6 +108,9 @@
     <string name="font_size_text">字体大小</string>
     <string name="font_color_text">字体颜色</string>
     <string name="select_singer_text">请选择歌手</string>
+    <string name="select_song_text">请选择歌曲</string>
+    <string name="play_song_text">请先播放歌曲</string>
+    <string name="setting_song_text">歌词设置成功</string>
 
     //歌曲详情窗口
     <string name="singer_text">歌手</string>
@@ -117,7 +120,11 @@
 
     <string name="unknow">未知</string>
     <string name="loading_tip">正在加载数据，请稍候...</string>
+    <string name="input_key">请输入关键字</string>
 
     <string name="help_tip">Github：https://github.com/zhangliangming\n联系方式：316257874@qq.com\n声明：仅用于学习用途</string>
+
+    <!-- TODO: Remove or change this placeholder text -->
+    <string name="hello_blank_fragment">Hello blank fragment</string>
 
 </resources>

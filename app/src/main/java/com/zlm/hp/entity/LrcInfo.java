@@ -1,12 +1,15 @@
 package com.zlm.hp.entity;
 
+import android.os.Parcel;
+import android.os.Parcelable;
+
 /**
  * @Description: 歌词信息类
  * @author: zhangliangming
  * @date: 2018-07-31 23:59
  **/
 
-public class LrcInfo {
+public class LrcInfo implements Parcelable{
     /**
      * 歌词id
      */
@@ -42,6 +45,50 @@ public class LrcInfo {
      * 歌词格式
      */
     private String fmt;
+
+    public LrcInfo(){
+
+    }
+
+    protected LrcInfo(Parcel in) {
+        id = in.readString();
+        accesskey = in.readString();
+        duration = in.readString();
+        singerName = in.readString();
+        songName = in.readString();
+        charset = in.readString();
+        content = in.readString();
+        fmt = in.readString();
+    }
+
+    @Override
+    public void writeToParcel(Parcel dest, int flags) {
+        dest.writeString(id);
+        dest.writeString(accesskey);
+        dest.writeString(duration);
+        dest.writeString(singerName);
+        dest.writeString(songName);
+        dest.writeString(charset);
+        dest.writeString(content);
+        dest.writeString(fmt);
+    }
+
+    @Override
+    public int describeContents() {
+        return 0;
+    }
+
+    public static final Creator<LrcInfo> CREATOR = new Creator<LrcInfo>() {
+        @Override
+        public LrcInfo createFromParcel(Parcel in) {
+            return new LrcInfo(in);
+        }
+
+        @Override
+        public LrcInfo[] newArray(int size) {
+            return new LrcInfo[size];
+        }
+    };
 
     public String getId() {
         return id;

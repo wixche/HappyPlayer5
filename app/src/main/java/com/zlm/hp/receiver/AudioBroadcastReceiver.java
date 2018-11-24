@@ -93,6 +93,16 @@ public class AudioBroadcastReceiver {
      */
     public static final int ACTION_CODE_RELOADSINGERIMG = 10;
 
+    /**
+     * 歌词重新加载
+     */
+    public static final int ACTION_CODE_LRCRELOADED = 11;
+
+    /**
+     * 歌词重新加载中
+     */
+    public static final int ACTION_CODE_LRCRELOADING = 12;
+
     private BroadcastReceiver mBroadcastReceiver;
     private IntentFilter mIntentFilter;
     private AudioReceiverListener mReceiverListener;
@@ -263,6 +273,28 @@ public class AudioBroadcastReceiver {
         Bundle bundle = new Bundle();
         bundle.putString(ACTION_DATA_KEY, hash);
         sendReceiver(context, ACTION_CODE_LRCLOADED, ACTION_BUNDLEKEY, bundle);
+    }
+
+    /**
+     * 发lrc reloading
+     *
+     * @param context
+     */
+    public static void sendLrcReLoadingReceiver(Context context, String hash) {
+        Bundle bundle = new Bundle();
+        bundle.putString(ACTION_DATA_KEY, hash);
+        sendReceiver(context, ACTION_CODE_LRCRELOADING, ACTION_BUNDLEKEY, bundle);
+    }
+
+    /**
+     * 发lrc reloaded
+     *
+     * @param context
+     */
+    public static void sendLrcReLoadedReceiver(Context context, String hash) {
+        Bundle bundle = new Bundle();
+        bundle.putString(ACTION_DATA_KEY, hash);
+        sendReceiver(context, ACTION_CODE_LRCRELOADED, ACTION_BUNDLEKEY, bundle);
     }
 
     /**

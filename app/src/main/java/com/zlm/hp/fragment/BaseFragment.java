@@ -38,7 +38,7 @@ public abstract class BaseFragment extends Fragment {
     /**
      * 是否是第一次可视
      */
-    private boolean mIsFristVisibleToUser = false;
+    private boolean mIsFristVisibleToUser;
 
     /**
      *
@@ -101,14 +101,11 @@ public abstract class BaseFragment extends Fragment {
 
     private RefreshListener mRefreshListener;
 
-    public BaseFragment() {
-        init();
-    }
-
     /**
      * 初始化
      */
     private void init() {
+        this.mIsFristVisibleToUser = false;
         this.mContext = ContextUtil.getContext();
         //创建ui handler
         mUIHandler = new WeakRefHandler(Looper.getMainLooper(), this, new Handler.Callback() {
@@ -149,6 +146,7 @@ public abstract class BaseFragment extends Fragment {
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
+        init();
         mStatusBarViewBG = ColorUtil.parserColor(ContextCompat.getColor(mContext, R.color.defColor));
         preInitStatusBar();
         View mainView = inflater.inflate(R.layout.fragment_base, container, false);

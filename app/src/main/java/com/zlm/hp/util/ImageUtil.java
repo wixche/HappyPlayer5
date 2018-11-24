@@ -1,9 +1,17 @@
 package com.zlm.hp.util;
 
+import android.annotation.SuppressLint;
 import android.content.Context;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
+import android.graphics.Canvas;
+import android.graphics.Color;
+import android.graphics.ColorMatrix;
+import android.graphics.ColorMatrixColorFilter;
+import android.graphics.Matrix;
+import android.graphics.Paint;
 import android.graphics.drawable.BitmapDrawable;
+import android.os.AsyncTask;
 import android.util.LruCache;
 import android.view.View;
 import android.widget.ImageView;
@@ -21,7 +29,6 @@ import com.zlm.hp.widget.TransitionImageView;
 import java.io.BufferedOutputStream;
 import java.io.ByteArrayOutputStream;
 import java.io.File;
-import java.io.FileInputStream;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
@@ -247,58 +254,6 @@ public class ImageUtil {
                 }
 
                 startSingerImage(singerImageView, returnResult);
-
-//                for (int i = 0; i < finalSingerNameArray.length; i++) {
-//                    final String searchSingerName = finalSingerNameArray[i];
-//                    //数据库中获取图片
-//                    List<SingerInfo> listResult = SingerInfoDB.getAllSingerImage(context, searchSingerName);
-//                    if (listResult != null && listResult.size() > 0) {
-//
-//                        for (int j = 0; j < listResult.size(); j++) {
-//                            SingerInfo singerInfo = listResult.get(j);
-//                            String imageUrl = singerInfo.getImageUrl();
-//
-//                            ZLog.d(new CodeLineUtil().getCodeLineInfo(), "loadSingerImage db imageUrl ->" + imageUrl);
-//                            ImageUtil.loadSingerImage(context, asyncHandlerTask, singerInfo.getSingerName(), imageUrl, askWifi);
-//
-//                        }
-//
-//                        returnResult.addAll(listResult);
-//                        startSingerImage(singerImageView, returnResult);
-//                        continue;
-//                    }
-//
-//                    APIHttpClient apiHttpClient = HttpUtil.getHttpClient();
-//                    HttpReturnResult httpReturnResult = apiHttpClient.getSingerPicList(context, searchSingerName, askWifi);
-//                    if (httpReturnResult.isSuccessful()) {
-//                        Map<String, Object> mapResult = (Map<String, Object>) httpReturnResult.getResult();
-//                        List<SingerInfo> lists = (List<SingerInfo>) mapResult.get("rows");
-//                        listResult = new ArrayList<SingerInfo>();
-//                        if (lists != null) {
-//                            int maxSize = 3;
-//                            int size = lists.size() > maxSize ? maxSize : lists.size();
-//                            if (size > 0) {
-//                                for (int k = 0; k < size; k++) {
-//                                    SingerInfo singerInfo = lists.get(k);
-//                                    String imageUrl = singerInfo.getImageUrl();
-//
-//                                    ZLog.d(new CodeLineUtil().getCodeLineInfo(), "loadSingerImage http url imageUrl ->" + imageUrl);
-//                                    ImageUtil.loadSingerImage(context, asyncHandlerTask, singerInfo.getSingerName(), imageUrl, askWifi);
-//
-//                                    singerInfo.setCreateTime(DateUtil.parseDateToString(new Date()));
-//                                    SingerInfoDB.add(context, singerInfo);
-//
-//                                    listResult.add(singerInfo);
-//                                }
-//                            }
-//                        }
-//                        //
-//                        if (listResult != null && listResult.size() > 0) {
-//                            returnResult.addAll(listResult);
-//                            startSingerImage(singerImageView, returnResult);
-//                        }
-//                    }
-//                }
                 return null;
             }
         });
@@ -622,6 +577,71 @@ public class ImageUtil {
         } catch (IOException e) {
             e.printStackTrace();
         }
+    }
+
+    /**
+     * 获取转换颜色的图标
+     *
+     * @param imageView
+     * @param resourceId     图片资源id
+     * @param translateColor 需要转换成的颜色
+     * @return
+     */
+    public static void getTranslateColorImg(final Context context, final ImageView imageView, final int resourceId, final int translateColor) {
+
+        final String key = resourceId + "";
+
+        new AsyncTask<String, Integer, Bitmap>() {
+
+            @Override
+            protected Bitmap doInBackground(String... params) {
+
+                if (mImageCache.get(key) != null) {
+                    return mImageCache.get(key);
+                }
+
+                Bitmap baseBitmap = BitmapFactory.decodeResource(context.getResources(), resourceId);
+
+                Bitmap defBitmap = Bitmap.createBitmap(baseBitmap.getWidth(),
+                        baseBitmap.getHeight(), baseBitmap.getConfig());
+                Canvas pCanvas = new Canvas(defBitmap);
+                Paint paint = new Paint();
+                paint.setDither(true);
+                paint.setAntiAlias(true);
+
+                float progressR = Color.red(translateColor) / 255f;
+                float progressG = Color.green(translateColor) / 255f;
+                float progressB = Color.blue(translateColor) / 255f;
+                float progressA = Color.alpha(translateColor) / 255f;
+
+                // 根据SeekBar定义RGBA的矩阵
+                float[] src = new float[]{progressR, 0, 0, 0, 0, 0, progressG, 0,
+                        0, 0, 0, 0, progressB, 0, 0, 0, 0, 0, progressA, 0};
+                // 定义ColorMatrix，并指定RGBA矩阵
+                ColorMatrix colorMatrix = new ColorMatrix();
+                colorMatrix.set(src);
+                // 设置Paint的颜色
+                paint.setColorFilter(new ColorMatrixColorFilter(src));
+                // 通过指定了RGBA矩阵的Paint把原图画到空白图片上
+                pCanvas.drawBitmap(baseBitmap, new Matrix(), paint);
+
+
+                return defBitmap;
+            }
+
+            @SuppressLint("NewApi")
+            @Override
+            protected void onPostExecute(Bitmap result) {
+
+                if (result != null) {
+                    imageView.setImageDrawable(new BitmapDrawable(result));
+
+                    if (mImageCache.get(key) == null) {
+                        mImageCache.put(key, result);
+                    }
+                }
+            }
+        }.execute("");
     }
 
     /**

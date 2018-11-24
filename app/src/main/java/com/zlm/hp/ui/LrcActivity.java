@@ -769,6 +769,32 @@ public class LrcActivity extends BaseActivity {
         mViewStubMoreMenu = findViewById(R.id.vs_more_menu);
         mViewStubMoreMenu.inflate();
 
+        //搜索歌词
+        ImageView lrcImgV = findViewById(R.id.search_lrc);
+        lrcImgV.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                final AudioInfo audioInfo = AudioPlayerManager.newInstance(mContext).getCurSong(mConfigInfo.getPlayHash());
+                if (audioInfo != null) {
+
+                    hideMoreMenuView();
+
+                    //
+                    if (AudioPlayerManager.newInstance(mContext).getPlayStatus() == AudioPlayerManager.PLAYING) {
+                        Intent intent = new Intent(LrcActivity.this, SearchLrcActivity.class);
+                        startActivity(intent);
+                        //
+                        overridePendingTransition(R.anim.in_from_bottom, 0);
+                    } else {
+                        ToastUtil.showTextToast(mContext, getString(R.string.play_song_text));
+                    }
+
+                } else {
+                    ToastUtil.showTextToast(mContext, getString(R.string.select_song_text));
+                }
+            }
+        });
+
         //歌手
         ImageView singerImgV = findViewById(R.id.search_singer_pic);
         singerImgV.setOnClickListener(new View.OnClickListener() {
@@ -810,6 +836,8 @@ public class LrcActivity extends BaseActivity {
                         showSearchSingerView(singerName, audioInfo.getHash());
 
                     }
+                } else {
+                    ToastUtil.showTextToast(mContext, getString(R.string.select_singer_text));
                 }
             }
         });
@@ -842,6 +870,8 @@ public class LrcActivity extends BaseActivity {
                     } else {
                         showSongInfoView(audioInfo);
                     }
+                } else {
+                    ToastUtil.showTextToast(mContext, getString(R.string.select_song_text));
                 }
             }
         });
@@ -1597,6 +1627,36 @@ public class LrcActivity extends BaseActivity {
                         }
                     }
                 }
+                break;
+
+            case AudioBroadcastReceiver.ACTION_CODE_LRCRELOADING:
+                //歌词重新加载中
+                AudioInfo curAudioInfoTemp1 = AudioPlayerManager.newInstance(mContext).getCurSong(mConfigInfo.getPlayHash());
+                LyricsReader oldLyricsReader = mManyLineLyricsView.getLyricsReader();
+                if (oldLyricsReader == null || oldLyricsReader.getHash().equals(curAudioInfoTemp1.getHash())) {
+                    //加载中
+                    mManyLineLyricsView.initLrcData();
+                    mManyLineLyricsView.setLrcStatus(AbstractLrcView.LRCSTATUS_LOADING);
+                }
+
+                break;
+            case AudioBroadcastReceiver.ACTION_CODE_LRCRELOADED:
+                //歌词重新加载
+                Bundle lrcreloadedBundle = intent.getBundleExtra(AudioBroadcastReceiver.ACTION_BUNDLEKEY);
+                String reloadlrcHash = lrcreloadedBundle.getString(AudioBroadcastReceiver.ACTION_DATA_KEY);
+                AudioInfo curAudioInfoTemp = AudioPlayerManager.newInstance(mContext).getCurSong(mConfigInfo.getPlayHash());
+                if (curAudioInfoTemp != null && reloadlrcHash.equals(curAudioInfoTemp.getHash())) {
+                    LyricsReader newLyricsReader = LyricsManager.newInstance(mContext).getLyricsReader(reloadlrcHash);
+                    if (newLyricsReader != null) {
+                        mManyLineLyricsView.setLyricsReader(newLyricsReader);
+                    }
+                    if (newLyricsReader != null) {
+                        if (mManyLineLyricsView.getLrcStatus() == AbstractLrcView.LRCSTATUS_LRC) {
+                            mManyLineLyricsView.seekto((int) curAudioInfoTemp.getPlayProgress());
+                        }
+                    }
+                }
+
                 break;
 
             case AudioBroadcastReceiver.ACTION_CODE_RELOADSINGERIMG:

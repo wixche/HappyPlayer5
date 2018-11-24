@@ -291,7 +291,7 @@ public class SongFragment extends BaseFragment {
      */
     private void loadMoreData() {
         try {
-            Thread.sleep(500);
+            Thread.sleep(200);
         } catch (InterruptedException e) {
             e.printStackTrace();
         }
@@ -334,7 +334,7 @@ public class SongFragment extends BaseFragment {
     private void loadRefreshData() {
 
         try {
-            Thread.sleep(500);
+            Thread.sleep(200);
         } catch (InterruptedException e) {
             e.printStackTrace();
         }
