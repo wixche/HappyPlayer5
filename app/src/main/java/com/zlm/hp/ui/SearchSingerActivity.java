@@ -26,6 +26,7 @@ import com.zlm.hp.util.ImageUtil;
 import com.zlm.hp.util.ToastUtil;
 import com.zlm.hp.widget.ButtonRelativeLayout;
 import com.zlm.hp.widget.IconfontTextView;
+import com.zlm.libs.widget.SwipeBackLayout;
 
 import java.util.ArrayList;
 import java.util.Date;
@@ -38,6 +39,11 @@ import java.util.Map;
  * @date: 2018-11-18 18:12
  **/
 public class SearchSingerActivity extends BaseActivity {
+
+    /**
+     *
+     */
+    private SwipeBackLayout mSwipeBackLayout;
 
     /**
      * 歌手名称
@@ -92,6 +98,16 @@ public class SearchSingerActivity extends BaseActivity {
             mSingerName = getString(R.string.search_singer_text);
         }
 
+        mSwipeBackLayout = findViewById(R.id.swipeback_layout);
+        mSwipeBackLayout.setSwipeBackLayoutListener(new SwipeBackLayout.SwipeBackLayoutListener() {
+
+            @Override
+            public void finishActivity() {
+
+                finish();
+                overridePendingTransition(0, 0);
+            }
+        });
 
         TextView titleView = findViewById(R.id.title);
         titleView.setText(mSingerName);
@@ -101,7 +117,7 @@ public class SearchSingerActivity extends BaseActivity {
         backImg.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                closeActivity();
+                mSwipeBackLayout.closeView();
             }
         });
 
@@ -133,6 +149,10 @@ public class SearchSingerActivity extends BaseActivity {
         mContentContainer = findViewById(R.id.content);
         showLoadingView();
 
+        mDatas = new ArrayList<SingerInfo>();
+        mAdapter = new SearchSingerAdapter(mContext, mDatas, mSelectDatas, mUIHandler, mWorkerHandler);
+        mRecyclerView.setAdapter(mAdapter);
+
         mWorkerHandler.sendEmptyMessageDelayed(MESSAGE_CODE_LOADDATA, 500);
     }
 
@@ -161,7 +181,7 @@ public class SearchSingerActivity extends BaseActivity {
             //发重新加载数据广播
             AudioBroadcastReceiver.sendReloadSingerImgReceiver(mContext, mHash);
         }
-        closeActivity();
+        mSwipeBackLayout.closeView();
     }
 
     /**
@@ -199,8 +219,7 @@ public class SearchSingerActivity extends BaseActivity {
                     ToastUtil.showTextToast(mContext, HttpReturnResult.ERROR_MSG_NULLDATA);
                 }
 
-                mAdapter = new SearchSingerAdapter(mContext, mDatas, mSelectDatas, mUIHandler, mWorkerHandler);
-                mRecyclerView.setAdapter(mAdapter);
+
                 mAdapter.notifyDataSetChanged();
 
                 showContentView();
@@ -220,9 +239,7 @@ public class SearchSingerActivity extends BaseActivity {
                 HttpReturnResult httpReturnResult = apiHttpClient.getSingerPicList(mContext, mSingerName, configInfo.isWifi());
                 if (httpReturnResult.isSuccessful()) {
                     Map<String, Object> mapResult = (Map<String, Object>) httpReturnResult.getResult();
-                    mDatas = (List<SingerInfo>) mapResult.get("rows");
-                } else {
-                    mDatas = new ArrayList<SingerInfo>();
+                    mDatas.addAll((List<SingerInfo>) mapResult.get("rows"));
                 }
 
                 //数据库数据
@@ -247,13 +264,9 @@ public class SearchSingerActivity extends BaseActivity {
         mLoadingContainer.setVisibility(View.GONE);
     }
 
-    private void closeActivity() {
-        finish();
-        overridePendingTransition(0, R.anim.out_to_bottom);
-    }
-
     @Override
     public void onBackPressed() {
-        closeActivity();
+        mSwipeBackLayout.closeView();
     }
+
 }

@@ -1,9 +1,8 @@
 <?xml version="1.0" encoding="utf-8"?>
-<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<com.zlm.libs.widget.SwipeBackLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:tools="http://schemas.android.com/tools"
     android:id="@+id/swipeback_layout"
     android:layout_width="match_parent"
-    android:orientation="vertical"
     android:layout_height="match_parent"
     tools:context="com.zlm.hp.ui.SearchSingerActivity">
 
@@ -19,85 +18,80 @@
             android:layout_height="wrap_content"
             android:visibility="gone" />
 
-        <LinearLayout
-            android:layout_width="match_parent"
-            android:layout_height="match_parent"
-            android:orientation="vertical">
 
-            <include
-                layout="@layout/layout_title"
-                android:layout_width="match_parent"
-                android:layout_height="@dimen/title_height" />
+        <include
+            layout="@layout/layout_title"
+            android:layout_width="match_parent"
+            android:layout_height="@dimen/title_height" />
+
+        <RelativeLayout
+            android:layout_width="match_parent"
+            android:layout_height="match_parent">
+
 
             <RelativeLayout
+                android:id="@+id/loading"
                 android:layout_width="match_parent"
                 android:layout_height="match_parent">
 
 
-                <RelativeLayout
-                    android:id="@+id/loading"
-                    android:layout_width="match_parent"
-                    android:layout_height="match_parent">
+                <com.zlm.hp.widget.IconfontTextView
+                    android:id="@+id/load_img"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_centerInParent="true"
+                    android:layout_centerVertical="true"
+                    android:text="@string/loading_img"
+                    android:textColor="@color/def_bar_title_color"
+                    android:textSize="@dimen/base_img_height" />
 
 
-                    <com.zlm.hp.widget.IconfontTextView
-                        android:id="@+id/load_img"
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:layout_centerInParent="true"
-                        android:layout_centerVertical="true"
-                        android:text="@string/loading_img"
-                        android:textColor="@color/def_bar_title_color"
-                        android:textSize="@dimen/base_img_height" />
-
-
-                </RelativeLayout>
-
-                <RelativeLayout
-                    android:id="@+id/content"
-                    android:layout_width="match_parent"
-                    android:layout_height="match_parent"
-                    android:visibility="invisible">
-
-                    <android.support.v7.widget.RecyclerView
-                        android:id="@+id/recyclerView"
-                        android:layout_width="match_parent"
-                        android:layout_height="match_parent"
-                        android:layout_above="@+id/bottomlayout"
-                        android:overScrollMode="never"></android.support.v7.widget.RecyclerView>
-
-                    <LinearLayout
-                        android:id="@+id/bottomlayout"
-                        android:layout_width="match_parent"
-                        android:layout_height="55dp"
-                        android:layout_alignParentBottom="true"
-                        android:orientation="vertical">
-
-
-                        <com.zlm.hp.widget.ButtonRelativeLayout
-                            android:id="@+id/surebtn"
-                            android:layout_width="match_parent"
-                            android:layout_height="match_parent"
-                            android:layout_centerHorizontal="true"
-                            android:layout_margin="10dp"
-                            android:clickable="true">
-
-                            <TextView
-
-                                android:layout_width="wrap_content"
-                                android:layout_height="match_parent"
-                                android:layout_centerHorizontal="true"
-                                android:layout_margin="8dp"
-                                android:text="确定"
-                                android:textColor="#fff" />
-
-
-                        </com.zlm.hp.widget.ButtonRelativeLayout>
-                    </LinearLayout>
-                </RelativeLayout>
             </RelativeLayout>
 
-        </LinearLayout>
+            <RelativeLayout
+                android:id="@+id/content"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:visibility="gone">
+
+                <android.support.v7.widget.RecyclerView
+                    android:id="@+id/recyclerView"
+                    android:layout_width="match_parent"
+                    android:layout_height="match_parent"
+                    android:layout_above="@+id/bottomlayout"
+                    android:overScrollMode="never"></android.support.v7.widget.RecyclerView>
+
+                <LinearLayout
+                    android:id="@+id/bottomlayout"
+                    android:layout_width="match_parent"
+                    android:layout_height="55dp"
+                    android:layout_alignParentBottom="true"
+                    android:orientation="vertical">
+
+
+                    <com.zlm.hp.widget.ButtonRelativeLayout
+                        android:id="@+id/surebtn"
+                        android:layout_width="match_parent"
+                        android:layout_height="match_parent"
+                        android:layout_centerHorizontal="true"
+                        android:layout_margin="10dp"
+                        android:clickable="true">
+
+                        <TextView
+
+                            android:layout_width="wrap_content"
+                            android:layout_height="match_parent"
+                            android:layout_centerHorizontal="true"
+                            android:layout_margin="8dp"
+                            android:text="确定"
+                            android:textColor="#fff" />
+
+
+                    </com.zlm.hp.widget.ButtonRelativeLayout>
+                </LinearLayout>
+            </RelativeLayout>
+        </RelativeLayout>
+
     </LinearLayout>
 
-</LinearLayout>
+</com.zlm.libs.widget.SwipeBackLayout>
