@@ -230,6 +230,12 @@ public class SearchLrcActivity extends BaseActivity {
         mSearchBtn.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
+
+                //关闭输入法
+                InputMethodManager im = (InputMethodManager) getSystemService(Context.INPUT_METHOD_SERVICE);
+                im.hideSoftInputFromWindow(getCurrentFocus().getApplicationWindowToken(), InputMethodManager.HIDE_NOT_ALWAYS);
+
+
                 doSearch();
             }
         });
@@ -341,6 +347,7 @@ public class SearchLrcActivity extends BaseActivity {
 
             case MESSAGE_WHAT_SEARCN_LRC:
 
+                mLrcViews = new ArrayList<Fragment>();
                 HttpReturnResult httpReturnResult = (HttpReturnResult) msg.obj;
                 if (httpReturnResult.isSuccessful()) {
                     Map<String, Object> returnResult = (Map<String, Object>) httpReturnResult.getResult();
@@ -349,9 +356,9 @@ public class SearchLrcActivity extends BaseActivity {
                         mSearchLrcDatas.addAll(lists);
 
                         mCurIndexTv.setText("1");
-                        mSumTv.setText(mSearchLrcDatas.size() + "");
 
-                        mLrcViews = new ArrayList<Fragment>();
+
+
                         for (int i = 0; i < lists.size(); i++) {
 
                             LrcInfo lrcInfo = lists.get(i);
@@ -359,16 +366,16 @@ public class SearchLrcActivity extends BaseActivity {
 
                             mLrcViews.add(lrcFragment);
                         }
-
-                        mAdapter = new TabFragmentAdapter(getSupportFragmentManager(), mLrcViews);
-                        mViewPager.setAdapter(mAdapter);
-
                     } else {
                         ToastUtil.showTextToast(mContext, HttpReturnResult.ERROR_MSG_NULLDATA);
                     }
                 } else {
                     ToastUtil.showTextToast(mContext, httpReturnResult.getErrorMsg());
                 }
+
+                mSumTv.setText(mLrcViews.size() + "");
+                mAdapter = new TabFragmentAdapter(getSupportFragmentManager(), mLrcViews);
+                mViewPager.setAdapter(mAdapter);
                 showContentView();
 
                 break;
@@ -428,8 +435,6 @@ public class SearchLrcActivity extends BaseActivity {
             ToastUtil.showTextToast(getApplicationContext(), getString(R.string.input_key));
             return;
         }
-
-        mSumTv.setText("0");
         mCurIndexTv.setText("0");
         showLoadingView();
         mWorkerHandler.sendEmptyMessage(MESSAGE_WHAT_SEARCN_LRC);
