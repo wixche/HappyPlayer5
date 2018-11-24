@@ -2,11 +2,9 @@ package com.zlm.hp.ui;
 
 import android.content.Context;
 import android.content.Intent;
-import android.os.Message;
 import android.os.Bundle;
+import android.os.Message;
 import android.support.v4.app.Fragment;
-import android.support.v4.app.FragmentManager;
-import android.support.v4.app.FragmentTransaction;
 import android.support.v4.view.ViewPager;
 import android.text.Editable;
 import android.text.TextWatcher;
@@ -29,7 +27,6 @@ import com.zlm.hp.entity.LrcInfo;
 import com.zlm.hp.fragment.LrcFragment;
 import com.zlm.hp.http.APIHttpClient;
 import com.zlm.hp.http.HttpReturnResult;
-import com.zlm.hp.manager.AudioPlayerManager;
 import com.zlm.hp.receiver.AudioBroadcastReceiver;
 import com.zlm.hp.util.HttpUtil;
 import com.zlm.hp.util.ToastUtil;
@@ -43,6 +40,12 @@ import java.util.Map;
  * 歌词搜索
  */
 public class SearchLrcActivity extends BaseActivity {
+
+
+    /**
+     *
+     */
+    public static final String AUDIO_DATA_KEY = "audioDataKey";
 
     /**
      * 歌曲名称
@@ -302,7 +305,7 @@ public class SearchLrcActivity extends BaseActivity {
                 switch (code) {
                     case AudioBroadcastReceiver.ACTION_CODE_PLAYING:
 
-                        int playProgress = 0;
+                        int playProgress = (int) mAudioInfo.getDuration();
                         Bundle playingBundle = intent.getBundleExtra(AudioBroadcastReceiver.ACTION_BUNDLEKEY);
                         AudioInfo playingAudioInfo = playingBundle.getParcelable(AudioBroadcastReceiver.ACTION_DATA_KEY);
                         if (playingAudioInfo != null && mAudioInfo.getHash().equals(playingAudioInfo.getHash())) {
@@ -358,7 +361,6 @@ public class SearchLrcActivity extends BaseActivity {
                         mCurIndexTv.setText("1");
 
 
-
                         for (int i = 0; i < lists.size(); i++) {
 
                             LrcInfo lrcInfo = lists.get(i);
@@ -387,8 +389,7 @@ public class SearchLrcActivity extends BaseActivity {
         switch (msg.what) {
             case MESSAGE_WHAT_LOAD_DATA:
 
-                ConfigInfo configInfo = ConfigInfo.obtain();
-                mAudioInfo = AudioPlayerManager.newInstance(mContext).getCurSong(configInfo.getPlayHash());
+                mAudioInfo = getIntent().getParcelableExtra(AUDIO_DATA_KEY);
                 mUIHandler.sendEmptyMessage(MESSAGE_WHAT_LOAD_DATA);
 
                 break;

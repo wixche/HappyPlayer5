@@ -782,6 +782,7 @@ public class LrcActivity extends BaseActivity {
                     //
                     if (AudioPlayerManager.newInstance(mContext).getPlayStatus() == AudioPlayerManager.PLAYING) {
                         Intent intent = new Intent(LrcActivity.this, SearchLrcActivity.class);
+                        intent.putExtra(SearchLrcActivity.AUDIO_DATA_KEY,audioInfo);
                         startActivity(intent);
                         //
                         overridePendingTransition(R.anim.in_from_bottom, 0);
