@@ -132,8 +132,8 @@ public class LrcFragment extends BaseFragment {
                     hideTranslateImg.setVisibility(View.INVISIBLE);
                     showTranslateImg.setVisibility(View.INVISIBLE);
                     //音译歌词
-                    hideTransliterationImg.setVisibility(View.INVISIBLE);
-                    showTransliterationImg.setVisibility(View.VISIBLE);
+                    hideTransliterationImg.setVisibility(View.VISIBLE);
+                    showTransliterationImg.setVisibility(View.INVISIBLE);
 
                     //翻译歌词/音译歌词
                     showTTToTranslateImg.setVisibility(View.INVISIBLE);
@@ -146,8 +146,8 @@ public class LrcFragment extends BaseFragment {
                 case HASTRANSLATELRC:
 
                     //翻译歌词
-                    hideTranslateImg.setVisibility(View.INVISIBLE);
-                    showTranslateImg.setVisibility(View.VISIBLE);
+                    hideTranslateImg.setVisibility(View.VISIBLE);
+                    showTranslateImg.setVisibility(View.INVISIBLE);
                     //音译歌词
                     hideTransliterationImg.setVisibility(View.INVISIBLE);
                     showTransliterationImg.setVisibility(View.INVISIBLE);

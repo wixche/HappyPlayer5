@@ -77,7 +77,7 @@ dependencies {
     /**
      * 歌词
      */
-    implementation 'com.github.zhangliangming:HPLyrics:v1.51'
+    implementation 'com.github.zhangliangming:HPLyrics:v1.53'
     /**
      * 音频
      */
