@@ -15,6 +15,7 @@ import com.zlm.hp.http.HttpReturnResult;
 import com.zlm.hp.lyrics.LyricsReader;
 import com.zlm.hp.lyrics.widget.AbstractLrcView;
 import com.zlm.hp.lyrics.widget.ManyLyricsView;
+import com.zlm.hp.manager.AudioPlayerManager;
 import com.zlm.hp.manager.LyricsManager;
 import com.zlm.hp.receiver.AudioBroadcastReceiver;
 import com.zlm.hp.ui.R;
@@ -35,12 +36,16 @@ public class LrcFragment extends BaseFragment {
     /**
      *
      */
-    private static final String LRC_DATA_KEY = "lrcDataKey";
+    public static final String LRC_DATA_KEY = "lrcDataKey";
 
     /**
      *
      */
-    private static final String AUDIO_DATA_KEY = "audioDataKey";
+    public static final String AUDIO_DATA_KEY = "audioDataKey";
+    /**
+     *
+     */
+    private boolean isFristINVisibleToUser = false;
 
     /**
      *
@@ -184,6 +189,29 @@ public class LrcFragment extends BaseFragment {
     }
 
     @Override
+    public void setUserVisibleHint(boolean isVisibleToUser) {
+        super.setUserVisibleHint(isVisibleToUser);
+        if (mUIHandler != null && !getUserVisibleHint() && !isFristINVisibleToUser) {
+            isFristINVisibleToUser = true;
+            mUIHandler.postDelayed(new Runnable() {
+                @Override
+                public void run() {
+                    if (mAudioInfo != null) {
+                        AudioInfo audioInfo = AudioPlayerManager.newInstance(mContext).getCurSong(mConfigInfo.getPlayHash());
+                        if (audioInfo == null) {
+                            refreshView((int) mAudioInfo.getDuration());
+                        } else if (mAudioInfo.getHash().equals(audioInfo.getHash())) {
+                            refreshView((int) audioInfo.getPlayProgress());
+                        }
+                    }
+                }
+            }, 100);
+        } else if (getUserVisibleHint()) {
+            isFristINVisibleToUser = false;
+        }
+    }
+
+    @Override
     protected void isFristVisibleToUser() {
         initData();
     }
@@ -204,6 +232,7 @@ public class LrcFragment extends BaseFragment {
             mLrcInfo = getArguments().getParcelable(LRC_DATA_KEY);
         }
 
+        isFristINVisibleToUser = false;
         mConfigInfo = ConfigInfo.obtain();
 
         //歌词视图

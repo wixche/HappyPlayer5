@@ -20,7 +20,7 @@ import android.widget.RelativeLayout;
 import android.widget.TextView;
 
 import com.zlm.hp.PageTransformer.ZoomOutPageTransformer;
-import com.zlm.hp.adapter.TabFragmentAdapter;
+import com.zlm.hp.adapter.SearchLrcFragmentAdapter;
 import com.zlm.hp.constants.ConfigInfo;
 import com.zlm.hp.entity.AudioInfo;
 import com.zlm.hp.entity.LrcInfo;
@@ -64,8 +64,7 @@ public class SearchLrcActivity extends BaseActivity {
     private AudioInfo mAudioInfo;
 
     //
-    private ArrayList<Fragment> mLrcViews;
-    private TabFragmentAdapter mAdapter;
+    private SearchLrcFragmentAdapter mAdapter;
     private ViewPager mViewPager;
 
     //
@@ -312,11 +311,12 @@ public class SearchLrcActivity extends BaseActivity {
                             playProgress = playingAudioInfo.getPlayProgress();
                         }
 
-                        if (mLrcViews != null && mLrcViews.size() > 0) {
-                            for (int i = 0; i < mLrcViews.size(); i++) {
-                                LrcFragment lrcFragment = (LrcFragment) mLrcViews.get(i);
+                        if (mAdapter != null && mSearchLrcDatas != null && mSearchLrcDatas.size() > 0) {
+
+                            LrcFragment lrcFragment = (LrcFragment) mAdapter.getCurrentFragment();
+                            if (lrcFragment != null)
                                 lrcFragment.refreshView(playProgress);
-                            }
+
                         }
 
                         break;
@@ -350,24 +350,13 @@ public class SearchLrcActivity extends BaseActivity {
 
             case MESSAGE_WHAT_SEARCN_LRC:
 
-                mLrcViews = new ArrayList<Fragment>();
                 HttpReturnResult httpReturnResult = (HttpReturnResult) msg.obj;
                 if (httpReturnResult.isSuccessful()) {
                     Map<String, Object> returnResult = (Map<String, Object>) httpReturnResult.getResult();
                     List<LrcInfo> lists = (List<LrcInfo>) returnResult.get("rows");
                     if (lists != null && lists.size() > 0) {
                         mSearchLrcDatas.addAll(lists);
-
                         mCurIndexTv.setText("1");
-
-
-                        for (int i = 0; i < lists.size(); i++) {
-
-                            LrcInfo lrcInfo = lists.get(i);
-                            LrcFragment lrcFragment = LrcFragment.newInstance(mAudioInfo, lrcInfo);
-
-                            mLrcViews.add(lrcFragment);
-                        }
                     } else {
                         ToastUtil.showTextToast(mContext, HttpReturnResult.ERROR_MSG_NULLDATA);
                     }
@@ -375,8 +364,8 @@ public class SearchLrcActivity extends BaseActivity {
                     ToastUtil.showTextToast(mContext, httpReturnResult.getErrorMsg());
                 }
 
-                mSumTv.setText(mLrcViews.size() + "");
-                mAdapter = new TabFragmentAdapter(getSupportFragmentManager(), mLrcViews);
+                mSumTv.setText(mSearchLrcDatas.size() + "");
+                mAdapter = new SearchLrcFragmentAdapter(getSupportFragmentManager(), mAudioInfo, mSearchLrcDatas);
                 mViewPager.setAdapter(mAdapter);
                 showContentView();
 

@@ -559,21 +559,16 @@ public class MainActivity extends BaseActivity {
      */
     private void initViewPage() {
 
-        ArrayList<Fragment> fragments = new ArrayList<Fragment>();
-        MeFragment meFragment = MeFragment.newInstance();
-        LastSongFragment lastSongFragment = LastSongFragment.newInstance();
-        RecommendFragment recommendFragment = RecommendFragment.newInstance();
-        SpecialFragment specialFragment = SpecialFragment.newInstance();
-
+        ArrayList<Class> fragmentsClass = new ArrayList<Class>();
         //
-        fragments.add(meFragment);
-        fragments.add(lastSongFragment);
-        fragments.add(recommendFragment);
-        fragments.add(specialFragment);
+        fragmentsClass.add(MeFragment.class);
+        fragmentsClass.add(LastSongFragment.class);
+        fragmentsClass.add(RecommendFragment.class);
+        fragmentsClass.add(SpecialFragment.class);
 
-        TabFragmentAdapter adapter = new TabFragmentAdapter(getSupportFragmentManager(), fragments);
+        TabFragmentAdapter adapter = new TabFragmentAdapter(getSupportFragmentManager(), fragmentsClass);
         mViewPager.setAdapter(adapter);
-        mViewPager.setOffscreenPageLimit(fragments.size());
+        mViewPager.setOffscreenPageLimit(fragmentsClass.size());
         mViewPager.addOnPageChangeListener(new ViewPager.OnPageChangeListener() {
             @Override
             public void onPageScrolled(int position, float positionOffset, int positionOffsetPixels) {

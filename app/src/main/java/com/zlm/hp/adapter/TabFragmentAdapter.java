@@ -2,8 +2,7 @@ package com.zlm.hp.adapter;
 
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentManager;
-import android.support.v4.app.FragmentStatePagerAdapter;
-import android.support.v4.view.PagerAdapter;
+import android.support.v4.app.FragmentPagerAdapter;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -16,34 +15,31 @@ import java.util.List;
  * @Date: 2017/7/16 20:33
  * @Throws: https://blog.csdn.net/shanshan_1117/article/details/79756399
  */
-public class TabFragmentAdapter extends FragmentStatePagerAdapter {
+public class TabFragmentAdapter extends FragmentPagerAdapter {
     //存储所有的fragment
-    private List<Fragment> list;
+    private List<Class> mDatas;
 
-    public TabFragmentAdapter(FragmentManager fm, ArrayList<Fragment> list) {
+    public TabFragmentAdapter(FragmentManager fm, ArrayList<Class> datas) {
         super(fm);
-        this.list = list;
+        this.mDatas = datas;
 
     }
 
     @Override
     public Fragment getItem(int index) {
-
-        return list.get(index);
-    }
-
-
-
-    @Override
-    public int getItemPosition(Object object) {
-        //注意：默认是PagerAdapter.POSITION_UNCHANGED，不会重新加载
-        return PagerAdapter.POSITION_NONE;
+        try {
+            Class clazz = mDatas.get(index);
+            Fragment fragment = (Fragment) clazz.newInstance();
+            return fragment;
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+        return null;
     }
 
     @Override
     public int getCount() {
-
-        return list.size();
+        return mDatas.size();
     }
 
 }
