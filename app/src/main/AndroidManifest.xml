@@ -54,7 +54,8 @@
 
         <activity android:name=".LrcActivity" />
         <activity android:name=".SearchSingerActivity" />
-        <activity android:name=".SearchLrcActivity"></activity>
+        <activity android:name=".SearchLrcActivity" />
+        <activity android:name=".TimerPowerOffActivity"></activity>
     </application>
 
 </manifest>

@@ -1,0 +1,258 @@
+<?xml version="1.0" encoding="utf-8"?>
+<com.zlm.libs.widget.SwipeBackLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:id="@+id/swipeback_layout"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    tools:context="com.zlm.hp.ui.TimerPowerOffActivity">
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:background="#fff"
+        android:orientation="vertical">
+
+        <View
+            android:id="@+id/status_bar_view"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:visibility="gone" />
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:orientation="vertical">
+
+            <include
+                layout="@layout/layout_title"
+                android:layout_width="match_parent"
+                android:layout_height="@dimen/title_height" />
+
+
+            <TextView
+                android:id="@+id/time_tip"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:background="#eee"
+                android:padding="10dp"
+                android:text="@string/timer_close_text"
+                android:textColor="@color/defColor"
+                android:textSize="@dimen/copyright_size" />
+
+
+            <com.zlm.hp.widget.ListItemRelativeLayout
+                android:id="@+id/timer_close_rl"
+                android:layout_width="match_parent"
+                android:layout_height="@dimen/title_setting_height"
+                android:clickable="true">
+
+                <TextView
+                    android:id="@+id/timer_close_text"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_centerVertical="true"
+                    android:layout_marginLeft="10dp"
+                    android:text="@string/timer_close"
+                    android:textColor="@color/defColor"
+                    android:textSize="@dimen/title_size" />
+
+                <com.zlm.hp.widget.IconfontTextView
+                    android:id="@+id/timer_close_img"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_alignParentRight="true"
+                    android:layout_centerVertical="true"
+                    android:layout_marginRight="10dp"
+                    android:text="@string/sure_img"
+                    android:textColor="@color/defColor"
+                    android:textSize="@dimen/title_size" />
+
+            </com.zlm.hp.widget.ListItemRelativeLayout>
+
+            <com.zlm.hp.widget.DividerView
+                android:layout_width="match_parent"
+                android:layout_height="1dp" />
+
+            <com.zlm.hp.widget.ListItemRelativeLayout
+                android:id="@+id/timer_10_rl"
+                android:layout_width="match_parent"
+                android:layout_height="@dimen/title_setting_height"
+                android:clickable="true">
+
+                <TextView
+                    android:id="@+id/timer_10_text"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_centerVertical="true"
+                    android:layout_marginLeft="10dp"
+                    android:text="@string/timer_10"
+                    android:textColor="#000"
+                    android:textSize="@dimen/title_size" />
+
+                <com.zlm.hp.widget.IconfontTextView
+                    android:id="@+id/timer_10_img"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_alignParentRight="true"
+                    android:layout_centerVertical="true"
+                    android:layout_marginRight="10dp"
+                    android:text="@string/sure_img"
+                    android:textColor="@color/defColor"
+                    android:textSize="@dimen/title_size"
+                    android:visibility="invisible" />
+
+            </com.zlm.hp.widget.ListItemRelativeLayout>
+
+            <com.zlm.hp.widget.DividerView
+                android:layout_width="match_parent"
+                android:layout_height="1dp" />
+
+            <com.zlm.hp.widget.ListItemRelativeLayout
+                android:id="@+id/timer_20_rl"
+                android:layout_width="match_parent"
+                android:layout_height="@dimen/title_setting_height"
+                android:clickable="true">
+
+                <TextView
+                    android:id="@+id/timer_20_text"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_centerVertical="true"
+                    android:layout_marginLeft="10dp"
+                    android:text="@string/timer_20"
+                    android:textColor="#000"
+                    android:textSize="@dimen/title_size" />
+
+                <com.zlm.hp.widget.IconfontTextView
+                    android:id="@+id/timer_20_img"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_alignParentRight="true"
+                    android:layout_centerVertical="true"
+                    android:layout_marginRight="10dp"
+                    android:text="@string/sure_img"
+                    android:textColor="@color/defColor"
+                    android:textSize="@dimen/title_size"
+                    android:visibility="invisible" />
+
+            </com.zlm.hp.widget.ListItemRelativeLayout>
+
+            <com.zlm.hp.widget.DividerView
+                android:layout_width="match_parent"
+                android:layout_height="1dp" />
+
+            <com.zlm.hp.widget.ListItemRelativeLayout
+                android:id="@+id/timer_30_rl"
+                android:layout_width="match_parent"
+                android:layout_height="@dimen/title_setting_height"
+                android:clickable="true">
+
+                <TextView
+                    android:id="@+id/timer_30_text"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_centerVertical="true"
+                    android:layout_marginLeft="10dp"
+                    android:text="@string/timer_30"
+                    android:textColor="#000"
+                    android:textSize="@dimen/title_size" />
+
+                <com.zlm.hp.widget.IconfontTextView
+                    android:id="@+id/timer_30_img"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_alignParentRight="true"
+                    android:layout_centerVertical="true"
+                    android:layout_marginRight="10dp"
+                    android:text="@string/sure_img"
+                    android:textColor="@color/defColor"
+                    android:textSize="@dimen/title_size"
+                    android:visibility="invisible" />
+
+            </com.zlm.hp.widget.ListItemRelativeLayout>
+
+            <com.zlm.hp.widget.DividerView
+                android:layout_width="match_parent"
+                android:layout_height="1dp" />
+
+            <com.zlm.hp.widget.ListItemRelativeLayout
+                android:id="@+id/timer_60_rl"
+                android:layout_width="match_parent"
+                android:layout_height="@dimen/title_setting_height"
+                android:clickable="true">
+
+                <TextView
+                    android:id="@+id/timer_60_text"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_centerVertical="true"
+                    android:layout_marginLeft="10dp"
+                    android:text="@string/timer_60"
+                    android:textColor="#000"
+                    android:textSize="@dimen/title_size" />
+
+                <com.zlm.hp.widget.IconfontTextView
+                    android:id="@+id/timer_60_img"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_alignParentRight="true"
+                    android:layout_centerVertical="true"
+                    android:layout_marginRight="10dp"
+                    android:text="@string/sure_img"
+                    android:textColor="@color/defColor"
+                    android:textSize="@dimen/title_size"
+                    android:visibility="invisible" />
+
+            </com.zlm.hp.widget.ListItemRelativeLayout>
+
+            <com.zlm.hp.widget.DividerView
+                android:layout_width="match_parent"
+                android:layout_height="1dp" />
+
+            <com.zlm.hp.widget.ListItemRelativeLayout
+                android:id="@+id/timer_def_rl"
+                android:layout_width="match_parent"
+                android:layout_height="@dimen/title_setting_height"
+                android:clickable="true">
+
+                <TextView
+                    android:id="@+id/timer_def_text"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_centerVertical="true"
+                    android:layout_marginLeft="10dp"
+                    android:text="@string/timer_def"
+                    android:textColor="#000"
+                    android:textSize="@dimen/title_size" />
+
+                <TextView
+                    android:id="@+id/timer_def_time_text"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_centerVertical="true"
+                    android:layout_marginLeft="20dp"
+                    android:layout_toRightOf="@+id/timer_def_text"
+                    android:textColor="@color/defColor"
+                    android:textSize="@dimen/title_size" />
+
+                <com.zlm.hp.widget.IconfontTextView
+                    android:id="@+id/timer_def_img"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_alignParentRight="true"
+                    android:layout_centerVertical="true"
+                    android:layout_marginRight="10dp"
+                    android:text="@string/sure_img"
+                    android:textColor="@color/defColor"
+                    android:textSize="@dimen/title_size"
+                    android:visibility="invisible" />
+
+            </com.zlm.hp.widget.ListItemRelativeLayout>
+
+            <com.zlm.hp.widget.DividerView
+                android:layout_width="match_parent"
+                android:layout_height="1dp" />
+
+        </LinearLayout>
+    </LinearLayout>
+</com.zlm.libs.widget.SwipeBackLayout>

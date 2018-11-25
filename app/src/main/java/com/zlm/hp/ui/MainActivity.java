@@ -32,6 +32,7 @@ import com.zlm.hp.audio.utils.MediaUtil;
 import com.zlm.hp.constants.ConfigInfo;
 import com.zlm.hp.db.util.DownloadThreadInfoDB;
 import com.zlm.hp.entity.AudioInfo;
+import com.zlm.hp.entity.TimerInfo;
 import com.zlm.hp.fragment.LastSongFragment;
 import com.zlm.hp.fragment.MeFragment;
 import com.zlm.hp.fragment.RecommendFragment;
@@ -52,9 +53,11 @@ import com.zlm.hp.util.AppOpsUtils;
 import com.zlm.hp.util.ColorUtil;
 import com.zlm.hp.util.ImageUtil;
 import com.zlm.hp.util.IntentUtil;
+import com.zlm.hp.util.TimeUtil;
 import com.zlm.hp.util.ToastUtil;
 import com.zlm.hp.widget.IconfontImageButtonTextView;
 import com.zlm.hp.widget.IconfontIndicatorTextView;
+import com.zlm.hp.widget.WhiteTranLinearLayout;
 import com.zlm.hp.widget.WhiteTranRelativeLayout;
 import com.zlm.libs.widget.MusicSeekBar;
 import com.zlm.libs.widget.SlidingMenuLayout;
@@ -116,7 +119,19 @@ public class MainActivity extends BaseActivity {
      */
     private LinearLayout mExitLL;
 
+    /**
+     * 定时关闭
+     */
+    private WhiteTranRelativeLayout mTimerPowerOffLL;
+    private TextView mTimerTv;
+
+    //wifi
     private WhiteTranRelativeLayout mWifiLR;
+
+    /**
+     * 工具
+     */
+    private WhiteTranLinearLayout mToolLL;
 
     /**
      * wifi开关
@@ -174,6 +189,10 @@ public class MainActivity extends BaseActivity {
      */
     private final int LOAD_CONFIG_DATA = 1;
 
+    /**
+     * 更新计时器
+     */
+    private final int MESSAGE_WHAT_TIMERUPDATE = 2;
 
     /**
      *
@@ -423,6 +442,24 @@ public class MainActivity extends BaseActivity {
                         ToastUtil.showTextToast(mContext, msg);
 
                         break;
+                    case AppSystemReceiver.ACTION_CODE_TIMER_SETTING:
+                        mUIHandler.removeMessages(MESSAGE_WHAT_TIMERUPDATE);
+                        //设置timer
+                    case AppSystemReceiver.ACTION_CODE_TIMER_UPDATE:
+                        Message tempMsg = Message.obtain();
+                        tempMsg.what = MESSAGE_WHAT_TIMERUPDATE;
+
+                        Bundle timerBundle = intent.getBundleExtra(AppSystemReceiver.ACTION_BUNDLEKEY);
+                        TimerInfo timerInfo = timerBundle.getParcelable(AppSystemReceiver.ACTION_DATA_KEY);
+                        mConfigInfo.setTimerInfo(timerInfo);
+                        if (timerInfo != null) {
+                            tempMsg.obj = timerInfo;
+                            mUIHandler.sendMessageDelayed(tempMsg, 1000);
+                        } else {
+                            mUIHandler.sendMessage(tempMsg);
+                        }
+                        //更新
+                        break;
                 }
             }
         });
@@ -451,6 +488,22 @@ public class MainActivity extends BaseActivity {
         switch (msg.what) {
             case LOAD_CONFIG_DATA:
                 resetMenuPageData();
+                break;
+            case MESSAGE_WHAT_TIMERUPDATE:
+
+                TimerInfo timerInfo = (TimerInfo) msg.obj;
+                if (timerInfo != null) {
+                    timerInfo.setCurTime(timerInfo.getCurTime() - 1000);
+                    mTimerTv.setText(TimeUtil.parseTimeToTimerString(timerInfo.getCurTime()));
+                    if (timerInfo.getCurTime() <= 0) {
+                        //定时关闭应用
+                        ActivityManager.getInstance().exit();
+                    } else {
+                        AppSystemReceiver.sendTimerUpdateMsgReceiver(mContext, timerInfo);
+                    }
+                } else {
+                    mTimerTv.setText("");
+                }
                 break;
         }
     }
@@ -693,6 +746,29 @@ public class MainActivity extends BaseActivity {
      * 初始化菜单栏
      */
     private void initMenu() {
+        //工具
+        mToolLL = findViewById(R.id.tool_ll);
+        mToolLL.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+
+            }
+        });
+
+        mTimerTv = findViewById(R.id.timer_text);
+        //定时关闭
+        mTimerPowerOffLL = findViewById(R.id.timer_power_off_ll);
+        mTimerPowerOffLL.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+
+                Intent intent = new Intent(MainActivity.this, TimerPowerOffActivity.class);
+                startActivity(intent);
+                //去掉动画
+                overridePendingTransition(0, 0);
+            }
+        });
+
         //设置
         mSettingLL = findViewById(R.id.setting_ll);
         mSettingLL.setOnClickListener(new View.OnClickListener() {

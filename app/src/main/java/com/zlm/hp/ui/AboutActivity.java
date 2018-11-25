@@ -1,5 +1,6 @@
 package com.zlm.hp.ui;
 
+import android.annotation.SuppressLint;
 import android.os.Bundle;
 import android.os.Message;
 import android.view.View;
@@ -8,6 +9,8 @@ import android.widget.TextView;
 
 import com.zlm.hp.util.ApkUtil;
 import com.zlm.libs.widget.SwipeBackLayout;
+
+import java.util.Calendar;
 
 /**
  * @Description: 关于
@@ -28,6 +31,11 @@ public class AboutActivity extends BaseActivity {
      * 版本
      */
     private TextView mVersionTV;
+
+    /**
+     * 版权
+     */
+    private TextView mCopyrightTV;
 
     @Override
     protected int setContentLayoutResID() {
@@ -60,11 +68,18 @@ public class AboutActivity extends BaseActivity {
 
         //版本号文本控件
         mVersionTV = findViewById(R.id.app_name_version_name);
+        mCopyrightTV = findViewById(R.id.copyright);
+
+        Calendar cal = Calendar.getInstance();
+        int year = cal.get(Calendar.YEAR);
+        String copyright = getString(R.string.copyright);
+        mCopyrightTV.setText(String.format(copyright,year + ""));
 
         //加载数据
         mWorkerHandler.sendEmptyMessage(LOAD_VERSION);
     }
 
+    @SuppressLint("StringFormatMatches")
     @Override
     protected void handleUIMessage(Message msg) {
         switch (msg.what) {

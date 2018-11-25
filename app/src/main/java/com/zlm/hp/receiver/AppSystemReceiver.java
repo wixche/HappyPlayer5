@@ -7,6 +7,8 @@ import android.content.IntentFilter;
 import android.os.Bundle;
 import android.text.TextUtils;
 
+import com.zlm.hp.entity.TimerInfo;
+
 /**
  * @Description: app系统广播
  * @param:
@@ -40,6 +42,16 @@ public class AppSystemReceiver {
      * toast error msg
      */
     public static final int ACTION_CODE_TOAST_ERRORMSG = 0;
+
+    /**
+     * 设置定时器
+     */
+    public static final int ACTION_CODE_TIMER_SETTING = 1;
+
+    /**
+     * 定时器更新
+     */
+    public static final int ACTION_CODE_TIMER_UPDATE = 2;
 
 
     private BroadcastReceiver mBroadcastReceiver;
@@ -110,6 +122,30 @@ public class AppSystemReceiver {
         Bundle bundle = new Bundle();
         bundle.putString(ACTION_DATA_KEY, msg);
         sendReceiver(context, ACTION_CODE_TOAST_ERRORMSG, ACTION_BUNDLEKEY, bundle);
+    }
+
+    /**
+     * timer setting
+     *
+     * @param context
+     */
+    public static void sendTimerSettingMsgReceiver(Context context, TimerInfo timerInfo) {
+        Bundle bundle = new Bundle();
+        if (timerInfo != null)
+            bundle.putParcelable(ACTION_DATA_KEY, timerInfo);
+        sendReceiver(context, ACTION_CODE_TIMER_SETTING, ACTION_BUNDLEKEY, bundle);
+    }
+
+    /**
+     * timer update
+     *
+     * @param context
+     */
+    public static void sendTimerUpdateMsgReceiver(Context context, TimerInfo timerInfo) {
+        Bundle bundle = new Bundle();
+        if (timerInfo != null)
+            bundle.putParcelable(ACTION_DATA_KEY, timerInfo);
+        sendReceiver(context, ACTION_CODE_TIMER_UPDATE, ACTION_BUNDLEKEY, bundle);
     }
 
 

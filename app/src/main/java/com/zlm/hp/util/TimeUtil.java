@@ -8,6 +8,26 @@ package com.zlm.hp.util;
 
 public class TimeUtil {
     /**
+     * 设置倒计时
+     *
+     * @param time
+     * @return
+     */
+    public static String parseTimeToTimerString(int time) {
+        time /= 1000;
+        int minute = time / 60;
+        int hour = minute / 60;
+        int second = time % 60;
+        minute %= 60;
+        if (hour == 1 || hour == 0) {
+            minute += hour * 60;
+            return String.format("%02d:%02d", minute, second);
+        }
+        return String.format("%02d:%02d:%02d", hour, minute, second);
+
+    }
+
+    /**
      * @throws
      * @Description: 转音频时间字符串
      * @param:

@@ -15,7 +15,7 @@
     <string name="def_text">乐乐音乐 就是任性</string>
     <string name="def_artist">乐乐音乐</string>
     <string name="def_songName">就是任性</string>
-    <string name="copyright">Copyright ©2015-2019 zhangliangming All Rights Reserved</string>
+    <string name="copyright">Copyright ©2015-%s zhangliangming All Rights Reserved</string>
 
     <string name="loadmore">点击加载更多</string>
     <string name="loading">正在加载...</string>
@@ -55,9 +55,21 @@
     <string name="make_lrc_img">&#xe62e;</string>
     <string name="lrc_to_video">歌词图片生成器</string>
     <string name="lrc_to_video_img">&#xe646;</string>
+
+
     <string name="timer_power_off">定时关闭</string>
     <string name="timer_power_off_img">&#xe688;</string>
+    <string name="timer_close_text">定时功能未启动</string>
+    <string name="timer_open_text">%s后，将停止播放歌曲</string>
+    <string name="timer_close">关闭</string>
+    <string name="timer_10">10分钟</string>
+    <string name="timer_20">20分钟</string>
+    <string name="timer_30">30分钟</string>
+    <string name="timer_60">1小时</string>
+    <string name="timer_def">自定义</string>
+    <string name="timer_setting_time">请设置关闭时间</string>
 
+    <string name="sure_img">&#xe713;</string>
     <string name="no_net_img">&#xe62d;</string>
     <string name="loading_img">&#xe68e;</string>
 

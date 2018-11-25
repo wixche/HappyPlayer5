@@ -5,6 +5,7 @@ import android.os.Parcel;
 import android.os.Parcelable;
 
 import com.zlm.hp.entity.AudioInfo;
+import com.zlm.hp.entity.TimerInfo;
 import com.zlm.hp.util.CodeLineUtil;
 import com.zlm.hp.util.ColorUtil;
 import com.zlm.hp.util.ContextUtil;
@@ -179,6 +180,11 @@ public class ConfigInfo implements Parcelable {
      */
     public static String[] LRC_COLORS_STRING = {"#fada83", "#fe8db6", "#feb88e",
             "#adfe8e", "#8dc7ff", "#e69bff"};
+
+    /**
+     * 定时器
+     */
+    private TimerInfo timerInfo;
 
 
     protected ConfigInfo(Parcel in) {
@@ -406,6 +412,14 @@ public class ConfigInfo implements Parcelable {
     public ConfigInfo setPlayHash(String playHash) {
         this.playHash = playHash;
         return this;
+    }
+
+    public TimerInfo getTimerInfo() {
+        return timerInfo;
+    }
+
+    public void setTimerInfo(TimerInfo timerInfo) {
+        this.timerInfo = timerInfo;
     }
 
     public int getPlayModel() {

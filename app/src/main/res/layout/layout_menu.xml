@@ -64,7 +64,7 @@
                 android:layout_height="match_parent"
                 android:orientation="vertical">
 
-                <com.zlm.hp.widget.WhiteTranLinearLayout
+                <com.zlm.hp.widget.WhiteTranRelativeLayout
                     android:id="@+id/timer_power_off_ll"
                     android:layout_width="match_parent"
                     android:layout_height="@dimen/title_setting_height"
@@ -72,6 +72,7 @@
                     android:orientation="horizontal">
 
                     <com.zlm.hp.widget.IconfontTextView
+                        android:id="@+id/timer_power_off_img"
                         android:layout_width="wrap_content"
                         android:layout_height="match_parent"
                         android:layout_marginLeft="10dp"
@@ -84,12 +85,23 @@
                         android:layout_width="wrap_content"
                         android:layout_height="match_parent"
                         android:layout_marginLeft="5dp"
+                        android:layout_toRightOf="@+id/timer_power_off_img"
                         android:gravity="center_vertical|center_horizontal"
                         android:text="@string/timer_power_off"
                         android:textColor="#FFF"
                         android:textSize="@dimen/title_setting_icon_size" />
 
-                </com.zlm.hp.widget.WhiteTranLinearLayout>
+                    <TextView
+                        android:id="@+id/timer_text"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_alignParentRight="true"
+                        android:layout_centerVertical="true"
+                        android:layout_marginRight="10dp"
+                        android:textColor="#FFF"
+                        android:textSize="@dimen/title_icon_size" />
+
+                </com.zlm.hp.widget.WhiteTranRelativeLayout>
 
                 <com.zlm.hp.widget.WhiteTranLinearLayout
                     android:id="@+id/tool_ll"

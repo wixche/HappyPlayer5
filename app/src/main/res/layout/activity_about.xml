@@ -54,13 +54,13 @@
                     android:textSize="@dimen/title_size" />
 
                 <TextView
+                    android:id="@+id/copyright"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:layout_alignParentBottom="true"
                     android:layout_centerHorizontal="true"
                     android:layout_marginBottom="10dp"
                     android:gravity="center_horizontal"
-                    android:text="@string/copyright"
                     android:textColor="@color/textColor"
                     android:textSize="@dimen/copyright_size" />
 
