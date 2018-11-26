@@ -103,6 +103,46 @@ public class AudioBroadcastReceiver {
      */
     public static final int ACTION_CODE_LRCRELOADING = 12;
 
+    /**
+     * 通知栏 play
+     */
+    public static final int ACTION_CODE_NOTIFY_PLAY = 13;
+
+    /**
+     * 通知栏 pause
+     */
+    public static final int ACTION_CODE_NOTIFY_PAUSE = 14;
+
+    /**
+     * 通知栏 next
+     */
+    public static final int ACTION_CODE_NOTIFY_NEXT = 15;
+
+    /**
+     * 通知栏 pre
+     */
+    public static final int ACTION_CODE_NOTIFY_PRE = 16;
+
+    /**
+     * 通知栏 unlock
+     */
+    public static final int ACTION_CODE_NOTIFY_UNLOCK = 17;
+
+    /**
+     * 通知栏 桌面歌词隐藏
+     */
+    public static final int ACTION_CODE_NOTIFY_DESLRC_HIDE = 18;
+
+    /**
+     * 通知栏 桌面歌词显示
+     */
+    public static final int ACTION_CODE_NOTIFY_DESLRC_SHOW = 19;
+
+    /**
+     * 通知栏 歌手头像加载完成
+     */
+    public static final int ACTION_CODE_NOTIFY_SINGERICONLOADED = 20;
+
     private BroadcastReceiver mBroadcastReceiver;
     private IntentFilter mIntentFilter;
     private AudioReceiverListener mReceiverListener;
@@ -173,7 +213,6 @@ public class AudioBroadcastReceiver {
         //清空当前的播放的索引
         ConfigInfo configInfo = ConfigInfo.obtain();
         configInfo.setPlayHash("");
-        //configInfo.setAudioInfos(new ArrayList<AudioInfo>());
         configInfo.save();
 
         sendReceiver(context, ACTION_CODE_NULL, null, null);
@@ -298,8 +337,6 @@ public class AudioBroadcastReceiver {
     }
 
     /**
-     *
-     *
      * @param context
      * @param hash
      */
@@ -307,6 +344,30 @@ public class AudioBroadcastReceiver {
         Bundle bundle = new Bundle();
         bundle.putString(ACTION_DATA_KEY, hash);
         sendReceiver(context, ACTION_CODE_RELOADSINGERIMG, ACTION_BUNDLEKEY, bundle);
+    }
+
+    /**
+     * 获取通知栏 intent
+     *
+     * @param code
+     * @return
+     */
+    public static Intent getNotifiyIntent(int code) {
+        Intent intent = new Intent(RECEIVER_ACTION);
+        intent.putExtra(ACTION_CODE_KEY, code);
+        intent.setFlags(Intent.FLAG_INCLUDE_STOPPED_PACKAGES);
+        return intent;
+    }
+
+    /**
+     * 发送notify 图片加载完成广播
+     *
+     * @param context
+     */
+    public static void sendNotifiyImgLoadedReceiver(Context context, AudioInfo audioInfo) {
+        Bundle bundle = new Bundle();
+        bundle.putParcelable(ACTION_DATA_KEY, audioInfo);
+        sendReceiver(context, ACTION_CODE_NOTIFY_SINGERICONLOADED, ACTION_BUNDLEKEY, bundle);
     }
 
 

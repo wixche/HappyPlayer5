@@ -70,6 +70,43 @@ public class ImageUtil {
     }
 
     /**
+     * 加载通知栏歌手头像
+     *
+     * @param context
+     * @param singerName
+     * @param asyncHandlerTask
+     * @return
+     */
+    public static Bitmap getNotifiIcon(Context context, String singerName, int width, int height, AsyncHandlerTask asyncHandlerTask) {
+        //多个歌手，则取第一个歌手头像
+        String regex = "、";
+        String searchSingerName = singerName;
+        if (singerName.contains(regex)) {
+            String reg = "\\s*、\\s*";
+            String[] temp = singerName.split(reg);
+            if (temp.length > 0) {
+                searchSingerName = temp[0];
+            }
+        }
+
+        String filePath = ResourceUtil.getFilePath(context, ResourceConstants.PATH_SINGER, searchSingerName + File.separator + searchSingerName + ".jpg");
+        String key = filePath.hashCode() + "";
+
+        Bitmap bitmap = null;
+        if (mImageCache.get(key) != null) {
+            bitmap = mImageCache.get(key);
+        }
+        //从本地文件中获取
+        if (bitmap == null && filePath != null) {
+            bitmap = readBitmapFromFile(filePath, width, height);
+        }
+        if (mImageCache.get(key) == null && bitmap != null) {
+            mImageCache.put(key, bitmap);
+        }
+        return bitmap;
+    }
+
+    /**
      * 加载歌手头像
      *
      * @param context
@@ -77,10 +114,14 @@ public class ImageUtil {
      */
     public static void loadSingerImage(final Context context, ImageView imageView, final String singerName, final boolean askWifi, int width, int height, AsyncHandlerTask asyncHandlerTask, ImageLoadCallBack imageLoadCallBack) {
         //多个歌手，则取第一个歌手头像
-        String regex = "\\s*、\\s*";
+        String regex = "、";
         String searchSingerName = singerName;
         if (singerName.contains(regex)) {
-            searchSingerName = singerName.split(regex)[0];
+            String reg = "\\s*、\\s*";
+            String[] temp = singerName.split(reg);
+            if (temp.length > 0) {
+                searchSingerName = temp[0];
+            }
         }
 
         final String filePath = ResourceUtil.getFilePath(context, ResourceConstants.PATH_SINGER, searchSingerName + File.separator + searchSingerName + ".jpg");
@@ -143,6 +184,20 @@ public class ImageUtil {
         final String key = filePath.hashCode() + "";
         //如果当前的图片与上一次一样，则不操作
         if (imageView.getTag() != null && imageView.getTag().equals(key)) {
+            if (imageLoadCallBack != null) {
+                Bitmap result = null;
+                if (mImageCache.get(key) != null) {
+                    result = mImageCache.get(key);
+                }
+                //从本地文件中获取
+                if (result == null && filePath != null) {
+                    result = readBitmapFromFile(filePath, width, height);
+                }
+                if (mImageCache.get(key) == null && result != null) {
+                    mImageCache.put(key, result);
+                }
+                imageLoadCallBack.callback(result);
+            }
             return;
         }
 

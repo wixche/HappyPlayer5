@@ -341,7 +341,7 @@ public class MainActivity extends BaseActivity {
                         break;
                     case AudioBroadcastReceiver.ACTION_CODE_INIT:
                         Bundle initBundle = intent.getBundleExtra(AudioBroadcastReceiver.ACTION_BUNDLEKEY);
-                        AudioInfo initAudioInfo = initBundle.getParcelable(AudioBroadcastReceiver.ACTION_DATA_KEY);
+                        final AudioInfo initAudioInfo = initBundle.getParcelable(AudioBroadcastReceiver.ACTION_DATA_KEY);
                         if (initAudioInfo != null) {
                             mSongNameTextView.setText(initAudioInfo.getSongName());
                             mSingerNameTextView.setText(initAudioInfo.getSingerName());
@@ -355,7 +355,14 @@ public class MainActivity extends BaseActivity {
                             mMusicSeekBar.setSecondaryProgress(0);
 
                             //加载歌手头像
-                            ImageUtil.loadSingerImage(mContext, mArtistImageView, initAudioInfo.getSingerName(), mConfigInfo.isWifi(), 400, 400, new AsyncHandlerTask(mUIHandler, mWorkerHandler), null);
+                            ImageUtil.loadSingerImage(mContext, mArtistImageView, initAudioInfo.getSingerName(), mConfigInfo.isWifi(), 400, 400, new AsyncHandlerTask(mUIHandler, mWorkerHandler), new ImageUtil.ImageLoadCallBack() {
+                                @Override
+                                public void callback(Bitmap bitmap) {
+                                    //if (bitmap != null) {
+                                        AudioBroadcastReceiver.sendNotifiyImgLoadedReceiver(mContext, initAudioInfo);
+                                   // }
+                                }
+                            });
 
                             //加载歌词
                             String keyWords = "";
