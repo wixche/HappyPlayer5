@@ -80,6 +80,11 @@ public class SongFragment extends BaseFragment {
      * 本地
      */
     public static final int SONG_TYPE_LOCAL = 2;
+
+    /**
+     * 最新
+     */
+    public static final int SONG_TYPE_LAST = 3;
     /**
      * 网络歌曲类型
      */
@@ -134,7 +139,7 @@ public class SongFragment extends BaseFragment {
         mRecyclerView.setLayoutManager(layoutManager);
         //
         mDatas = new ArrayList<AudioInfo>();
-        mAdapter = new LRecyclerViewAdapter(new AudioAdapter(mContext, mDatas));
+        mAdapter = new LRecyclerViewAdapter(new AudioAdapter(mContext, mDatas,mSongType));
         mRecyclerView.setAdapter(mAdapter);
 
 
@@ -352,13 +357,11 @@ public class SongFragment extends BaseFragment {
             case SONG_TYPE_RECOMMEND:
 
                 RankInfo rankInfo = bundle.getParcelable(DATA_KEY);
-                ;
                 httpReturnResult = apiHttpClient.rankSongList(mContext, rankInfo.getRankId(),rankInfo.getRankType(), mPage, mPageSize, configInfo.isWifi());
 
                 break;
             case SONG_TYPE_SPECIAL:
                 SpecialInfo specialInfo = bundle.getParcelable(DATA_KEY);
-                ;
                 httpReturnResult = apiHttpClient.specialSongList(mContext, specialInfo.getSpecialId(), mPage, mPageSize, configInfo.isWifi());
 
                 break;

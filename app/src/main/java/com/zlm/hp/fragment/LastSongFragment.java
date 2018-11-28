@@ -96,7 +96,7 @@ public class LastSongFragment extends BaseFragment {
         mRecyclerView.setLayoutManager(layoutManager);
         //
         mDatas = new ArrayList<AudioInfo>();
-        mAdapter = new LRecyclerViewAdapter(new AudioAdapter(mContext, mDatas));
+        mAdapter = new LRecyclerViewAdapter(new AudioAdapter(mContext, mDatas, SongFragment.SONG_TYPE_LAST));
         mRecyclerView.setAdapter(mAdapter);
 
         mRecyclerView.setLoadMoreEnabled(false);

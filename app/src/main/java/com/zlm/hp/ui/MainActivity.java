@@ -4,6 +4,7 @@ import android.content.Context;
 import android.content.Intent;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
+import android.graphics.Color;
 import android.graphics.drawable.BitmapDrawable;
 import android.os.Build;
 import android.os.Bundle;
@@ -11,25 +12,34 @@ import android.os.Message;
 import android.support.v4.app.Fragment;
 import android.support.v4.content.ContextCompat;
 import android.support.v4.view.ViewPager;
+import android.support.v7.widget.LinearLayoutManager;
+import android.support.v7.widget.RecyclerView;
 import android.text.TextUtils;
 import android.util.DisplayMetrics;
 import android.view.Display;
 import android.view.LayoutInflater;
 import android.view.View;
+import android.view.ViewStub;
+import android.view.ViewTreeObserver;
 import android.view.WindowManager;
+import android.view.animation.Animation;
+import android.view.animation.TranslateAnimation;
 import android.widget.FrameLayout;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
+import android.widget.RelativeLayout;
 import android.widget.TextView;
 
 import com.dou361.dialogui.DialogUIUtils;
 import com.dou361.dialogui.listener.DialogUIListener;
 import com.suke.widget.SwitchButton;
 import com.zlm.down.entity.DownloadTask;
+import com.zlm.hp.adapter.PopPlayListAdapter;
 import com.zlm.hp.adapter.TabFragmentAdapter;
 import com.zlm.hp.async.AsyncHandlerTask;
 import com.zlm.hp.audio.utils.MediaUtil;
 import com.zlm.hp.constants.ConfigInfo;
+import com.zlm.hp.db.util.AudioInfoDB;
 import com.zlm.hp.db.util.DownloadThreadInfoDB;
 import com.zlm.hp.entity.AudioInfo;
 import com.zlm.hp.entity.TimerInfo;
@@ -57,12 +67,15 @@ import com.zlm.hp.util.TimeUtil;
 import com.zlm.hp.util.ToastUtil;
 import com.zlm.hp.widget.IconfontImageButtonTextView;
 import com.zlm.hp.widget.IconfontIndicatorTextView;
+import com.zlm.hp.widget.IconfontTextView;
 import com.zlm.hp.widget.WhiteTranLinearLayout;
 import com.zlm.hp.widget.WhiteTranRelativeLayout;
 import com.zlm.libs.widget.MusicSeekBar;
+import com.zlm.libs.widget.RotateLayout;
 import com.zlm.libs.widget.SlidingMenuLayout;
 
 import java.util.ArrayList;
+import java.util.List;
 
 /**
  * @Description: 主界面
@@ -179,6 +192,36 @@ public class MainActivity extends BaseActivity {
      * 歌曲进度
      */
     private MusicSeekBar mMusicSeekBar;
+
+    ///////////////////////////////歌曲列表弹出窗口布局/////////////////////////////////////////
+    private boolean mIsShowPopPlayList = false;
+    /**
+     * 播放列表全屏界面
+     */
+    private RelativeLayout mPopPlayListRL;
+
+    /**
+     * 播放列表内容界面
+     */
+    private RelativeLayout mPopPlayContentRL;
+
+    /**
+     *
+     */
+    private RecyclerView mPlayListRListView;
+
+    /**
+     * 当前播放列表歌曲总数
+     */
+    private TextView mPopListSizeTv;
+
+    //播放模式
+    private IconfontTextView modeAllTv;
+    private IconfontTextView modeRandomTv;
+    private IconfontTextView modeSingleTv;
+
+
+    ////////////////////////////////////////////////////////////////////////////
 
     /**
      * 基本数据
@@ -359,8 +402,8 @@ public class MainActivity extends BaseActivity {
                                 @Override
                                 public void callback(Bitmap bitmap) {
                                     //if (bitmap != null) {
-                                        AudioBroadcastReceiver.sendNotifiyImgLoadedReceiver(mContext, initAudioInfo);
-                                   // }
+                                    AudioBroadcastReceiver.sendNotifiyImgLoadedReceiver(mContext, initAudioInfo);
+                                    // }
                                 }
                             });
 
@@ -570,6 +613,11 @@ public class MainActivity extends BaseActivity {
             public void onClick(View v) {
                 if (mSlidingMenuLayout.isShowingMenu()) {
                     mSlidingMenuLayout.hideMenu();
+                    return;
+                }
+
+                if (mIsShowPopPlayList) {
+                    hidePopPlayListView();
                     return;
                 }
 
@@ -961,9 +1009,188 @@ public class MainActivity extends BaseActivity {
         listMenuImg.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
+                if (mIsShowPopPlayList) {
+                    hidePopPlayListView();
+                } else {
+                    if (mPopPlayListRL == null) {
+                        initPopPlayListViews();
+                    }
+                    showPopPlayListView();
+                }
+            }
+
+
+        });
+    }
+
+    /**
+     * 初始化歌曲列表弹出窗口视图
+     */
+    private void initPopPlayListViews() {
+        ViewStub stub = findViewById(R.id.viewstub_main_pop);
+        stub.inflate();
+
+        mPlayListRListView = findViewById(R.id.curplaylist_recyclerView);
+        //初始化内容视图
+        mPlayListRListView.setLayoutManager(new LinearLayoutManager(mContext));
+
+        //全屏视图
+        mPopPlayListRL = findViewById(R.id.list_pop);
+        mPopPlayListRL.setVisibility(View.INVISIBLE);
+        mPopPlayListRL.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                hidePopPlayListView();
+            }
+        });
+
+        //内容布局
+        mPopPlayContentRL = findViewById(R.id.pop_content);
+        mPopListSizeTv = findViewById(R.id.list_size);
+        //播放模式
+        modeAllTv = findViewById(R.id.modeAll);
+        modeRandomTv = findViewById(R.id.modeRandom);
+        modeSingleTv = findViewById(R.id.modeSingle);
+
+        modeAllTv.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                initPlayModeView(1, modeAllTv, modeRandomTv, modeSingleTv, true);
+            }
+        });
+
+        modeRandomTv.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                initPlayModeView(3, modeAllTv, modeRandomTv, modeSingleTv, true);
+            }
+        });
+
+        modeSingleTv.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                initPlayModeView(0, modeAllTv, modeRandomTv, modeSingleTv, true);
+            }
+        });
+    }
+
+    /**
+     * 初始化播放列表播放模式
+     *
+     * @param playMode
+     * @param modeAllImg
+     * @param modeRandomImg
+     * @param modeSingleImg
+     */
+    private void initPlayModeView(int playMode, IconfontTextView modeAllImg, IconfontTextView modeRandomImg, IconfontTextView modeSingleImg, boolean isTipShow) {
+        if (playMode == 0) {
+            if (isTipShow)
+                ToastUtil.showTextToast(mContext, getString(R.string.mode_all_text));
+            modeAllImg.setVisibility(View.VISIBLE);
+            modeRandomImg.setVisibility(View.INVISIBLE);
+            modeSingleImg.setVisibility(View.INVISIBLE);
+        } else if (playMode == 1) {
+            if (isTipShow)
+                ToastUtil.showTextToast(mContext, getString(R.string.mode_random_text));
+            modeAllImg.setVisibility(View.INVISIBLE);
+            modeRandomImg.setVisibility(View.VISIBLE);
+            modeSingleImg.setVisibility(View.INVISIBLE);
+        } else {
+            if (isTipShow)
+                ToastUtil.showTextToast(mContext, getString(R.string.mode_single_text));
+            modeAllImg.setVisibility(View.INVISIBLE);
+            modeRandomImg.setVisibility(View.INVISIBLE);
+            modeSingleImg.setVisibility(View.VISIBLE);
+        }
+        //保存
+        if (isTipShow)
+            mConfigInfo.setPlayModel(playMode);
+    }
+
+    /**
+     * 显示歌曲列表弹出窗口
+     */
+    private void showPopPlayListView() {
+        //设置当前播放模式
+        initPlayModeView(mConfigInfo.getPlayModel(), modeAllTv, modeRandomTv, modeSingleTv, false);
+        //设置当前歌曲数据
+        List<AudioInfo> audioInfoList =  mConfigInfo.getAudioInfos();
+        mPopListSizeTv.setText(audioInfoList.size() + "");
+        PopPlayListAdapter adapter = new PopPlayListAdapter(mContext,audioInfoList,PopPlayListAdapter.TYPE_MAIN);
+        mPlayListRListView.setAdapter(adapter);
+        /**
+         * 如果该界面还没初始化，则监听
+         */
+        if (mPopPlayContentRL.getHeight() == 0) {
+            mPopPlayContentRL.getViewTreeObserver().addOnGlobalLayoutListener(new ViewTreeObserver.OnGlobalLayoutListener() {
+                @Override
+                public void onGlobalLayout() {
+                    mPopPlayContentRL.getViewTreeObserver().removeOnGlobalLayoutListener(this);
+                    showPopPlayListViewAnimation();
+                }
+            });
+
+        } else {
+            showPopPlayListViewAnimation();
+        }
+    }
+
+    /**
+     * 显示动画
+     */
+    private void showPopPlayListViewAnimation() {
+        mPopPlayListRL.setVisibility(View.VISIBLE);
+        TranslateAnimation translateAnimation = new TranslateAnimation(0, 0, mPopPlayContentRL.getHeight(), 0);
+        translateAnimation.setDuration(250);//设置动画持续时间
+        translateAnimation.setFillAfter(true);
+        translateAnimation.setAnimationListener(new Animation.AnimationListener() {
+            @Override
+            public void onAnimationStart(Animation animation) {
+                mIsShowPopPlayList = true;
+
+            }
+
+            @Override
+            public void onAnimationEnd(Animation animation) {
+                mPopPlayListRL.setBackgroundColor(ColorUtil.parserColor(Color.BLACK, 120));
+            }
+
+            @Override
+            public void onAnimationRepeat(Animation animation) {
 
             }
         });
+
+        mPopPlayContentRL.clearAnimation();
+        mPopPlayContentRL.startAnimation(translateAnimation);
+    }
+
+    /**
+     * 隐藏歌曲列表弹出窗口
+     */
+    private void hidePopPlayListView() {
+        TranslateAnimation translateAnimation = new TranslateAnimation(0, 0, 0, mPopPlayContentRL.getHeight());
+        translateAnimation.setDuration(250);//设置动画持续时间
+        translateAnimation.setFillAfter(true);
+        translateAnimation.setAnimationListener(new Animation.AnimationListener() {
+            @Override
+            public void onAnimationStart(Animation animation) {
+
+            }
+
+            @Override
+            public void onAnimationEnd(Animation animation) {
+                mIsShowPopPlayList = false;
+                mPopPlayListRL.setVisibility(View.GONE);
+            }
+
+            @Override
+            public void onAnimationRepeat(Animation animation) {
+
+            }
+        });
+        mPopPlayContentRL.clearAnimation();
+        mPopPlayContentRL.startAnimation(translateAnimation);
     }
 
     @Override
@@ -972,6 +1199,8 @@ public class MainActivity extends BaseActivity {
             mSlidingMenuLayout.hideFragment();
         } else if (mSlidingMenuLayout.isShowingMenu()) {
             mSlidingMenuLayout.hideMenu();
+        } else if (mIsShowPopPlayList) {
+            hidePopPlayListView();
         } else {
             if ((System.currentTimeMillis() - mExitTime) > 2000) {
                 ToastUtil.showTextToast(getApplicationContext(), getString(R.string.back_tip));

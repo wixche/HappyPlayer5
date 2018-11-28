@@ -10,7 +10,9 @@ import android.widget.LinearLayout;
 import android.widget.RelativeLayout;
 import android.widget.TextView;
 
+import com.zlm.hp.db.util.AudioInfoDB;
 import com.zlm.hp.entity.AudioInfo;
+import com.zlm.hp.fragment.SongFragment;
 import com.zlm.hp.manager.AudioPlayerManager;
 import com.zlm.hp.ui.R;
 import com.zlm.hp.widget.IconfontImageButtonTextView;
@@ -28,10 +30,12 @@ public class AudioAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> 
 
     private Context mContext;
     private ArrayList<AudioInfo> mDatas;
+    private int mSongType;
 
-    public AudioAdapter(Context context, ArrayList<AudioInfo> datas) {
+    public AudioAdapter(Context context, ArrayList<AudioInfo> datas, int songType) {
         this.mContext = context;
         this.mDatas = datas;
+        this.mSongType = songType;
     }
 
     @Override
@@ -68,7 +72,12 @@ public class AudioAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> 
         viewHolder.getListItemRelativeLayout().setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                AudioPlayerManager.newInstance(mContext).playSong(audioInfo);
+                if (mSongType == SongFragment.SONG_TYPE_LOCAL) {
+                    //如果是本地歌曲列表，点击列表时，需要替换当前的播放列表为本地歌曲列表
+                    AudioPlayerManager.newInstance(mContext).playSong(AudioInfoDB.getLocalAudios(mContext), audioInfo);
+                } else {
+                    AudioPlayerManager.newInstance(mContext).playSong(audioInfo);
+                }
             }
         });
 
