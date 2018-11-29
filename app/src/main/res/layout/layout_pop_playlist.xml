@@ -96,20 +96,48 @@
             android:layout_centerVertical="true"
             android:background="#e5e5e5"></View>
 
-        <LinearLayout
+        <RelativeLayout
             android:layout_width="match_parent"
             android:layout_height="match_parent"
-            android:layout_below="@+id/line"
-            android:orientation="vertical">
+            android:layout_below="@+id/line">
 
             <android.support.v7.widget.RecyclerView
                 android:id="@+id/curplaylist_recyclerView"
                 android:layout_width="match_parent"
                 android:layout_height="match_parent"
-                android:overScrollMode="never"
-                android:paddingBottom="@dimen/bar_height"></android.support.v7.widget.RecyclerView>
+                android:layout_above="@+id/poplistcancel"
+                android:overScrollMode="never"></android.support.v7.widget.RecyclerView>
 
-        </LinearLayout>
+
+            <com.zlm.hp.widget.ListItemRelativeLayout
+                android:id="@+id/poplistcancel"
+                android:layout_width="match_parent"
+                android:layout_height="@dimen/songitem_height"
+                android:layout_alignParentBottom="true"
+                android:orientation="vertical"
+                android:visibility="gone">
+
+                <View
+                    android:id="@+id/cancel_line"
+                    android:layout_width="wrap_content"
+                    android:layout_height="0.1dip"
+                    android:layout_marginLeft="5dp"
+                    android:layout_marginRight="5dp"
+                    android:background="#e5e5e5"></View>
+
+                <TextView
+                    android:layout_width="match_parent"
+                    android:layout_height="match_parent"
+                    android:layout_below="@+id/cancel_line"
+                    android:layout_gravity="center_vertical"
+                    android:gravity="center_vertical|center_horizontal"
+                    android:text="@string/title_cancel"
+                    android:textColor="#000"
+                    android:textSize="13dp"></TextView>
+            </com.zlm.hp.widget.ListItemRelativeLayout>
+
+
+        </RelativeLayout>
     </RelativeLayout>
 
     <View

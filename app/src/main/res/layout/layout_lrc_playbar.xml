@@ -131,7 +131,7 @@
                 android:layout_centerVertical="true">
 
                 <ImageView
-                    android:id="@+id/modeAll"
+                    android:id="@+id/modeAllImg"
                     android:layout_width="@dimen/lrc_bar_img_min_height"
                     android:layout_height="@dimen/lrc_bar_img_min_height"
                     android:layout_centerInParent="true"
@@ -140,7 +140,7 @@
 
 
                 <ImageView
-                    android:id="@+id/modeRandom"
+                    android:id="@+id/modeRandomImg"
                     android:layout_width="@dimen/lrc_bar_img_min_height"
                     android:layout_height="@dimen/lrc_bar_img_min_height"
                     android:layout_centerInParent="true"
@@ -148,7 +148,7 @@
                     android:background="@mipmap/ic_player_mode_random1" />
 
                 <ImageView
-                    android:id="@+id/modeSingle"
+                    android:id="@+id/modeSingleImg"
                     android:layout_width="@dimen/lrc_bar_img_min_height"
                     android:layout_height="@dimen/lrc_bar_img_min_height"
                     android:layout_centerInParent="true"

@@ -15,7 +15,7 @@
         android:id="@+id/viewstub_main_pop"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        android:layout="@layout/layout_main_pop"></ViewStub>
+        android:layout="@layout/layout_pop_playlist"></ViewStub>
 
     <LinearLayout
         android:id="@+id/playerBar"

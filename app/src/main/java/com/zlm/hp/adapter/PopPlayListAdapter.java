@@ -40,7 +40,7 @@ public class PopPlayListAdapter extends RecyclerView.Adapter<RecyclerView.ViewHo
     public RecyclerView.ViewHolder onCreateViewHolder(@NonNull ViewGroup viewGroup, int viewType) {
         View view = null;
         if (mType == TYPE_MAIN) {
-            view = LayoutInflater.from(mContext).inflate(R.layout.layout_lvitem_main_popsong, null, false);
+            view = LayoutInflater.from(mContext).inflate(R.layout.layout_lvitem_popsong, null, false);
             PopListViewHolder holder = new PopListViewHolder(view);
             return holder;
         }

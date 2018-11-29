@@ -46,6 +46,12 @@
                 android:layout_alignParentBottom="true"
                 android:layout="@layout/layout_lrc_singerlist"></ViewStub>
 
+            <ViewStub
+                android:id="@+id/viewstub_main_pop"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:layout="@layout/layout_pop_playlist"></ViewStub>
+
         </RelativeLayout>
     </LinearLayout>
 </com.zlm.libs.widget.RotateLayout>

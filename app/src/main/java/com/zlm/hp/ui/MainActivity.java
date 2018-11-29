@@ -216,9 +216,9 @@ public class MainActivity extends BaseActivity {
     private TextView mPopListSizeTv;
 
     //播放模式
-    private IconfontTextView modeAllTv;
-    private IconfontTextView modeRandomTv;
-    private IconfontTextView modeSingleTv;
+    private IconfontTextView mModeAllTv;
+    private IconfontTextView mModeRandomTv;
+    private IconfontTextView mModeSingleTv;
 
 
     ////////////////////////////////////////////////////////////////////////////
@@ -1033,6 +1033,7 @@ public class MainActivity extends BaseActivity {
         mPlayListRListView = findViewById(R.id.curplaylist_recyclerView);
         //初始化内容视图
         mPlayListRListView.setLayoutManager(new LinearLayoutManager(mContext));
+        mPlayListRListView.setPadding(0,0,0,getResources().getDimensionPixelSize(R.dimen.bar_height));
 
         //全屏视图
         mPopPlayListRL = findViewById(R.id.list_pop);
@@ -1048,28 +1049,28 @@ public class MainActivity extends BaseActivity {
         mPopPlayContentRL = findViewById(R.id.pop_content);
         mPopListSizeTv = findViewById(R.id.list_size);
         //播放模式
-        modeAllTv = findViewById(R.id.modeAll);
-        modeRandomTv = findViewById(R.id.modeRandom);
-        modeSingleTv = findViewById(R.id.modeSingle);
+        mModeAllTv = findViewById(R.id.modeAll);
+        mModeRandomTv = findViewById(R.id.modeRandom);
+        mModeSingleTv = findViewById(R.id.modeSingle);
 
-        modeAllTv.setOnClickListener(new View.OnClickListener() {
+        mModeAllTv.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                initPlayModeView(1, modeAllTv, modeRandomTv, modeSingleTv, true);
+                initPlayModeView(1, mModeAllTv, mModeRandomTv, mModeSingleTv, true);
             }
         });
 
-        modeRandomTv.setOnClickListener(new View.OnClickListener() {
+        mModeRandomTv.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                initPlayModeView(3, modeAllTv, modeRandomTv, modeSingleTv, true);
+                initPlayModeView(3, mModeAllTv, mModeRandomTv, mModeSingleTv, true);
             }
         });
 
-        modeSingleTv.setOnClickListener(new View.OnClickListener() {
+        mModeSingleTv.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                initPlayModeView(0, modeAllTv, modeRandomTv, modeSingleTv, true);
+                initPlayModeView(0, mModeAllTv, mModeRandomTv, mModeSingleTv, true);
             }
         });
     }
@@ -1112,7 +1113,7 @@ public class MainActivity extends BaseActivity {
      */
     private void showPopPlayListView() {
         //设置当前播放模式
-        initPlayModeView(mConfigInfo.getPlayModel(), modeAllTv, modeRandomTv, modeSingleTv, false);
+        initPlayModeView(mConfigInfo.getPlayModel(), mModeAllTv, mModeRandomTv, mModeSingleTv, false);
         //设置当前歌曲数据
         List<AudioInfo> audioInfoList =  mConfigInfo.getAudioInfos();
         mPopListSizeTv.setText(audioInfoList.size() + "");

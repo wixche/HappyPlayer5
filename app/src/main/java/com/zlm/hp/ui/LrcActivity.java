@@ -21,6 +21,7 @@ import android.widget.TextView;
 
 import com.zlm.down.entity.DownloadTask;
 import com.zlm.hp.adapter.LrcPopSingerAdapter;
+import com.zlm.hp.adapter.PopPlayListAdapter;
 import com.zlm.hp.async.AsyncHandlerTask;
 import com.zlm.hp.audio.utils.MediaUtil;
 import com.zlm.hp.constants.ConfigInfo;
@@ -41,12 +42,15 @@ import com.zlm.hp.util.ImageUtil;
 import com.zlm.hp.util.ToastUtil;
 import com.zlm.hp.widget.ButtonRelativeLayout;
 import com.zlm.hp.widget.IconfontImageButtonTextView;
+import com.zlm.hp.widget.IconfontTextView;
+import com.zlm.hp.widget.ListItemRelativeLayout;
 import com.zlm.hp.widget.PlayListBGRelativeLayout;
 import com.zlm.hp.widget.TransitionImageView;
 import com.zlm.libs.widget.CustomSeekBar;
 import com.zlm.libs.widget.MusicSeekBar;
 import com.zlm.libs.widget.RotateLayout;
 
+import java.util.List;
 import java.util.Map;
 
 /**
@@ -106,9 +110,9 @@ public class LrcActivity extends BaseActivity {
     private ManyLyricsView mManyLineLyricsView;
 
     //播放模式
-    private ImageView modeAllImg;
-    private ImageView modeRandomImg;
-    private ImageView modeSingleImg;
+    private ImageView mModeAllImg;
+    private ImageView mModeRandomImg;
+    private ImageView mModeSingleImg;
 
     /**
      * 歌手写真图片
@@ -118,7 +122,7 @@ public class LrcActivity extends BaseActivity {
     /**
      * 更多按钮
      */
-    private boolean isMoreMenuPopShowing = false;
+    private boolean mIsMoreMenuPopShowing = false;
     private ViewStub mViewStubMoreMenu;
     private RelativeLayout mMoreMenuPopLayout;
     private PlayListBGRelativeLayout mMoreMenuPopRL;
@@ -127,7 +131,7 @@ public class LrcActivity extends BaseActivity {
     /**
      * 歌曲详情
      */
-    private boolean isSongInfoPopShowing = false;
+    private boolean mIsSongInfoPopShowing = false;
     private ViewStub mViewStubSongInfo;
     private RelativeLayout mSongInfoPopLayout;
     private PlayListBGRelativeLayout mSongInfoPopRL;
@@ -136,11 +140,42 @@ public class LrcActivity extends BaseActivity {
     /**
      * 歌手列表
      */
-    private boolean isSingerListPopShowing = false;
+    private boolean mIsSingerListPopShowing = false;
     private ViewStub mViewStubSingerList;
     private RelativeLayout mSingerListPopLayout;
     private PlayListBGRelativeLayout mSingerListPopRL;
     private RecyclerView mSingerListRecyclerView;
+
+    ///////////////////////////////歌曲列表弹出窗口布局/////////////////////////////////////////
+    private boolean mIsShowPopPlayList = false;
+    /**
+     * 播放列表全屏界面
+     */
+    private RelativeLayout mPopPlayListRL;
+
+    /**
+     * 播放列表内容界面
+     */
+    private RelativeLayout mPopPlayContentRL;
+
+    /**
+     *
+     */
+    private RecyclerView mPlayListRListView;
+
+    /**
+     * 当前播放列表歌曲总数
+     */
+    private TextView mPopListSizeTv;
+
+    //播放模式
+    private IconfontTextView mModeAllTv;
+    private IconfontTextView mModeRandomTv;
+    private IconfontTextView mModeSingleTv;
+
+
+    ////////////////////////////////////////////////////////////////////////////
+
 
     //、、、、、、、、、、、、、、、、、、、、、、、、、翻译和音译歌词、、、、、、、、、、、、、、、、、、、、、、、、、、、
     //翻译歌词
@@ -666,40 +701,32 @@ public class LrcActivity extends BaseActivity {
 
         /////////播放模式//////////////
         //顺序播放
-        modeAllImg = findViewById(R.id.modeAll);
-        modeRandomImg = findViewById(R.id.modeRandom);
-        modeSingleImg = findViewById(R.id.modeSingle);
+        mModeAllImg = mLrcPlaybarLinearLayout.findViewById(R.id.modeAllImg);
+        mModeRandomImg = mLrcPlaybarLinearLayout.findViewById(R.id.modeRandomImg);
+        mModeSingleImg = mLrcPlaybarLinearLayout.findViewById(R.id.modeSingleImg);
 
 
-        modeAllImg.setOnClickListener(new View.OnClickListener() {
+        mModeAllImg.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                initPlayModeView(1, modeAllImg, modeRandomImg, modeSingleImg, true);
+                initPlayModeView(1, mModeAllImg, mModeRandomImg, mModeSingleImg, true);
             }
         });
 
-        modeRandomImg.setOnClickListener(new View.OnClickListener() {
+        mModeRandomImg.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                initPlayModeView(3, modeAllImg, modeRandomImg, modeSingleImg, true);
+                initPlayModeView(3, mModeAllImg, mModeRandomImg, mModeSingleImg, true);
             }
         });
 
-        modeSingleImg.setOnClickListener(new View.OnClickListener() {
+        mModeSingleImg.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                initPlayModeView(0, modeAllImg, modeRandomImg, modeSingleImg, true);
+                initPlayModeView(0, mModeAllImg, mModeRandomImg, mModeSingleImg, true);
             }
         });
-        initPlayModeView(mConfigInfo.getPlayModel(), modeAllImg, modeRandomImg, modeSingleImg, false);
-
-        //播放列表
-        RelativeLayout playListMenu = findViewById(R.id.playlistmenu);
-        playListMenu.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-            }
-        });
+        initPlayModeView(mConfigInfo.getPlayModel(), mModeAllImg, mModeRandomImg, mModeSingleImg, false);
 
         //更多菜单
         IconfontImageButtonTextView moreMenuIIBTV = findViewById(R.id.more_menu);
@@ -727,13 +754,177 @@ public class LrcActivity extends BaseActivity {
                 }
             }
         });
+
+        //播放列表
+        RelativeLayout playlistMenuRL = findViewById(R.id.playlistmenu);
+        playlistMenuRL.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                if (mIsShowPopPlayList) {
+                    hidePopPlayListView();
+                } else {
+                    if (mPopPlayListRL == null) {
+                        initPopPlayListViews();
+                    }
+                    showPopPlayListView();
+                }
+            }
+        });
+    }
+
+
+    /**
+     * 初始化歌曲列表弹出窗口视图
+     */
+    private void initPopPlayListViews() {
+        ViewStub stub = findViewById(R.id.viewstub_main_pop);
+        stub.inflate();
+
+        mPlayListRListView = findViewById(R.id.curplaylist_recyclerView);
+        //初始化内容视图
+        mPlayListRListView.setLayoutManager(new LinearLayoutManager(mContext));
+
+        //全屏视图
+        mPopPlayListRL = findViewById(R.id.list_pop);
+        mPopPlayListRL.setVisibility(View.INVISIBLE);
+        mPopPlayListRL.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                hidePopPlayListView();
+            }
+        });
+
+        //
+        ListItemRelativeLayout cancelLL = findViewById(R.id.poplistcancel);
+        cancelLL.setVisibility(View.VISIBLE);
+        cancelLL.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                hidePopPlayListView();
+            }
+        });
+
+        //内容布局
+        mPopPlayContentRL = findViewById(R.id.pop_content);
+        mPopListSizeTv = findViewById(R.id.list_size);
+        //播放模式
+        mModeAllTv = mPopPlayListRL.findViewById(R.id.modeAll);
+        mModeRandomTv = mPopPlayListRL.findViewById(R.id.modeRandom);
+        mModeSingleTv = mPopPlayListRL.findViewById(R.id.modeSingle);
+
+        mModeAllTv.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                initPlayModeView(1, mModeAllTv, mModeRandomTv, mModeSingleTv, true);
+            }
+        });
+
+        mModeRandomTv.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                initPlayModeView(3, mModeAllTv, mModeRandomTv, mModeSingleTv, true);
+            }
+        });
+
+        mModeSingleTv.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                initPlayModeView(0, mModeAllTv, mModeRandomTv, mModeSingleTv, true);
+            }
+        });
+    }
+
+    /**
+     * 显示歌曲列表弹出窗口
+     */
+    private void showPopPlayListView() {
+        //设置当前播放模式
+        initPlayModeView(mConfigInfo.getPlayModel(), mModeAllTv, mModeRandomTv, mModeSingleTv, false);
+        //设置当前歌曲数据
+        List<AudioInfo> audioInfoList = mConfigInfo.getAudioInfos();
+        mPopListSizeTv.setText(audioInfoList.size() + "");
+        PopPlayListAdapter adapter = new PopPlayListAdapter(mContext, audioInfoList, PopPlayListAdapter.TYPE_MAIN);
+        mPlayListRListView.setAdapter(adapter);
+        /**
+         * 如果该界面还没初始化，则监听
+         */
+        if (mPopPlayContentRL.getHeight() == 0) {
+            mPopPlayContentRL.getViewTreeObserver().addOnGlobalLayoutListener(new ViewTreeObserver.OnGlobalLayoutListener() {
+                @Override
+                public void onGlobalLayout() {
+                    mPopPlayContentRL.getViewTreeObserver().removeOnGlobalLayoutListener(this);
+                    showPopPlayListViewAnimation();
+                }
+            });
+
+        } else {
+            showPopPlayListViewAnimation();
+        }
+    }
+
+    /**
+     * 显示动画
+     */
+    private void showPopPlayListViewAnimation() {
+        mPopPlayListRL.setVisibility(View.VISIBLE);
+        TranslateAnimation translateAnimation = new TranslateAnimation(0, 0, mPopPlayContentRL.getHeight(), 0);
+        translateAnimation.setDuration(250);//设置动画持续时间
+        translateAnimation.setFillAfter(true);
+        translateAnimation.setAnimationListener(new Animation.AnimationListener() {
+            @Override
+            public void onAnimationStart(Animation animation) {
+                mIsShowPopPlayList = true;
+
+            }
+
+            @Override
+            public void onAnimationEnd(Animation animation) {
+                mPopPlayListRL.setBackgroundColor(ColorUtil.parserColor(Color.BLACK, 120));
+            }
+
+            @Override
+            public void onAnimationRepeat(Animation animation) {
+
+            }
+        });
+
+        mPopPlayContentRL.clearAnimation();
+        mPopPlayContentRL.startAnimation(translateAnimation);
+    }
+
+    /**
+     * 隐藏歌曲列表弹出窗口
+     */
+    private void hidePopPlayListView() {
+        TranslateAnimation translateAnimation = new TranslateAnimation(0, 0, 0, mPopPlayContentRL.getHeight());
+        translateAnimation.setDuration(250);//设置动画持续时间
+        translateAnimation.setFillAfter(true);
+        translateAnimation.setAnimationListener(new Animation.AnimationListener() {
+            @Override
+            public void onAnimationStart(Animation animation) {
+
+            }
+
+            @Override
+            public void onAnimationEnd(Animation animation) {
+                mIsShowPopPlayList = false;
+                mPopPlayListRL.setVisibility(View.GONE);
+            }
+
+            @Override
+            public void onAnimationRepeat(Animation animation) {
+
+            }
+        });
+        mPopPlayContentRL.clearAnimation();
+        mPopPlayContentRL.startAnimation(translateAnimation);
     }
 
     /**
      * 显示更多菜单按钮
      */
     private void showMoreMenuView() {
-        if (isMoreMenuPopShowing) return;
+        if (mIsMoreMenuPopShowing) return;
 
         mMoreMenuPopLayout.setVisibility(View.VISIBLE);
 
@@ -743,7 +934,7 @@ public class LrcActivity extends BaseActivity {
         translateAnimation.setAnimationListener(new Animation.AnimationListener() {
             @Override
             public void onAnimationStart(Animation animation) {
-                isMoreMenuPopShowing = true;
+                mIsMoreMenuPopShowing = true;
                 mRotateLayout.setDragType(RotateLayout.NONE);
             }
 
@@ -782,7 +973,7 @@ public class LrcActivity extends BaseActivity {
                     //
                     if (AudioPlayerManager.newInstance(mContext).getPlayStatus() == AudioPlayerManager.PLAYING) {
                         Intent intent = new Intent(LrcActivity.this, SearchLrcActivity.class);
-                        intent.putExtra(SearchLrcActivity.AUDIO_DATA_KEY,audioInfo);
+                        intent.putExtra(SearchLrcActivity.AUDIO_DATA_KEY, audioInfo);
                         startActivity(intent);
                         //
                         overridePendingTransition(R.anim.in_from_bottom, 0);
@@ -1169,7 +1360,7 @@ public class LrcActivity extends BaseActivity {
      * @param singerNameArray
      */
     private void showSingerListView(String[] singerNameArray, final String hash) {
-        if (isSingerListPopShowing) return;
+        if (mIsSingerListPopShowing) return;
 
         LrcPopSingerAdapter adapter = new LrcPopSingerAdapter(mContext, singerNameArray, mUIHandler, mWorkerHandler, new PopSingerListener() {
             @Override
@@ -1188,7 +1379,7 @@ public class LrcActivity extends BaseActivity {
         translateAnimation.setAnimationListener(new Animation.AnimationListener() {
             @Override
             public void onAnimationStart(Animation animation) {
-                isSingerListPopShowing = true;
+                mIsSingerListPopShowing = true;
                 mRotateLayout.setDragType(RotateLayout.NONE);
             }
 
@@ -1265,7 +1456,7 @@ public class LrcActivity extends BaseActivity {
 
             @Override
             public void onAnimationEnd(Animation animation) {
-                isSingerListPopShowing = false;
+                mIsSingerListPopShowing = false;
                 mSingerListPopLayout.setVisibility(View.INVISIBLE);
                 mRotateLayout.setDragType(RotateLayout.LEFT_TO_RIGHT);
             }
@@ -1322,7 +1513,7 @@ public class LrcActivity extends BaseActivity {
 
             @Override
             public void onAnimationEnd(Animation animation) {
-                isSongInfoPopShowing = false;
+                mIsSongInfoPopShowing = false;
                 mSongInfoPopLayout.setVisibility(View.INVISIBLE);
                 mRotateLayout.setDragType(RotateLayout.LEFT_TO_RIGHT);
             }
@@ -1342,7 +1533,7 @@ public class LrcActivity extends BaseActivity {
      * @param audioInfo
      */
     private void showSongInfoView(AudioInfo audioInfo) {
-        if (isSongInfoPopShowing) return;
+        if (mIsSongInfoPopShowing) return;
 
         TextView popSingerNameTv = findViewById(R.id.pop_singerName);
         popSingerNameTv.setText(audioInfo.getSingerName());
@@ -1364,7 +1555,7 @@ public class LrcActivity extends BaseActivity {
         translateAnimation.setAnimationListener(new Animation.AnimationListener() {
             @Override
             public void onAnimationStart(Animation animation) {
-                isSongInfoPopShowing = true;
+                mIsSongInfoPopShowing = true;
                 mRotateLayout.setDragType(RotateLayout.NONE);
             }
 
@@ -1427,7 +1618,7 @@ public class LrcActivity extends BaseActivity {
 
             @Override
             public void onAnimationEnd(Animation animation) {
-                isMoreMenuPopShowing = false;
+                mIsMoreMenuPopShowing = false;
                 mMoreMenuPopLayout.setVisibility(View.INVISIBLE);
                 mRotateLayout.setDragType(RotateLayout.LEFT_TO_RIGHT);
             }
@@ -1679,7 +1870,7 @@ public class LrcActivity extends BaseActivity {
      * @param modeRandomImg
      * @param modeSingleImg
      */
-    private void initPlayModeView(int playMode, ImageView modeAllImg, ImageView modeRandomImg, ImageView modeSingleImg, boolean isTipShow) {
+    private void initPlayModeView(int playMode, View modeAllImg, View modeRandomImg, View modeSingleImg, boolean isTipShow) {
         if (playMode == 0) {
             if (isTipShow)
                 ToastUtil.showTextToast(mContext, getString(R.string.mode_all_text));
@@ -1700,23 +1891,29 @@ public class LrcActivity extends BaseActivity {
             modeSingleImg.setVisibility(View.VISIBLE);
         }
         //
-        mConfigInfo.setPlayModel(playMode).save();
+        if (isTipShow)
+            mConfigInfo.setPlayModel(playMode).save();
     }
 
     @Override
     public void onBackPressed() {
-        if (isMoreMenuPopShowing) {
+        if (mIsMoreMenuPopShowing) {
             hideMoreMenuView();
             return;
         }
 
-        if (isSongInfoPopShowing) {
+        if (mIsSongInfoPopShowing) {
             hideSongInfoView();
             return;
         }
 
-        if (isSingerListPopShowing) {
+        if (mIsSingerListPopShowing) {
             hideSingerListView();
+            return;
+        }
+
+        if (mIsShowPopPlayList) {
+            hidePopPlayListView();
             return;
         }
 
