@@ -815,6 +815,7 @@ public class LrcActivity extends BaseActivity {
         mModeAllTv.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
+                initPlayModeView(1, mModeAllImg, mModeRandomImg, mModeSingleImg, false);
                 initPlayModeView(1, mModeAllTv, mModeRandomTv, mModeSingleTv, true);
             }
         });
@@ -822,6 +823,7 @@ public class LrcActivity extends BaseActivity {
         mModeRandomTv.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
+                initPlayModeView(3, mModeAllImg, mModeRandomImg, mModeSingleImg, false);
                 initPlayModeView(3, mModeAllTv, mModeRandomTv, mModeSingleTv, true);
             }
         });
@@ -829,6 +831,7 @@ public class LrcActivity extends BaseActivity {
         mModeSingleTv.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
+                initPlayModeView(0, mModeAllImg, mModeRandomImg, mModeSingleImg, false);
                 initPlayModeView(0, mModeAllTv, mModeRandomTv, mModeSingleTv, true);
             }
         });
@@ -843,7 +846,7 @@ public class LrcActivity extends BaseActivity {
         //设置当前歌曲数据
         List<AudioInfo> audioInfoList = mConfigInfo.getAudioInfos();
         mPopListSizeTv.setText(audioInfoList.size() + "");
-        PopPlayListAdapter adapter = new PopPlayListAdapter(mContext, audioInfoList, PopPlayListAdapter.TYPE_MAIN);
+        PopPlayListAdapter adapter = new PopPlayListAdapter(mContext, audioInfoList);
         mPlayListRListView.setAdapter(adapter);
         /**
          * 如果该界面还没初始化，则监听

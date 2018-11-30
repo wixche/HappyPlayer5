@@ -23,28 +23,20 @@ import java.util.List;
  * @date: 2018-11-28 21:08
  **/
 public class PopPlayListAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> {
-    public static final int TYPE_MAIN = 0;
-    public static final int TYPE_LRC = 1;
     private Context mContext;
     private List<AudioInfo> mDatas;
-    private int mType;
 
-    public PopPlayListAdapter(Context context, List<AudioInfo> datas, int type) {
+    public PopPlayListAdapter(Context context, List<AudioInfo> datas) {
         this.mContext = context;
         this.mDatas = datas;
-        this.mType = type;
     }
 
     @NonNull
     @Override
     public RecyclerView.ViewHolder onCreateViewHolder(@NonNull ViewGroup viewGroup, int viewType) {
-        View view = null;
-        if (mType == TYPE_MAIN) {
-            view = LayoutInflater.from(mContext).inflate(R.layout.layout_lvitem_popsong, null, false);
-            PopListViewHolder holder = new PopListViewHolder(view);
-            return holder;
-        }
-        return null;
+        View view = LayoutInflater.from(mContext).inflate(R.layout.layout_lvitem_popsong, null, false);
+        PopListViewHolder holder = new PopListViewHolder(view);
+        return holder;
     }
 
     @Override

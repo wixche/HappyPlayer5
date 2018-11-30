@@ -209,6 +209,7 @@ public class MainActivity extends BaseActivity {
      *
      */
     private RecyclerView mPlayListRListView;
+    private PopPlayListAdapter mAdapter;
 
     /**
      * 当前播放列表歌曲总数
@@ -1117,8 +1118,8 @@ public class MainActivity extends BaseActivity {
         //设置当前歌曲数据
         List<AudioInfo> audioInfoList =  mConfigInfo.getAudioInfos();
         mPopListSizeTv.setText(audioInfoList.size() + "");
-        PopPlayListAdapter adapter = new PopPlayListAdapter(mContext,audioInfoList,PopPlayListAdapter.TYPE_MAIN);
-        mPlayListRListView.setAdapter(adapter);
+        mAdapter = new PopPlayListAdapter(mContext,audioInfoList);
+        mPlayListRListView.setAdapter(mAdapter);
         /**
          * 如果该界面还没初始化，则监听
          */
