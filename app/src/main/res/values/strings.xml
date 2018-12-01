@@ -134,7 +134,7 @@
     <string name="loading_tip">正在加载数据，请稍候...</string>
     <string name="input_key">请输入关键字</string>
 
-    <string name="help_tip">Github：https://github.com/zhangliangming\n联系方式：316257874@qq.com\n声明：仅用于学习用途</string>
+    <string name="help_tip">Git：https://github.com/zhangliangming\nGithub：https://zhangliangming.github.io/\n简书：https://www.jianshu.com/u/1c6b49fb806b\nCSDN：https://mp.csdn.net/\n安卓巴士：http://www.apkbus.com/?278062\n联系方式：316257874@qq.com\n声明：仅用于学习用途</string>
 
     <!-- TODO: Remove or change this placeholder text -->
     <string name="hello_blank_fragment">Hello blank fragment</string>

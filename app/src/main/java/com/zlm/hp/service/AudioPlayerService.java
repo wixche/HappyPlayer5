@@ -574,6 +574,7 @@ public class AudioPlayerService extends Service {
                 @Override
                 public void onCompletion(IMediaPlayer mp) {
 
+                    releasePlayer();
                     if (audioInfo.getType() == AudioInfo.TYPE_NET && mMediaPlayer.getCurrentPosition() < (audioInfo.getDuration() - 2 * 1000)) {
                         //网络歌曲未播放全部，需要重新调用播放歌曲
                         handleSong(audioInfo);
@@ -581,8 +582,6 @@ public class AudioPlayerService extends Service {
                         //播放完成，执行下一首操作
                         AudioPlayerManager.newInstance(mContext).next();
                     }
-
-                    releasePlayer();
 
                 }
             });
