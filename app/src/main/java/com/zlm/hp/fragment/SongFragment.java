@@ -133,6 +133,14 @@ public class SongFragment extends BaseFragment {
      * @param mainView
      */
     private void initView(View mainView) {
+
+        String title = getString(R.string.app_name);
+        Bundle bundle = getArguments();
+        if (bundle != null) {
+            mSongType = bundle.getInt(SONGTYPE_KEY, SONG_TYPE_RECOMMEND);
+        }
+
+
         mRecyclerView = mainView.findViewById(R.id.recyclerView);
         LinearLayoutManager layoutManager = new LinearLayoutManager(mContext);
         layoutManager.setOrientation(LinearLayoutManager.VERTICAL);
@@ -166,12 +174,6 @@ public class SongFragment extends BaseFragment {
                 mWorkerHandler.sendEmptyMessage(LOADREFRESHDATA);
             }
         });
-
-        String title = getString(R.string.app_name);
-        Bundle bundle = getArguments();
-        if (bundle != null) {
-            mSongType = bundle.getInt(SONGTYPE_KEY, SONG_TYPE_RECOMMEND);
-        }
 
         switch (mSongType) {
             case SONG_TYPE_RECOMMEND:

@@ -112,7 +112,7 @@
             <com.zlm.hp.widget.ListItemRelativeLayout
                 android:id="@+id/poplistcancel"
                 android:layout_width="match_parent"
-                android:layout_height="@dimen/songitem_height"
+                android:layout_height="@dimen/lrc_pop_item_height"
                 android:layout_alignParentBottom="true"
                 android:orientation="vertical"
                 android:visibility="gone">

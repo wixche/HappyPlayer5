@@ -407,15 +407,21 @@ public class AudioPlayerManager {
     }
 
     /**
-     * 播放歌曲
+     * 插队播放歌曲
      */
     public synchronized void playSong(AudioInfo audioInfo) {
         ConfigInfo configInfo = ConfigInfo.obtain();
         List<AudioInfo> audioInfoList = configInfo.getAudioInfos();
-        int curIndex = getCurSongIndex(audioInfoList, audioInfo.getHash());
+        int nextIndex = getCurSongIndex(audioInfoList, audioInfo.getHash());
+        if (nextIndex != -1) {
+            audioInfoList.remove(nextIndex);
+        }
+        int curIndex = getCurSongIndex(audioInfoList, configInfo.getPlayHash());
         if (curIndex == -1) {
             audioInfoList.add(audioInfo);
             configInfo.setAudioInfos(audioInfoList);
+        } else {
+            audioInfoList.add(curIndex + 1, audioInfo);
         }
 
         play(audioInfo);
@@ -431,6 +437,7 @@ public class AudioPlayerManager {
         if (audioInfoList != null) {
             ConfigInfo configInfo = ConfigInfo.obtain();
             configInfo.setAudioInfos(audioInfoList);
+            configInfo.save();
             //播放歌曲
             play(audioInfo);
         }
