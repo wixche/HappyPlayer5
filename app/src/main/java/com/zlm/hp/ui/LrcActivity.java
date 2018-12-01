@@ -848,6 +848,13 @@ public class LrcActivity extends BaseActivity {
         mPopListSizeTv.setText(audioInfoList.size() + "");
         PopPlayListAdapter adapter = new PopPlayListAdapter(mContext, audioInfoList);
         mPlayListRListView.setAdapter(adapter);
+
+        //定位
+        int position = AudioPlayerManager.newInstance(mContext).getCurSongIndex(mConfigInfo.getAudioInfos(), mConfigInfo.getPlayHash());
+        if (position != -1) {
+            ((LinearLayoutManager) mPlayListRListView.getLayoutManager()).scrollToPositionWithOffset(position, 0);
+        }
+
         /**
          * 如果该界面还没初始化，则监听
          */

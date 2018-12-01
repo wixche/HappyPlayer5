@@ -422,6 +422,7 @@ public class AudioPlayerManager {
             configInfo.setAudioInfos(audioInfoList);
         } else {
             audioInfoList.add(curIndex + 1, audioInfo);
+            configInfo.setAudioInfos(audioInfoList);
         }
 
         play(audioInfo);
@@ -437,7 +438,6 @@ public class AudioPlayerManager {
         if (audioInfoList != null) {
             ConfigInfo configInfo = ConfigInfo.obtain();
             configInfo.setAudioInfos(audioInfoList);
-            configInfo.save();
             //播放歌曲
             play(audioInfo);
         }
@@ -448,7 +448,7 @@ public class AudioPlayerManager {
      *
      * @return
      */
-    private int getCurSongIndex(List<AudioInfo> audioInfoList, String hash) {
+    public int getCurSongIndex(List<AudioInfo> audioInfoList, String hash) {
         int index = -1;
         if (audioInfoList == null) return index;
         for (int i = 0; i < audioInfoList.size(); i++) {

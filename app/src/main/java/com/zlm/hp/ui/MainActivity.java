@@ -1034,7 +1034,7 @@ public class MainActivity extends BaseActivity {
         mPlayListRListView = findViewById(R.id.curplaylist_recyclerView);
         //初始化内容视图
         mPlayListRListView.setLayoutManager(new LinearLayoutManager(mContext));
-        mPlayListRListView.setPadding(0,0,0,getResources().getDimensionPixelSize(R.dimen.bar_height));
+        mPlayListRListView.setPadding(0, 0, 0, getResources().getDimensionPixelSize(R.dimen.bar_height));
 
         //全屏视图
         mPopPlayListRL = findViewById(R.id.list_pop);
@@ -1116,10 +1116,16 @@ public class MainActivity extends BaseActivity {
         //设置当前播放模式
         initPlayModeView(mConfigInfo.getPlayModel(), mModeAllTv, mModeRandomTv, mModeSingleTv, false);
         //设置当前歌曲数据
-        List<AudioInfo> audioInfoList =  mConfigInfo.getAudioInfos();
+        List<AudioInfo> audioInfoList = mConfigInfo.getAudioInfos();
         mPopListSizeTv.setText(audioInfoList.size() + "");
-        mAdapter = new PopPlayListAdapter(mContext,audioInfoList);
+        mAdapter = new PopPlayListAdapter(mContext, audioInfoList);
         mPlayListRListView.setAdapter(mAdapter);
+
+        //定位
+        int position = AudioPlayerManager.newInstance(mContext).getCurSongIndex(mConfigInfo.getAudioInfos(), mConfigInfo.getPlayHash());
+        if (position != -1) {
+            ((LinearLayoutManager) mPlayListRListView.getLayoutManager()).scrollToPositionWithOffset(position, 0);
+        }
         /**
          * 如果该界面还没初始化，则监听
          */
