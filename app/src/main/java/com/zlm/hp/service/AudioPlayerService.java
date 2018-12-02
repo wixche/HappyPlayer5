@@ -113,6 +113,8 @@ public class AudioPlayerService extends Service {
                     case AudioBroadcastReceiver.ACTION_CODE_NOTIFY_PRE:
                         AudioPlayerManager.newInstance(mContext).pre();
                         break;
+                    case AudioBroadcastReceiver.ACTION_CODE_NOTIFY_UNLOCK:
+                        break;
                     case AudioBroadcastReceiver.ACTION_CODE_NOTIFY_DESLRC_SHOW_ACTION:
                         if (!AppOpsUtils.allowFloatWindow(getApplication())) {
                             //没有权限
@@ -125,16 +127,10 @@ public class AudioPlayerService extends Service {
                                 }
                             });
                         } else {
-                            AudioBroadcastReceiver.sendReceiver(getApplicationContext(), AudioBroadcastReceiver.ACTION_CODE_NOTIFY_DESLRC_SHOW);
+
                         }
 
                         break;
-                    case AudioBroadcastReceiver.ACTION_CODE_NOTIFY_UNLOCK:
-
-                        ConfigInfo configInfo = ConfigInfo.obtain();
-                        configInfo.setDesktopLrcCanMove(true);
-
-                    case AudioBroadcastReceiver.ACTION_CODE_NOTIFY_LOCK:
                     case AudioBroadcastReceiver.ACTION_CODE_NOTIFY_DESLRC:
 
                         mUIHandler.post(new Runnable() {
@@ -166,7 +162,7 @@ public class AudioPlayerService extends Service {
                         //
                         Bundle notifySingerLoadedBundle = intent.getBundleExtra(AudioBroadcastReceiver.ACTION_BUNDLEKEY);
                         final AudioInfo curAudioInfo = notifySingerLoadedBundle.getParcelable(AudioBroadcastReceiver.ACTION_DATA_KEY);
-                        if (curAudioInfo != null && mAudioInfo != null && curAudioInfo.getHash().equals(mAudioInfo.getHash())) {
+                        if (curAudioInfo != null) {
                             mUIHandler.post(new Runnable() {
                                 @Override
                                 public void run() {
@@ -180,10 +176,6 @@ public class AudioPlayerService extends Service {
 
                         Bundle initBundle = intent.getBundleExtra(AudioBroadcastReceiver.ACTION_BUNDLEKEY);
                         final AudioInfo initAudioInfo = initBundle.getParcelable(AudioBroadcastReceiver.ACTION_DATA_KEY);
-
-                        //设置为当前歌曲
-                        mAudioInfo = initAudioInfo;
-
                         mUIHandler.post(new Runnable() {
                             @Override
                             public void run() {
@@ -571,6 +563,7 @@ public class AudioPlayerService extends Service {
      * @param audioInfo
      */
     private void handleSong(final AudioInfo audioInfo) {
+        this.mAudioInfo = audioInfo;
         try {
             String fileName = audioInfo.getTitle();
             String filePath = ResourceUtil.getFilePath(mContext, ResourceConstants.PATH_AUDIO, fileName + "." + audioInfo.getFileExt());
