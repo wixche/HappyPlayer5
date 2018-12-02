@@ -448,6 +448,7 @@ public class AudioPlayerService extends Service {
                     .setContentText(getString(R.string.def_songName))
                     .setSmallIcon(R.mipmap.ic_launcher_foreground)
                     .setChannelId(CHANNEL_ID)
+                    .setVisibility(Notification.VISIBILITY_PUBLIC)
                     .build();
         } else {
 
@@ -458,6 +459,7 @@ public class AudioPlayerService extends Service {
                         .setContentTitle(tickerText)
                         .setContentText(getString(R.string.def_songName))
                         .setSmallIcon(R.mipmap.ic_launcher_foreground)
+                        .setVisibility(Notification.VISIBILITY_PUBLIC)
                         .build();
 
             } else {

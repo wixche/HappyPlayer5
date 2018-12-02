@@ -146,6 +146,7 @@ public class PhoneV4Receiver extends BroadcastReceiver {
         }
     }
 
+
     /**
      * 播放上一首
      */
@@ -169,11 +170,11 @@ public class PhoneV4Receiver extends BroadcastReceiver {
 
     @Override
     public void onReceive(Context context, Intent intent) {
-        ConfigInfo configInfo = ConfigInfo.obtain();
-        if (!configInfo.isWire()) return;
-
         String action = intent.getAction();
         if (action.equals("android.intent.action.MEDIA_BUTTON")) {
+
+            ConfigInfo configInfo = ConfigInfo.obtain();
+            if (!configInfo.isWire()) return;
 
             // 耳机事件 Intent 附加值为(Extra)点击MEDIA_BUTTON的按键码
 
