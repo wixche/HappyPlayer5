@@ -180,6 +180,10 @@ public class AudioPlayerService extends Service {
 
                         Bundle initBundle = intent.getBundleExtra(AudioBroadcastReceiver.ACTION_BUNDLEKEY);
                         final AudioInfo initAudioInfo = initBundle.getParcelable(AudioBroadcastReceiver.ACTION_DATA_KEY);
+
+                        //设置为当前歌曲
+                        mAudioInfo = initAudioInfo;
+
                         mUIHandler.post(new Runnable() {
                             @Override
                             public void run() {
@@ -567,7 +571,6 @@ public class AudioPlayerService extends Service {
      * @param audioInfo
      */
     private void handleSong(final AudioInfo audioInfo) {
-        this.mAudioInfo = audioInfo;
         try {
             String fileName = audioInfo.getTitle();
             String filePath = ResourceUtil.getFilePath(mContext, ResourceConstants.PATH_AUDIO, fileName + "." + audioInfo.getFileExt());
