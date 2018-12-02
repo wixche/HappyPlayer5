@@ -2,6 +2,7 @@ package com.zlm.hp.adapter;
 
 import android.content.Context;
 import android.support.v7.widget.RecyclerView;
+import android.text.TextUtils;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -10,6 +11,7 @@ import android.widget.LinearLayout;
 import android.widget.RelativeLayout;
 import android.widget.TextView;
 
+import com.zlm.hp.constants.ConfigInfo;
 import com.zlm.hp.db.util.AudioInfoDB;
 import com.zlm.hp.entity.AudioInfo;
 import com.zlm.hp.fragment.SongFragment;
@@ -31,11 +33,15 @@ public class AudioAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> 
     private Context mContext;
     private ArrayList<AudioInfo> mDatas;
     private int mSongType;
+    private String mOldPlayHash = "";
+    private ConfigInfo mConfigInfo;
 
     public AudioAdapter(Context context, ArrayList<AudioInfo> datas, int songType) {
         this.mContext = context;
         this.mDatas = datas;
         this.mSongType = songType;
+        mConfigInfo = ConfigInfo.obtain();
+        mOldPlayHash = mConfigInfo.getPlayHash();
     }
 
     @Override
@@ -61,26 +67,93 @@ public class AudioAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> 
      * @param viewHolder
      * @param audioInfo
      */
-    private void reshViewHolder(int position, final AudioViewHolder viewHolder, final AudioInfo audioInfo) {
+    private void reshViewHolder(final int position, final AudioViewHolder viewHolder, final AudioInfo audioInfo) {
+        if (audioInfo.getHash().equals(mConfigInfo.getPlayHash())) {
+            viewHolder.getStatusView().setVisibility(View.VISIBLE);
+            mOldPlayHash = audioInfo.getHash();
+        } else {
+            viewHolder.getStatusView().setVisibility(View.INVISIBLE);
 
-        viewHolder.getSongIndexTv().setText((position + 1) + "");
+        }
+
+        viewHolder.getSongIndexTv().setText(((position + 1) < 10 ? "0" + (position + 1) : (position + 1) + ""));
         viewHolder.getSongIndexTv().setVisibility(View.VISIBLE);
-
         viewHolder.getSongNameTv().setText(audioInfo.getSongName());
         viewHolder.getSingerNameTv().setText(audioInfo.getSingerName());
         viewHolder.getMenuLinearLayout().setVisibility(View.GONE);
         viewHolder.getListItemRelativeLayout().setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
+                int oldIndex = getAudioIndex(mConfigInfo.getPlayHash());
+                if (oldIndex == position) {
+                    AudioPlayerManager.newInstance(mContext).playOrPause();
+                    return;
+                }
+
+                mOldPlayHash = audioInfo.getHash();
                 if (mSongType == SongFragment.SONG_TYPE_LOCAL) {
                     //如果是本地歌曲列表，点击列表时，需要替换当前的播放列表为本地歌曲列表
                     AudioPlayerManager.newInstance(mContext).playSong(AudioInfoDB.getLocalAudios(mContext), audioInfo);
                 } else {
-                    AudioPlayerManager.newInstance(mContext).playSong(audioInfo);
+                    AudioPlayerManager.newInstance(mContext).playSongAndAdd(audioInfo);
+                }
+
+                if (oldIndex != -1) {
+                    notifyItemChanged(oldIndex);
+                }
+                int newIndex = getAudioIndex(audioInfo.getHash());
+                if (newIndex != -1) {
+                    notifyItemChanged(newIndex);
                 }
             }
         });
 
+    }
+
+    /***
+     * 刷新
+     * @param audioInfo
+     */
+    public void reshViewHolder(AudioInfo audioInfo) {
+        int oldIndex = getAudioIndex(mOldPlayHash);
+        if (oldIndex != -1) {
+            notifyItemChanged(oldIndex);
+        }
+        int newIndex = getAudioIndex(audioInfo);
+        if (newIndex != -1) {
+            notifyItemChanged(newIndex);
+        }
+    }
+
+    /**
+     * 获取歌曲索引
+     *
+     * @param audioInfo
+     * @return
+     */
+    private int getAudioIndex(AudioInfo audioInfo) {
+        if (audioInfo == null) {
+            return -1;
+        }
+        return getAudioIndex(audioInfo.getHash());
+    }
+
+    /**
+     * 获取歌曲索引
+     *
+     * @return
+     */
+    private int getAudioIndex(String playHash) {
+        if (TextUtils.isEmpty(playHash)) return -1;
+        if (mDatas != null && mDatas.size() > 0) {
+            for (int i = 0; i < mDatas.size(); i++) {
+                AudioInfo temp = mDatas.get(i);
+                if (temp.getHash().equals(playHash)) {
+                    return i;
+                }
+            }
+        }
+        return -1;
     }
 
     @Override

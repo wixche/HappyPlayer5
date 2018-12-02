@@ -1,5 +1,7 @@
 package com.zlm.hp.fragment;
 
+import android.content.Context;
+import android.content.Intent;
 import android.os.Bundle;
 import android.os.Message;
 import android.support.v7.widget.LinearLayoutManager;
@@ -13,6 +15,7 @@ import com.zlm.hp.constants.ConfigInfo;
 import com.zlm.hp.entity.AudioInfo;
 import com.zlm.hp.http.APIHttpClient;
 import com.zlm.hp.http.HttpReturnResult;
+import com.zlm.hp.receiver.AudioBroadcastReceiver;
 import com.zlm.hp.ui.R;
 import com.zlm.hp.util.HttpUtil;
 import com.zlm.hp.util.ToastUtil;
@@ -34,6 +37,12 @@ public class LastSongFragment extends BaseFragment {
     private LRecyclerView mRecyclerView;
 
     private LRecyclerViewAdapter mAdapter;
+
+    /**
+     * 音频广播
+     */
+    private AudioBroadcastReceiver mAudioBroadcastReceiver;
+
 
     /**
      *
@@ -117,6 +126,39 @@ public class LastSongFragment extends BaseFragment {
                 mWorkerHandler.sendEmptyMessage(LOADREFRESHDATA);
             }
         });
+
+        //音频广播
+        mAudioBroadcastReceiver = new AudioBroadcastReceiver();
+        mAudioBroadcastReceiver.setReceiverListener(new AudioBroadcastReceiver.AudioReceiverListener() {
+            @Override
+            public void onReceive(Context context, final Intent intent, final int code) {
+                mUIHandler.post(new Runnable() {
+                    @Override
+                    public void run() {
+                        handleAudioBroadcastReceiver(intent, code);
+                    }
+                });
+            }
+
+            private void handleAudioBroadcastReceiver(Intent intent, int code) {
+                switch (code) {
+                    case AudioBroadcastReceiver.ACTION_CODE_NULL:
+                    case AudioBroadcastReceiver.ACTION_CODE_INIT:
+
+                        if (mAdapter != null) {
+                            Bundle initBundle = intent.getBundleExtra(AudioBroadcastReceiver.ACTION_BUNDLEKEY);
+                            if (initBundle == null) {
+                                ((AudioAdapter) (mAdapter.getInnerAdapter())).reshViewHolder(null);
+                                return;
+                            }
+                            AudioInfo initAudioInfo = initBundle.getParcelable(AudioBroadcastReceiver.ACTION_DATA_KEY);
+                            ((AudioAdapter) (mAdapter.getInnerAdapter())).reshViewHolder(initAudioInfo);
+                        }
+                        break;
+                }
+            }
+        });
+        mAudioBroadcastReceiver.registerReceiver(mContext);
     }
 
     @Override
@@ -189,5 +231,12 @@ public class LastSongFragment extends BaseFragment {
     @Override
     protected void isFristVisibleToUser() {
         mWorkerHandler.sendEmptyMessage(LOADREFRESHDATA);
+    }
+
+    @Override
+    public void onDestroy() {
+        if (mAudioBroadcastReceiver != null)
+            mAudioBroadcastReceiver.unregisterReceiver(mContext);
+        super.onDestroy();
     }
 }

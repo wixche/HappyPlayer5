@@ -1,5 +1,7 @@
 package com.zlm.hp.fragment;
 
+import android.content.Context;
+import android.content.Intent;
 import android.os.Bundle;
 import android.os.Message;
 import android.support.v7.widget.LinearLayoutManager;
@@ -21,6 +23,7 @@ import com.zlm.hp.entity.SpecialInfo;
 import com.zlm.hp.http.APIHttpClient;
 import com.zlm.hp.http.HttpClient;
 import com.zlm.hp.http.HttpReturnResult;
+import com.zlm.hp.receiver.AudioBroadcastReceiver;
 import com.zlm.hp.receiver.FragmentReceiver;
 import com.zlm.hp.ui.R;
 import com.zlm.hp.util.HttpUtil;
@@ -44,6 +47,11 @@ public class SongFragment extends BaseFragment {
     private LRecyclerView mRecyclerView;
 
     private LRecyclerViewAdapter mAdapter;
+
+    /**
+     * 音频广播
+     */
+    private AudioBroadcastReceiver mAudioBroadcastReceiver;
 
     /**
      *
@@ -147,7 +155,7 @@ public class SongFragment extends BaseFragment {
         mRecyclerView.setLayoutManager(layoutManager);
         //
         mDatas = new ArrayList<AudioInfo>();
-        mAdapter = new LRecyclerViewAdapter(new AudioAdapter(mContext, mDatas,mSongType));
+        mAdapter = new LRecyclerViewAdapter(new AudioAdapter(mContext, mDatas, mSongType));
         mRecyclerView.setAdapter(mAdapter);
 
 
@@ -209,6 +217,38 @@ public class SongFragment extends BaseFragment {
             }
         });
 
+        //音频广播
+        mAudioBroadcastReceiver = new AudioBroadcastReceiver();
+        mAudioBroadcastReceiver.setReceiverListener(new AudioBroadcastReceiver.AudioReceiverListener() {
+            @Override
+            public void onReceive(Context context, final Intent intent, final int code) {
+                mUIHandler.post(new Runnable() {
+                    @Override
+                    public void run() {
+                        handleAudioBroadcastReceiver(intent, code);
+                    }
+                });
+            }
+
+            private void handleAudioBroadcastReceiver(Intent intent, int code) {
+                switch (code) {
+                    case AudioBroadcastReceiver.ACTION_CODE_NULL:
+                    case AudioBroadcastReceiver.ACTION_CODE_INIT:
+
+                        if (mAdapter != null) {
+                            Bundle initBundle = intent.getBundleExtra(AudioBroadcastReceiver.ACTION_BUNDLEKEY);
+                            if (initBundle == null) {
+                                ((AudioAdapter) (mAdapter.getInnerAdapter())).reshViewHolder(null);
+                                return;
+                            }
+                            AudioInfo initAudioInfo = initBundle.getParcelable(AudioBroadcastReceiver.ACTION_DATA_KEY);
+                            ((AudioAdapter) (mAdapter.getInnerAdapter())).reshViewHolder(initAudioInfo);
+                        }
+                        break;
+                }
+            }
+        });
+        mAudioBroadcastReceiver.registerReceiver(mContext);
     }
 
     @Override
@@ -314,7 +354,7 @@ public class SongFragment extends BaseFragment {
             case SONG_TYPE_RECOMMEND:
 
                 RankInfo rankInfo = bundle.getParcelable(DATA_KEY);
-                httpReturnResult = apiHttpClient.rankSongList(mContext, rankInfo.getRankId(),rankInfo.getRankType(), page, mPageSize, configInfo.isWifi());
+                httpReturnResult = apiHttpClient.rankSongList(mContext, rankInfo.getRankId(), rankInfo.getRankType(), page, mPageSize, configInfo.isWifi());
 
                 break;
             case SONG_TYPE_SPECIAL:
@@ -359,7 +399,7 @@ public class SongFragment extends BaseFragment {
             case SONG_TYPE_RECOMMEND:
 
                 RankInfo rankInfo = bundle.getParcelable(DATA_KEY);
-                httpReturnResult = apiHttpClient.rankSongList(mContext, rankInfo.getRankId(),rankInfo.getRankType(), mPage, mPageSize, configInfo.isWifi());
+                httpReturnResult = apiHttpClient.rankSongList(mContext, rankInfo.getRankId(), rankInfo.getRankType(), mPage, mPageSize, configInfo.isWifi());
 
                 break;
             case SONG_TYPE_SPECIAL:
@@ -393,4 +433,10 @@ public class SongFragment extends BaseFragment {
         mWorkerHandler.sendEmptyMessage(LOADREFRESHDATA);
     }
 
+    @Override
+    public void onDestroy() {
+        if (mAudioBroadcastReceiver != null)
+            mAudioBroadcastReceiver.unregisterReceiver(mContext);
+        super.onDestroy();
+    }
 }

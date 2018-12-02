@@ -142,6 +142,16 @@ public class AudioPlayerManager {
     }
 
     /**
+     * 播放
+     *
+     * @param audioInfo
+     */
+    public void playSong(AudioInfo audioInfo) {
+        play(audioInfo);
+    }
+
+
+    /**
      * 播放歌曲
      */
     public synchronized void playOrPause() {
@@ -159,7 +169,7 @@ public class AudioPlayerManager {
     /**
      * 播放歌曲
      */
-    private void play(AudioInfo audioInfo) {
+    public void play(AudioInfo audioInfo) {
         boolean isSeekTo = mPlayStatus == SEEKTO;
         boolean isInit = ((mPlayStatus != PAUSE) && !isSeekTo);
         //还有旧的歌曲在播放
@@ -409,7 +419,7 @@ public class AudioPlayerManager {
     /**
      * 插队播放歌曲
      */
-    public synchronized void playSong(AudioInfo audioInfo) {
+    public synchronized void playSongAndAdd(AudioInfo audioInfo) {
         ConfigInfo configInfo = ConfigInfo.obtain();
         List<AudioInfo> audioInfoList = configInfo.getAudioInfos();
         int nextIndex = getCurSongIndex(audioInfoList, audioInfo.getHash());

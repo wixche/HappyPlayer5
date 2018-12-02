@@ -162,6 +162,7 @@ public class LrcActivity extends BaseActivity {
      *
      */
     private RecyclerView mPlayListRListView;
+    private PopPlayListAdapter mAdapter;
 
     /**
      * 当前播放列表歌曲总数
@@ -846,8 +847,8 @@ public class LrcActivity extends BaseActivity {
         //设置当前歌曲数据
         List<AudioInfo> audioInfoList = mConfigInfo.getAudioInfos();
         mPopListSizeTv.setText(audioInfoList.size() + "");
-        PopPlayListAdapter adapter = new PopPlayListAdapter(mContext, audioInfoList);
-        mPlayListRListView.setAdapter(adapter);
+        mAdapter = new PopPlayListAdapter(mContext, audioInfoList, mUIHandler, mWorkerHandler);
+        mPlayListRListView.setAdapter(mAdapter);
 
         //定位
         int position = AudioPlayerManager.newInstance(mContext).getCurSongIndex(mConfigInfo.getAudioInfos(), mConfigInfo.getPlayHash());
@@ -1690,6 +1691,9 @@ public class LrcActivity extends BaseActivity {
                 mSingerImageView.setVisibility(View.INVISIBLE);
                 mSingerImageView.resetData();
 
+                if (mAdapter != null)
+                    mAdapter.reshViewHolder(null);
+
                 break;
             case AudioBroadcastReceiver.ACTION_CODE_INIT:
                 Bundle initBundle = intent.getBundleExtra(AudioBroadcastReceiver.ACTION_BUNDLEKEY);
@@ -1731,6 +1735,20 @@ public class LrcActivity extends BaseActivity {
 
                     ImageUtil.loadSingerImage(mContext, mSingerImageView, initAudioInfo.getSingerName(), mConfigInfo.isWifi(), new AsyncHandlerTask(mUIHandler, mWorkerHandler));
 
+                    if (mAdapter != null) {
+                        mAdapter.reshViewHolder(initAudioInfo);
+
+                        if (mIsShowPopPlayList) {
+                            //定位
+                            int position = AudioPlayerManager.newInstance(mContext).getCurSongIndex(mConfigInfo.getAudioInfos(), mConfigInfo.getPlayHash());
+                            if (position != -1) {
+                                ((LinearLayoutManager) mPlayListRListView.getLayoutManager()).scrollToPositionWithOffset(position, 0);
+                            }
+                        }
+                    }
+                } else {
+                    if (mAdapter != null)
+                        mAdapter.reshViewHolder(null);
                 }
 
                 break;

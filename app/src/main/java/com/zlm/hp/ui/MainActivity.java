@@ -34,6 +34,7 @@ import com.dou361.dialogui.DialogUIUtils;
 import com.dou361.dialogui.listener.DialogUIListener;
 import com.suke.widget.SwitchButton;
 import com.zlm.down.entity.DownloadTask;
+import com.zlm.hp.adapter.AudioAdapter;
 import com.zlm.hp.adapter.PopPlayListAdapter;
 import com.zlm.hp.adapter.TabFragmentAdapter;
 import com.zlm.hp.application.HPApplication;
@@ -49,6 +50,7 @@ import com.zlm.hp.fragment.MeFragment;
 import com.zlm.hp.fragment.RecommendFragment;
 import com.zlm.hp.fragment.SongFragment;
 import com.zlm.hp.fragment.SpecialFragment;
+import com.zlm.hp.lyrics.widget.AbstractLrcView;
 import com.zlm.hp.manager.ActivityManager;
 import com.zlm.hp.manager.AudioPlayerManager;
 import com.zlm.hp.manager.LyricsManager;
@@ -383,6 +385,9 @@ public class MainActivity extends BaseActivity {
                         //重置额外歌词状态
                         mConfigInfo.setExtraLrcStatus(ConfigInfo.EXTRALRCSTATUS_NOSHOWEXTRALRC);
 
+                        if (mAdapter != null)
+                            mAdapter.reshViewHolder(null);
+
                         break;
                     case AudioBroadcastReceiver.ACTION_CODE_INIT:
                         Bundle initBundle = intent.getBundleExtra(AudioBroadcastReceiver.ACTION_BUNDLEKEY);
@@ -417,7 +422,24 @@ public class MainActivity extends BaseActivity {
                                 keyWords = initAudioInfo.getTitle();
                             }
                             LyricsManager.newInstance(mContext).loadLyrics(keyWords, keyWords, initAudioInfo.getDuration() + "", initAudioInfo.getHash(), mConfigInfo.isWifi(), new AsyncHandlerTask(mUIHandler, mWorkerHandler), null);
+
+                            if (mAdapter != null) {
+
+                                if (mIsShowPopPlayList) {
+                                    //定位
+                                    int position = AudioPlayerManager.newInstance(mContext).getCurSongIndex(mConfigInfo.getAudioInfos(), mConfigInfo.getPlayHash());
+                                    if (position != -1) {
+                                        ((LinearLayoutManager) mPlayListRListView.getLayoutManager()).scrollToPositionWithOffset(position, 0);
+                                    }
+                                }
+
+                                mAdapter.reshViewHolder(initAudioInfo);
+                            }
+                        } else {
+                            if (mAdapter != null)
+                                mAdapter.reshViewHolder(null);
                         }
+
                         break;
                     case AudioBroadcastReceiver.ACTION_CODE_PLAY:
                         if (mPauseImageView.getVisibility() != View.VISIBLE)
@@ -429,8 +451,8 @@ public class MainActivity extends BaseActivity {
                         break;
                     case AudioBroadcastReceiver.ACTION_CODE_PLAYING:
 
-                        Bundle playBundle = intent.getBundleExtra(AudioBroadcastReceiver.ACTION_BUNDLEKEY);
-                        AudioInfo playingAudioInfo = playBundle.getParcelable(AudioBroadcastReceiver.ACTION_DATA_KEY);
+                        Bundle playingBundle = intent.getBundleExtra(AudioBroadcastReceiver.ACTION_BUNDLEKEY);
+                        AudioInfo playingAudioInfo = playingBundle.getParcelable(AudioBroadcastReceiver.ACTION_DATA_KEY);
                         if (playingAudioInfo != null) {
                             mMusicSeekBar.setProgress((int) playingAudioInfo.getPlayProgress());
                         }
@@ -1158,7 +1180,7 @@ public class MainActivity extends BaseActivity {
         //设置当前歌曲数据
         List<AudioInfo> audioInfoList = mConfigInfo.getAudioInfos();
         mPopListSizeTv.setText(audioInfoList.size() + "");
-        mAdapter = new PopPlayListAdapter(mContext, audioInfoList);
+        mAdapter = new PopPlayListAdapter(mContext, audioInfoList, mUIHandler, mWorkerHandler);
         mPlayListRListView.setAdapter(mAdapter);
 
         //定位

@@ -1,8 +1,10 @@
 package com.zlm.hp.adapter;
 
 import android.content.Context;
+import android.graphics.Bitmap;
 import android.support.annotation.NonNull;
 import android.support.v7.widget.RecyclerView;
+import android.text.TextUtils;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -10,9 +12,14 @@ import android.widget.ImageView;
 import android.widget.RelativeLayout;
 import android.widget.TextView;
 
+import com.zlm.hp.async.AsyncHandlerTask;
+import com.zlm.hp.constants.ConfigInfo;
 import com.zlm.hp.entity.AudioInfo;
+import com.zlm.hp.handler.WeakRefHandler;
 import com.zlm.hp.manager.AudioPlayerManager;
+import com.zlm.hp.receiver.AudioBroadcastReceiver;
 import com.zlm.hp.ui.R;
+import com.zlm.hp.util.ImageUtil;
 import com.zlm.hp.widget.IconfontTextView;
 
 import java.util.List;
@@ -25,10 +32,19 @@ import java.util.List;
 public class PopPlayListAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> {
     private Context mContext;
     private List<AudioInfo> mDatas;
+    private WeakRefHandler mUIHandler;
+    private WeakRefHandler mWorkerHandler;
+    private String mOldPlayHash = "";
+    private ConfigInfo mConfigInfo;
 
-    public PopPlayListAdapter(Context context, List<AudioInfo> datas) {
+
+    public PopPlayListAdapter(Context context, List<AudioInfo> datas, WeakRefHandler uiHandler, WeakRefHandler workerHandler) {
         this.mContext = context;
         this.mDatas = datas;
+        this.mUIHandler = uiHandler;
+        this.mWorkerHandler = workerHandler;
+        mConfigInfo = ConfigInfo.obtain();
+        mOldPlayHash = mConfigInfo.getPlayHash();
     }
 
     @NonNull
@@ -52,7 +68,29 @@ public class PopPlayListAdapter extends RecyclerView.Adapter<RecyclerView.ViewHo
      * @param viewHolder
      * @param audioInfo
      */
-    private void reshViewHolder(int position, PopListViewHolder viewHolder, final AudioInfo audioInfo) {
+    private void reshViewHolder(final int position, PopListViewHolder viewHolder, final AudioInfo audioInfo) {
+
+        if (audioInfo.getHash().equals(mConfigInfo.getPlayHash())) {
+            mOldPlayHash = audioInfo.getHash();
+
+            viewHolder.getSingPicImg().setVisibility(View.VISIBLE);
+
+            //加载歌手头像
+            ImageUtil.loadSingerImage(mContext, viewHolder.getSingPicImg(), audioInfo.getSingerName(), mConfigInfo.isWifi(), 400, 400, new AsyncHandlerTask(mUIHandler, mWorkerHandler), new ImageUtil.ImageLoadCallBack() {
+                @Override
+                public void callback(Bitmap bitmap) {
+
+                }
+            });
+
+
+
+            viewHolder.getSongIndexTv().setVisibility(View.INVISIBLE);
+        } else {
+            viewHolder.getSongIndexTv().setVisibility(View.VISIBLE);
+            viewHolder.getSingPicImg().setVisibility(View.INVISIBLE);
+        }
+
         //显示歌曲索引
         viewHolder.getSongIndexTv().setText(((position + 1) < 10 ? "0" + (position + 1) : (position + 1) + ""));
         String singerName = audioInfo.getSingerName();
@@ -63,9 +101,69 @@ public class PopPlayListAdapter extends RecyclerView.Adapter<RecyclerView.ViewHo
         viewHolder.getListItemRelativeLayout().setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
+                int oldIndex = getAudioIndex(mConfigInfo.getPlayHash());
+                if (oldIndex == position) {
+                    AudioPlayerManager.newInstance(mContext).playOrPause();
+                    return;
+                }
+
                 AudioPlayerManager.newInstance(mContext).playSong(audioInfo);
+
+                if (oldIndex != -1) {
+                    notifyItemChanged(oldIndex);
+                }
+                int newIndex = getAudioIndex(audioInfo.getHash());
+                if (newIndex != -1) {
+                    notifyItemChanged(newIndex);
+                }
             }
         });
+    }
+
+    /***
+     * 刷新
+     * @param audioInfo
+     */
+    public void reshViewHolder(AudioInfo audioInfo) {
+        int oldIndex = getAudioIndex(mOldPlayHash);
+        if (oldIndex != -1) {
+            notifyItemChanged(oldIndex);
+        }
+        int newIndex = getAudioIndex(audioInfo);
+        if (newIndex != -1) {
+            notifyItemChanged(newIndex);
+        }
+    }
+
+    /**
+     * 获取歌曲索引
+     *
+     * @param audioInfo
+     * @return
+     */
+    private int getAudioIndex(AudioInfo audioInfo) {
+        if (audioInfo == null) {
+            return -1;
+        }
+        return getAudioIndex(audioInfo.getHash());
+    }
+
+    /**
+     * 获取歌曲索引
+     *
+     * @return
+     */
+    private int getAudioIndex(String playHash) {
+        if (TextUtils.isEmpty(playHash)) return -1;
+        if (mDatas != null && mDatas.size() > 0) {
+            for (int i = 0; i < mDatas.size(); i++) {
+                AudioInfo temp = mDatas.get(i);
+                if (temp.getHash().equals(playHash)) {
+                    return i;
+                }
+            }
+        }
+        return -1;
     }
 
     @Override
