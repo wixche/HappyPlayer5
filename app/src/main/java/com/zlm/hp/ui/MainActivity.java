@@ -36,6 +36,7 @@ import com.suke.widget.SwitchButton;
 import com.zlm.down.entity.DownloadTask;
 import com.zlm.hp.adapter.PopPlayListAdapter;
 import com.zlm.hp.adapter.TabFragmentAdapter;
+import com.zlm.hp.application.HPApplication;
 import com.zlm.hp.async.AsyncHandlerTask;
 import com.zlm.hp.audio.utils.MediaUtil;
 import com.zlm.hp.constants.ConfigInfo;
@@ -467,6 +468,31 @@ public class MainActivity extends BaseActivity {
                         }
 
                         break;
+                    case AudioBroadcastReceiver.ACTION_CODE_NOTIFY_DESLRC_HIDE_ACTION:
+
+                        mDesktoplrcSwitchButton.setChecked(false);
+                        mConfigInfo.setShowDesktopLrc(false).save();
+                        //
+                        AudioBroadcastReceiver.sendReceiver(mContext, AudioBroadcastReceiver.ACTION_CODE_NOTIFY_DESLRC);
+                        //关闭桌面歌词
+                        HPApplication applicationTtemp = (HPApplication) getApplication();
+                        applicationTtemp.stopFloatService();
+
+                        break;
+                    case AudioBroadcastReceiver.ACTION_CODE_NOTIFY_DESLRC_SHOW:
+
+                        if (!hasShowFloatWindowPermission()) return;
+
+                        mDesktoplrcSwitchButton.setChecked(true);
+                        mConfigInfo.setShowDesktopLrc(true).save();
+                        //
+                        AudioBroadcastReceiver.sendReceiver(mContext, AudioBroadcastReceiver.ACTION_CODE_NOTIFY_DESLRC);
+                        //启动桌面歌词
+                        HPApplication application = (HPApplication) getApplication();
+                        application.startFloatService();
+
+                        break;
+
                 }
             }
         });
@@ -890,32 +916,13 @@ public class MainActivity extends BaseActivity {
             @Override
             public void onCheckedChanged(SwitchButton view, boolean isChecked) {
                 if (isChecked) {
-                    if (!AppOpsUtils.allowFloatWindow(getApplication())) {
-
-                        String tipMsg = getString(R.string.desktoplrc_tip);
-                        DialogUIUtils.showMdAlert(MainActivity.this, getString(R.string.tip_title), tipMsg, new DialogUIListener() {
-                            @Override
-                            public void onPositive() {
-                                //跳转权限设置页面
-                                IntentUtil.gotoPermissionSetting(MainActivity.this);
-                                mDesktoplrcSwitchButton.setChecked(false);
-                            }
-
-                            @Override
-                            public void onNegative() {
-                                mDesktoplrcSwitchButton.setChecked(false);
-                            }
-
-                            @Override
-                            public void onCancle() {
-                                mDesktoplrcSwitchButton.setChecked(false);
-                            }
-                        }).setCancelable(true, false).show();
-                        return;
-                    }
+                    if (!hasShowFloatWindowPermission()) return;
                 }
-                if (mConfigInfo.isShowDesktopLrc() != isChecked)
+                if (mConfigInfo.isShowDesktopLrc() != isChecked) {
                     mConfigInfo.setShowDesktopLrc(isChecked).save();
+                    //
+                    AudioBroadcastReceiver.sendReceiver(mContext, AudioBroadcastReceiver.ACTION_CODE_NOTIFY_DESLRC);
+                }
             }
         });
 
@@ -936,6 +943,39 @@ public class MainActivity extends BaseActivity {
                     mConfigInfo.setShowLockScreenLrc(isChecked).save();
             }
         });
+    }
+
+    /**
+     * 是否有显示桌面的权限
+     *
+     * @return
+     */
+    private boolean hasShowFloatWindowPermission() {
+        if (!AppOpsUtils.allowFloatWindow(getApplication())) {
+
+            String tipMsg = getString(R.string.desktoplrc_tip);
+            DialogUIUtils.showMdAlert(MainActivity.this, getString(R.string.tip_title), tipMsg, new DialogUIListener() {
+                @Override
+                public void onPositive() {
+                    //跳转权限设置页面
+                    IntentUtil.gotoPermissionSetting(MainActivity.this);
+                    mDesktoplrcSwitchButton.setChecked(false);
+                }
+
+                @Override
+                public void onNegative() {
+                    mDesktoplrcSwitchButton.setChecked(false);
+                }
+
+                @Override
+                public void onCancle() {
+                    mDesktoplrcSwitchButton.setChecked(false);
+                }
+            }).setCancelable(true, false).show();
+
+            return false;
+        }
+        return true;
     }
 
     /**

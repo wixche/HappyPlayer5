@@ -55,7 +55,12 @@
         <activity android:name=".LrcActivity" />
         <activity android:name=".SearchSingerActivity" />
         <activity android:name=".SearchLrcActivity" />
-        <activity android:name=".TimerPowerOffActivity"></activity>
+        <activity android:name=".TimerPowerOffActivity" />
+
+        <service
+            android:name="com.zlm.hp.service.FloatService"
+            android:enabled="true"
+            android:exported="true"></service>
     </application>
 
 </manifest>

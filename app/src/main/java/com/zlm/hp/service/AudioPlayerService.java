@@ -30,6 +30,7 @@ import com.zlm.hp.manager.AudioPlayerManager;
 import com.zlm.hp.receiver.AudioBroadcastReceiver;
 import com.zlm.hp.ui.MainActivity;
 import com.zlm.hp.ui.R;
+import com.zlm.hp.util.AppOpsUtils;
 import com.zlm.hp.util.ImageUtil;
 import com.zlm.hp.util.ResourceUtil;
 import com.zlm.hp.util.ToastUtil;
@@ -112,11 +113,37 @@ public class AudioPlayerService extends Service {
                     case AudioBroadcastReceiver.ACTION_CODE_NOTIFY_PRE:
                         AudioPlayerManager.newInstance(mContext).pre();
                         break;
+                    case AudioBroadcastReceiver.ACTION_CODE_NOTIFY_DESLRC_SHOW_ACTION:
+                        if (!AppOpsUtils.allowFloatWindow(getApplication())) {
+                            //没有权限
+                            mUIHandler.post(new Runnable() {
+                                @Override
+                                public void run() {
+
+                                    ToastUtil.showTextToast(getApplicationContext(), getString(R.string.desktoplrc_tip));
+
+                                }
+                            });
+                        } else {
+                            AudioBroadcastReceiver.sendReceiver(getApplicationContext(), AudioBroadcastReceiver.ACTION_CODE_NOTIFY_DESLRC_SHOW);
+                        }
+
+                        break;
                     case AudioBroadcastReceiver.ACTION_CODE_NOTIFY_UNLOCK:
-                        break;
-                    case AudioBroadcastReceiver.ACTION_CODE_NOTIFY_DESLRC_HIDE:
-                        break;
-                    case AudioBroadcastReceiver.ACTION_CODE_NOTIFY_DESLRC_SHOW:
+
+                        ConfigInfo configInfo = ConfigInfo.obtain();
+                        configInfo.setDesktopLrcCanMove(true);
+
+                    case AudioBroadcastReceiver.ACTION_CODE_NOTIFY_LOCK:
+                    case AudioBroadcastReceiver.ACTION_CODE_NOTIFY_DESLRC:
+
+                        mUIHandler.post(new Runnable() {
+                            @Override
+                            public void run() {
+                                doNotification(null, code, false);
+                            }
+                        });
+
                         break;
 
                     case AudioBroadcastReceiver.ACTION_CODE_NULL:
@@ -269,14 +296,14 @@ public class AudioPlayerService extends Service {
 
         Intent buttonnextIntent = AudioBroadcastReceiver.getNotifiyIntent(AudioBroadcastReceiver.ACTION_CODE_NOTIFY_NEXT);
         PendingIntent pendnextButtonIntent = PendingIntent.getBroadcast(
-                AudioPlayerService.this,  AudioBroadcastReceiver.ACTION_CODE_NOTIFY_NEXT, buttonnextIntent, PendingIntent.FLAG_CANCEL_CURRENT);
+                AudioPlayerService.this, AudioBroadcastReceiver.ACTION_CODE_NOTIFY_NEXT, buttonnextIntent, PendingIntent.FLAG_CANCEL_CURRENT);
 
         mNotifyPlayBarRemoteViews.setOnClickPendingIntent(R.id.next,
                 pendnextButtonIntent);
 
         Intent buttonprewtIntent = AudioBroadcastReceiver.getNotifiyIntent(AudioBroadcastReceiver.ACTION_CODE_NOTIFY_PRE);
         PendingIntent pendprewButtonIntent = PendingIntent.getBroadcast(
-                AudioPlayerService.this,  AudioBroadcastReceiver.ACTION_CODE_NOTIFY_PRE, buttonprewtIntent, PendingIntent.FLAG_CANCEL_CURRENT);
+                AudioPlayerService.this, AudioBroadcastReceiver.ACTION_CODE_NOTIFY_PRE, buttonprewtIntent, PendingIntent.FLAG_CANCEL_CURRENT);
 
         mNotifyPlayBarRemoteViews.setOnClickPendingIntent(R.id.prew,
                 pendprewButtonIntent);
@@ -290,16 +317,16 @@ public class AudioPlayerService extends Service {
         mNotifyPlayBarRemoteViews.setOnClickPendingIntent(R.id.deslrcUnlock,
                 pendDesLrcUnlockIntent);
 
-        Intent buttonDesLrcHideIntent = AudioBroadcastReceiver.getNotifiyIntent(AudioBroadcastReceiver.ACTION_CODE_NOTIFY_DESLRC_HIDE);
+        Intent buttonDesLrcHideIntent = AudioBroadcastReceiver.getNotifiyIntent(AudioBroadcastReceiver.ACTION_CODE_NOTIFY_DESLRC_HIDE_ACTION);
         PendingIntent pendDesLrcHideIntent = PendingIntent.getBroadcast(
-                AudioPlayerService.this, AudioBroadcastReceiver.ACTION_CODE_NOTIFY_DESLRC_HIDE, buttonDesLrcHideIntent, PendingIntent.FLAG_CANCEL_CURRENT);
+                AudioPlayerService.this, AudioBroadcastReceiver.ACTION_CODE_NOTIFY_DESLRC_HIDE_ACTION, buttonDesLrcHideIntent, PendingIntent.FLAG_CANCEL_CURRENT);
 
         mNotifyPlayBarRemoteViews.setOnClickPendingIntent(R.id.showdeslrc,
                 pendDesLrcHideIntent);
 
-        Intent buttonDesLrcShowIntent = AudioBroadcastReceiver.getNotifiyIntent(AudioBroadcastReceiver.ACTION_CODE_NOTIFY_DESLRC_SHOW);
+        Intent buttonDesLrcShowIntent = AudioBroadcastReceiver.getNotifiyIntent(AudioBroadcastReceiver.ACTION_CODE_NOTIFY_DESLRC_SHOW_ACTION);
         PendingIntent pendDesLrcShowIntent = PendingIntent.getBroadcast(
-                AudioPlayerService.this, AudioBroadcastReceiver.ACTION_CODE_NOTIFY_DESLRC_SHOW, buttonDesLrcShowIntent, PendingIntent.FLAG_CANCEL_CURRENT);
+                AudioPlayerService.this, AudioBroadcastReceiver.ACTION_CODE_NOTIFY_DESLRC_SHOW_ACTION, buttonDesLrcShowIntent, PendingIntent.FLAG_CANCEL_CURRENT);
 
         mNotifyPlayBarRemoteViews.setOnClickPendingIntent(R.id.hidedeslrc,
                 pendDesLrcShowIntent);

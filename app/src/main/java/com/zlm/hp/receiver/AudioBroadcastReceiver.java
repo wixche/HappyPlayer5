@@ -129,19 +129,26 @@ public class AudioBroadcastReceiver {
     public static final int ACTION_CODE_NOTIFY_UNLOCK = 17;
 
     /**
+     * 通知栏 lock
+     */
+    public static final int ACTION_CODE_NOTIFY_LOCK = 18;
+
+    /**
      * 通知栏 桌面歌词隐藏
      */
-    public static final int ACTION_CODE_NOTIFY_DESLRC_HIDE = 18;
+    public static final int ACTION_CODE_NOTIFY_DESLRC_HIDE_ACTION = 19;
+    public static final int ACTION_CODE_NOTIFY_DESLRC = 20;
 
     /**
      * 通知栏 桌面歌词显示
      */
-    public static final int ACTION_CODE_NOTIFY_DESLRC_SHOW = 19;
+    public static final int ACTION_CODE_NOTIFY_DESLRC_SHOW_ACTION = 21;
+    public static final int ACTION_CODE_NOTIFY_DESLRC_SHOW = 22;
 
     /**
      * 通知栏 歌手头像加载完成
      */
-    public static final int ACTION_CODE_NOTIFY_SINGERICONLOADED = 20;
+    public static final int ACTION_CODE_NOTIFY_SINGERICONLOADED = 23;
 
     private BroadcastReceiver mBroadcastReceiver;
     private IntentFilter mIntentFilter;
@@ -199,7 +206,7 @@ public class AudioBroadcastReceiver {
      * @param context
      * @param code
      */
-    private static void sendReceiver(Context context, int code) {
+    public static void sendReceiver(Context context, int code) {
         sendReceiver(context, code, null, null);
     }
 
