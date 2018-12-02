@@ -114,23 +114,9 @@ public class AudioPlayerService extends Service {
                         AudioPlayerManager.newInstance(mContext).pre();
                         break;
                     case AudioBroadcastReceiver.ACTION_CODE_NOTIFY_UNLOCK:
-                        break;
-                    case AudioBroadcastReceiver.ACTION_CODE_NOTIFY_DESLRC_SHOW_ACTION:
-                        if (!AppOpsUtils.allowFloatWindow(getApplication())) {
-                            //没有权限
-                            mUIHandler.post(new Runnable() {
-                                @Override
-                                public void run() {
-
-                                    ToastUtil.showTextToast(getApplicationContext(), getString(R.string.desktoplrc_tip));
-
-                                }
-                            });
-                        } else {
-
-                        }
-
-                        break;
+                        ConfigInfo configInfo = ConfigInfo.obtain();
+                        configInfo.setDesktopLrcCanMove(true).save();
+                    case AudioBroadcastReceiver.ACTION_CODE_NOTIFY_LOCK:
                     case AudioBroadcastReceiver.ACTION_CODE_NOTIFY_DESLRC:
 
                         mUIHandler.post(new Runnable() {
@@ -139,6 +125,18 @@ public class AudioPlayerService extends Service {
                                 doNotification(null, code, false);
                             }
                         });
+
+                        break;
+                    case AudioBroadcastReceiver.ACTION_CODE_NOTIFY_DESLRC_SHOW_ACTION:
+                        if (!AppOpsUtils.allowFloatWindow(getApplication())) {
+                            //没有权限
+                            mUIHandler.post(new Runnable() {
+                                @Override
+                                public void run() {
+                                    ToastUtil.showTextToast(getApplicationContext(), getString(R.string.desktoplrc_tip));
+                                }
+                            });
+                        }
 
                         break;
 
@@ -162,7 +160,7 @@ public class AudioPlayerService extends Service {
                         //
                         Bundle notifySingerLoadedBundle = intent.getBundleExtra(AudioBroadcastReceiver.ACTION_BUNDLEKEY);
                         final AudioInfo curAudioInfo = notifySingerLoadedBundle.getParcelable(AudioBroadcastReceiver.ACTION_DATA_KEY);
-                        if (curAudioInfo != null) {
+                        if (curAudioInfo != null && mAudioInfo != null && curAudioInfo.getHash().equals(mAudioInfo.getHash())) {
                             mUIHandler.post(new Runnable() {
                                 @Override
                                 public void run() {
@@ -599,12 +597,11 @@ public class AudioPlayerService extends Service {
                 @Override
                 public void onCompletion(IMediaPlayer mp) {
 
+                    releasePlayer();
                     if (audioInfo.getType() == AudioInfo.TYPE_NET && mMediaPlayer.getCurrentPosition() < (audioInfo.getDuration() - 2 * 1000)) {
-                        releasePlayer();
                         //网络歌曲未播放全部，需要重新调用播放歌曲
                         handleSong(audioInfo);
                     } else {
-                        releasePlayer();
                         //播放完成，执行下一首操作
                         AudioPlayerManager.newInstance(mContext).next();
                     }

@@ -501,7 +501,7 @@ public class MainActivity extends BaseActivity {
                         applicationTtemp.stopFloatService();
 
                         break;
-                    case AudioBroadcastReceiver.ACTION_CODE_NOTIFY_DESLRC_SHOW:
+                    case AudioBroadcastReceiver.ACTION_CODE_NOTIFY_DESLRC_SHOW_ACTION:
 
                         if (!hasShowFloatWindowPermission()) return;
 
@@ -1265,12 +1265,12 @@ public class MainActivity extends BaseActivity {
 
     @Override
     public void onBackPressed() {
-        if (mSlidingMenuLayout.isShowingFragment()) {
+        if (mIsShowPopPlayList) {
+            hidePopPlayListView();
+        } else if (mSlidingMenuLayout.isShowingFragment()) {
             mSlidingMenuLayout.hideFragment();
         } else if (mSlidingMenuLayout.isShowingMenu()) {
             mSlidingMenuLayout.hideMenu();
-        } else if (mIsShowPopPlayList) {
-            hidePopPlayListView();
         } else {
             if ((System.currentTimeMillis() - mExitTime) > 2000) {
                 ToastUtil.showTextToast(getApplicationContext(), getString(R.string.back_tip));
