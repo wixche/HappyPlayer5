@@ -360,7 +360,7 @@ public class HttpClient {
     private Result doQueryHttps(String url, Map<String, String> headParams,
                                 byte[] data, int jump) {
 
-        Result result = new Result();
+        Result result = null;
         HttpsURLConnection conn = null;
         int i = 0;
         if (jump <= 0) {
@@ -368,6 +368,7 @@ public class HttpClient {
         }
         try {
             for (; i < jump && !TextUtils.isEmpty(url); ++i) {
+                result = new Result();
                 // 创建SSLContext
                 SSLContext sslContext = SSLContext.getInstance("SSL");
                 TrustManager[] tm = {new IgnoreSSLTrustManager()};
@@ -483,7 +484,7 @@ public class HttpClient {
      */
     private Result doQueryHttp(String url, Map<String, String> headParams,
                                byte[] data, int jump) {
-        Result result = new Result();
+        Result result = null;
         HttpURLConnection conn = null;
         int i = 0;
         if (jump <= 0) {
@@ -491,6 +492,7 @@ public class HttpClient {
         }
         try {
             for (; i < jump && !TextUtils.isEmpty(url); ++i) {
+                result = new Result();
                 conn = (HttpURLConnection) (new URL(url)).openConnection();
                 ZLog.i("HttpClient REQ => " + url);
                 conn.setConnectTimeout(CONN_TIMEOUT);
