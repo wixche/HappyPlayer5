@@ -4,7 +4,6 @@ import android.annotation.SuppressLint;
 import android.app.Service;
 import android.content.Context;
 import android.content.Intent;
-
 import android.graphics.Color;
 import android.graphics.Paint;
 import android.graphics.PixelFormat;
@@ -38,7 +37,6 @@ import com.zlm.hp.lyrics.widget.AbstractLrcView;
 import com.zlm.hp.lyrics.widget.FloatLyricsView;
 import com.zlm.hp.manager.AudioPlayerManager;
 import com.zlm.hp.manager.LyricsManager;
-
 import com.zlm.hp.receiver.AudioBroadcastReceiver;
 import com.zlm.hp.ui.MainActivity;
 import com.zlm.hp.ui.R;

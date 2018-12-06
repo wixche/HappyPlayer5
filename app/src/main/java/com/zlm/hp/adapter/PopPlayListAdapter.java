@@ -17,7 +17,6 @@ import com.zlm.hp.constants.ConfigInfo;
 import com.zlm.hp.entity.AudioInfo;
 import com.zlm.hp.handler.WeakRefHandler;
 import com.zlm.hp.manager.AudioPlayerManager;
-import com.zlm.hp.receiver.AudioBroadcastReceiver;
 import com.zlm.hp.ui.R;
 import com.zlm.hp.util.ImageUtil;
 import com.zlm.hp.widget.IconfontTextView;
