@@ -187,12 +187,6 @@ public abstract class BaseActivity extends AppCompatActivity {
     @Override
     public void finish() {
         ActivityManager.getInstance().removeActivity(this);
-        super.finish();
-    }
-
-    @Override
-    protected void onDestroy() {
-
         //移除队列任务
         if (mUIHandler != null) {
             mUIHandler.removeCallbacksAndMessages(null);
@@ -207,7 +201,7 @@ public abstract class BaseActivity extends AppCompatActivity {
         if (mHandlerThread != null)
             mHandlerThread.quit();
 
-        super.onDestroy();
+        super.finish();
     }
 
     /**

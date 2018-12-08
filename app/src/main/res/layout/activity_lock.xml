@@ -1,0 +1,28 @@
+<?xml version="1.0" encoding="utf-8"?>
+<com.zlm.libs.widget.SwipeBackLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:id="@+id/swipeback_layout"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    tools:context="com.zlm.hp.ui.LrcActivity">
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:background="@android:color/black"
+        android:orientation="vertical">
+
+        <RelativeLayout
+            android:layout_width="match_parent"
+            android:layout_height="match_parent">
+
+            <com.zlm.hp.widget.TransitionImageView
+                android:id="@+id/singerimg"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent" />
+
+            <include layout="@layout/layout_lock"></include>
+
+        </RelativeLayout>
+    </LinearLayout>
+</com.zlm.libs.widget.SwipeBackLayout>

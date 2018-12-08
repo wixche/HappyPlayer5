@@ -175,7 +175,7 @@ public abstract class BaseFragment extends Fragment {
     }
 
     @Override
-    public void onDestroy() {
+    public void onDestroyView() {
 
         //移除队列任务
         if (mUIHandler != null) {
@@ -191,7 +191,7 @@ public abstract class BaseFragment extends Fragment {
         if (mHandlerThread != null)
             mHandlerThread.quit();
 
-        super.onDestroy();
+        super.onDestroyView();
     }
 
     /**

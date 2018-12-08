@@ -56,7 +56,7 @@ public class IntentUtil {
                     intent.setAction("miui.intent.action.APP_PERM_EDITOR");
                     intent.setClassName("com.miui.securitycenter", "com.miui.permcenter.permissions.AppPermissionsEditorActivity");
                     intent.putExtra("extra_pkgname", packageName);
-                } else if ("V8".equals(rom) || "V9".equals(rom)) {
+                } else if ("V8".equals(rom) || "V9".equals(rom) || "V10".equals(rom)) {
                     intent.setAction("miui.intent.action.APP_PERM_EDITOR");
                     intent.setClassName("com.miui.securitycenter", "com.miui.permcenter.permissions.PermissionsEditorActivity");
                     intent.putExtra("extra_pkgname", packageName);
@@ -97,7 +97,7 @@ public class IntentUtil {
         } catch (Exception e) {
             e.printStackTrace();
             // 跳转失败, 前往普通设置界面
-            IntentUtil.gotoSetting(context);
+            IntentUtil.gotoAppDetailSetting(context, packageName);
             success = false;
             //LogUtils.i("无法跳转权限界面, 开始跳转普通设置界面");
         }

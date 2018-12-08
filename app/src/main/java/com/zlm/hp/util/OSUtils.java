@@ -1,12 +1,6 @@
 package com.zlm.hp.util;
 
-import android.os.Environment;
 import android.text.TextUtils;
-
-import java.io.File;
-import java.io.FileInputStream;
-import java.io.IOException;
-import java.util.Properties;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -119,203 +113,212 @@ public class OSUtils {
      */
     private static ROM initRomType() {
         ROM rom = ROM.Other;
-        FileInputStream is = null;
-        try {
-            Properties buildProperties = new Properties();
-            is = new FileInputStream(new File(Environment.getRootDirectory(), "build.prop"));
-            buildProperties.load(is);
-
-            if (buildProperties.containsKey(KEY_MIUI_VERSION_NANE) || buildProperties.containsKey(KEY_MIUI_VERSION_CODE)) {
-                // MIUI
-                rom = ROM.MIUI;
-                if (buildProperties.containsKey(KEY_MIUI_VERSION_NANE)) {
-                    String versionName = buildProperties.getProperty(KEY_MIUI_VERSION_NANE);
-                    if (!TextUtils.isEmpty(versionName) && versionName.matches("[Vv]\\d+")) { // V8
-                        try {
-                            rom.setBaseVersion(Integer.parseInt(versionName.split("[Vv]")[1]));
-                        } catch (Exception e) {
-                            e.printStackTrace();
-                        }
+        if (containsKey(KEY_MIUI_VERSION_NANE) || containsKey(KEY_MIUI_VERSION_CODE)) {
+            // MIUI
+            rom = ROM.MIUI;
+            if (containsKey(KEY_MIUI_VERSION_NANE)) {
+                String versionName = getProperty(KEY_MIUI_VERSION_NANE);
+                if (!TextUtils.isEmpty(versionName) && versionName.matches("[Vv]\\d+")) { // V8
+                    try {
+                        rom.setBaseVersion(Integer.parseInt(versionName.split("[Vv]")[1]));
+                    } catch (Exception e) {
+                        e.printStackTrace();
                     }
-                }
-                if (buildProperties.containsKey(KEY_MIUI_VERSION)) {
-                    String versionStr = buildProperties.getProperty(KEY_MIUI_VERSION);
-                    if (!TextUtils.isEmpty(versionStr) && versionStr.matches("[\\d.]+")) {
-                        rom.setVersion(versionStr);
-                    }
-                }
-            } else if (buildProperties.containsKey(KEY_EMUI_VERSION) || buildProperties.containsKey(KEY_EMUI_API_LEVEL)
-                    || buildProperties.containsKey(KEY_EMUI_SYSTEM_VERSION)) {
-                // EMUI
-                rom = ROM.EMUI;
-                if (buildProperties.containsKey(KEY_EMUI_VERSION)) {
-                    String versionStr = buildProperties.getProperty(KEY_EMUI_VERSION);
-                    Matcher matcher = Pattern.compile("EmotionUI_([\\d.]+)").matcher(versionStr); // EmotionUI_3.0
-                    if (!TextUtils.isEmpty(versionStr) && matcher.find()) {
-                        try {
-                            String version = matcher.group(1);
-                            rom.setVersion(version);
-                            rom.setBaseVersion(Integer.parseInt(version.split("\\.")[0]));
-                        } catch (Exception e) {
-                            e.printStackTrace();
-                        }
-                    }
-                }
-            } else if (buildProperties.containsKey(KEY_FLYME_SETUP) || buildProperties.containsKey(KEY_FLYME_PUBLISHED)) {
-                // Flyme
-                rom = ROM.Flyme;
-                if (buildProperties.containsKey(KEY_DISPLAY_ID)) {
-                    String versionStr = buildProperties.getProperty(KEY_DISPLAY_ID);
-                    Matcher matcher = Pattern.compile("Flyme[^\\d]*([\\d.]+)[^\\d]*").matcher(versionStr); // Flyme OS 4.5.4.2U
-                    if (!TextUtils.isEmpty(versionStr) && matcher.find()) {
-                        try {
-                            String version = matcher.group(1);
-                            rom.setVersion(version);
-                            rom.setBaseVersion(Integer.parseInt(version.split("\\.")[0]));
-                        } catch (Exception e) {
-                            e.printStackTrace();
-                        }
-                    }
-                }
-            } else if (buildProperties.containsKey(KEY_COLOROS_VERSION) || buildProperties.containsKey(KEY_COLOROS_THEME_VERSION)
-                    || buildProperties.containsKey(KEY_COLOROS_ROM_VERSION)) {
-                // ColorOS
-                rom = ROM.ColorOS;
-                if (buildProperties.containsKey(KEY_COLOROS_ROM_VERSION)) {
-                    String versionStr = buildProperties.getProperty(KEY_COLOROS_ROM_VERSION);
-                    Matcher matcher = Pattern.compile("ColorOS([\\d.]+)").matcher(versionStr); // ColorOS2.1
-                    if (!TextUtils.isEmpty(versionStr) && matcher.find()) {
-                        try {
-                            String version = matcher.group(1);
-                            rom.setVersion(version);
-                            rom.setBaseVersion(Integer.parseInt(version.split("\\.")[0]));
-                        } catch (Exception e) {
-                            e.printStackTrace();
-                        }
-                    }
-                }
-            } else if (buildProperties.containsKey(KEY_FUNTOUCHOS_OS_NAME) || buildProperties.containsKey(KEY_FUNTOUCHOS_OS_VERSION)
-                    || buildProperties.containsKey(KEY_FUNTOUCHOS_DISPLAY_ID)) {
-                // FuntouchOS
-                rom = ROM.FuntouchOS;
-                if (buildProperties.containsKey(KEY_FUNTOUCHOS_OS_VERSION)) {
-                    String versionStr = buildProperties.getProperty(KEY_FUNTOUCHOS_OS_VERSION);
-                    if (!TextUtils.isEmpty(versionStr) && versionStr.matches("[\\d.]+")) { // 3.0
-                        try {
-                            rom.setVersion(versionStr);
-                            rom.setBaseVersion(Integer.parseInt(versionStr.split("\\.")[0]));
-                        } catch (Exception e) {
-                            e.printStackTrace();
-                        }
-                    }
-                }
-            } else if (buildProperties.containsKey(KEY_EUI_VERSION) || buildProperties.containsKey(KEY_EUI_NAME)
-                    || buildProperties.containsKey(KEY_EUI_MODEL)) {
-                // EUI
-                rom = ROM.EUI;
-                if (buildProperties.containsKey(KEY_EUI_VERSION)) {
-                    String versionStr = buildProperties.getProperty(KEY_EUI_VERSION);
-                    Matcher matcher = Pattern.compile("([\\d.]+)[^\\d]*").matcher(versionStr); // 5.9.023S
-                    if (!TextUtils.isEmpty(versionStr) && matcher.find()) {
-                        try {
-                            String version = matcher.group(1);
-                            rom.setVersion(version);
-                            rom.setBaseVersion(Integer.parseInt(version.split("\\.")[0]));
-                        } catch (Exception e) {
-                            e.printStackTrace();
-                        }
-                    }
-                }
-            } else if (buildProperties.containsKey(KEY_AMIGO_ROM_VERSION) || buildProperties.containsKey(KEY_AMIGO_SYSTEM_UI_SUPPORT)) {
-                // amigo
-                rom = ROM.AmigoOS;
-                if (buildProperties.containsKey(KEY_DISPLAY_ID)) {
-                    String versionStr = buildProperties.getProperty(KEY_DISPLAY_ID);
-                    Matcher matcher = Pattern.compile("amigo([\\d.]+)[a-zA-Z]*").matcher(versionStr); // "amigo3.5.1"
-                    if (!TextUtils.isEmpty(versionStr) && matcher.find()) {
-                        try {
-                            String version = matcher.group(1);
-                            rom.setVersion(version);
-                            rom.setBaseVersion(Integer.parseInt(version.split("\\.")[0]));
-                        } catch (Exception e) {
-                            e.printStackTrace();
-                        }
-                    }
-                }
-            } else if (buildProperties.containsKey(KEY_SONY_PROTOCOL_TYPE) || buildProperties.containsKey(KEY_SONY_ENCRYPTED_DATA)) {
-                // Sony
-                rom = ROM.Sony;
-            } else if (buildProperties.containsKey(KEY_YULONG_VERSION_RELEASE) || buildProperties.containsKey(KEY_YULONG_VERSION_TAG)) {
-                // YuLong
-                rom = ROM.YuLong;
-            } else if (buildProperties.containsKey(KEY_SENSE_BUILD_STAGE) || buildProperties.containsKey(KEY_SENSE_BLUETOOTH_SAP)) {
-                // Sense
-                rom = ROM.Sense;
-            } else if (buildProperties.containsKey(KEY_LG_SW_VERSION) || buildProperties.containsKey(KEY_LG_SW_VERSION_SHORT)
-                    || buildProperties.containsKey(KEY_LG_FACTORY_VERSION)) {
-                // LG
-                rom = ROM.LG;
-            } else if (buildProperties.containsKey(KEY_LENOVO_DEVICE) || buildProperties.containsKey(KEY_LENOVO_PLATFORM)
-                    || buildProperties.containsKey(KEY_LENOVO_ADB)) {
-                // Lenovo
-                rom = ROM.Lenovo;
-            } else if (buildProperties.containsKey(KEY_DISPLAY_ID)) {
-                String displayId = buildProperties.getProperty(KEY_DISPLAY_ID);
-                if (!TextUtils.isEmpty(displayId)) {
-                    if (displayId.contains(VALUE_FLYME_DISPLAY_ID_CONTAIN)) {
-                        return ROM.Flyme;
-                    } else if (displayId.contains(VALUE_AMIGO_DISPLAY_ID_CONTAIN)) {
-                        return ROM.AmigoOS;
-                    }
-                }
-            } else if (buildProperties.containsKey(KEY_BASE_OS_VERSION)) {
-                String baseOsVersion = buildProperties.getProperty(KEY_BASE_OS_VERSION);
-                if (!TextUtils.isEmpty(baseOsVersion)) {
-                    if (baseOsVersion.contains(VALUE_COLOROS_BASE_OS_VERSION_CONTAIN)) {
-                        return ROM.ColorOS;
-                    } else if (baseOsVersion.contains(VALUE_SAMSUNG_BASE_OS_VERSION_CONTAIN)) {
-                        return ROM.SamSung;
-                    }
-                }
-            } else if (buildProperties.containsKey(KEY_CLIENT_ID_BASE)) {
-                String clientIdBase = buildProperties.getProperty(KEY_CLIENT_ID_BASE);
-                switch (clientIdBase) {
-                    case VALUE_MIUI_CLIENT_ID_BASE:
-                        return ROM.MIUI;
-                    case VALUE_COLOROS_CLIENT_ID_BASE:
-                        return ROM.ColorOS;
-                    case VALUE_FUNTOUCHOS_CLIENT_ID_BASE:
-                        return ROM.FuntouchOS;
-                    case VALUE_SAMSUNG_CLIENT_ID_BASE:
-                        return ROM.SamSung;
-                    case VALUE_SONY_CLIENT_ID_BASE:
-                        return ROM.Sony;
-                    case VALUE_YULONG_CLIENT_ID_BASE:
-                        return ROM.YuLong;
-                    case VALUE_SENSE_CLIENT_ID_BASE:
-                        return ROM.Sense;
-                    case VALUE_LENOVO_CLIENT_ID_BASE:
-                        return ROM.Lenovo;
-                    case VALUE_AMIGO_CLIENT_ID_BASE:
-                        return ROM.AmigoOS;
-                    default:
-                        break;
                 }
             }
-
-        } catch (IOException e) {
-            e.printStackTrace();
-        } finally {
-            if (is != null) {
-                try {
-                    is.close();
-                } catch (IOException e) {
-                    e.printStackTrace();
+            if (containsKey(KEY_MIUI_VERSION)) {
+                String versionStr = getProperty(KEY_MIUI_VERSION);
+                if (!TextUtils.isEmpty(versionStr) && versionStr.matches("[\\d.]+")) {
+                    rom.setVersion(versionStr);
                 }
+            }
+        } else if (containsKey(KEY_EMUI_VERSION) || containsKey(KEY_EMUI_API_LEVEL)
+                || containsKey(KEY_EMUI_SYSTEM_VERSION)) {
+            // EMUI
+            rom = ROM.EMUI;
+            if (containsKey(KEY_EMUI_VERSION)) {
+                String versionStr = getProperty(KEY_EMUI_VERSION);
+                Matcher matcher = Pattern.compile("EmotionUI_([\\d.]+)").matcher(versionStr); // EmotionUI_3.0
+                if (!TextUtils.isEmpty(versionStr) && matcher.find()) {
+                    try {
+                        String version = matcher.group(1);
+                        rom.setVersion(version);
+                        rom.setBaseVersion(Integer.parseInt(version.split("\\.")[0]));
+                    } catch (Exception e) {
+                        e.printStackTrace();
+                    }
+                }
+            }
+        } else if (containsKey(KEY_FLYME_SETUP) || containsKey(KEY_FLYME_PUBLISHED)) {
+            // Flyme
+            rom = ROM.Flyme;
+            if (containsKey(KEY_DISPLAY_ID)) {
+                String versionStr = getProperty(KEY_DISPLAY_ID);
+                Matcher matcher = Pattern.compile("Flyme[^\\d]*([\\d.]+)[^\\d]*").matcher(versionStr); // Flyme OS 4.5.4.2U
+                if (!TextUtils.isEmpty(versionStr) && matcher.find()) {
+                    try {
+                        String version = matcher.group(1);
+                        rom.setVersion(version);
+                        rom.setBaseVersion(Integer.parseInt(version.split("\\.")[0]));
+                    } catch (Exception e) {
+                        e.printStackTrace();
+                    }
+                }
+            }
+        } else if (containsKey(KEY_COLOROS_VERSION) || containsKey(KEY_COLOROS_THEME_VERSION)
+                || containsKey(KEY_COLOROS_ROM_VERSION)) {
+            // ColorOS
+            rom = ROM.ColorOS;
+            if (containsKey(KEY_COLOROS_ROM_VERSION)) {
+                String versionStr = getProperty(KEY_COLOROS_ROM_VERSION);
+                Matcher matcher = Pattern.compile("ColorOS([\\d.]+)").matcher(versionStr); // ColorOS2.1
+                if (!TextUtils.isEmpty(versionStr) && matcher.find()) {
+                    try {
+                        String version = matcher.group(1);
+                        rom.setVersion(version);
+                        rom.setBaseVersion(Integer.parseInt(version.split("\\.")[0]));
+                    } catch (Exception e) {
+                        e.printStackTrace();
+                    }
+                }
+            }
+        } else if (containsKey(KEY_FUNTOUCHOS_OS_NAME) || containsKey(KEY_FUNTOUCHOS_OS_VERSION)
+                || containsKey(KEY_FUNTOUCHOS_DISPLAY_ID)) {
+            // FuntouchOS
+            rom = ROM.FuntouchOS;
+            if (containsKey(KEY_FUNTOUCHOS_OS_VERSION)) {
+                String versionStr = getProperty(KEY_FUNTOUCHOS_OS_VERSION);
+                if (!TextUtils.isEmpty(versionStr) && versionStr.matches("[\\d.]+")) { // 3.0
+                    try {
+                        rom.setVersion(versionStr);
+                        rom.setBaseVersion(Integer.parseInt(versionStr.split("\\.")[0]));
+                    } catch (Exception e) {
+                        e.printStackTrace();
+                    }
+                }
+            }
+        } else if (containsKey(KEY_EUI_VERSION) || containsKey(KEY_EUI_NAME)
+                || containsKey(KEY_EUI_MODEL)) {
+            // EUI
+            rom = ROM.EUI;
+            if (containsKey(KEY_EUI_VERSION)) {
+                String versionStr = getProperty(KEY_EUI_VERSION);
+                Matcher matcher = Pattern.compile("([\\d.]+)[^\\d]*").matcher(versionStr); // 5.9.023S
+                if (!TextUtils.isEmpty(versionStr) && matcher.find()) {
+                    try {
+                        String version = matcher.group(1);
+                        rom.setVersion(version);
+                        rom.setBaseVersion(Integer.parseInt(version.split("\\.")[0]));
+                    } catch (Exception e) {
+                        e.printStackTrace();
+                    }
+                }
+            }
+        } else if (containsKey(KEY_AMIGO_ROM_VERSION) || containsKey(KEY_AMIGO_SYSTEM_UI_SUPPORT)) {
+            // amigo
+            rom = ROM.AmigoOS;
+            if (containsKey(KEY_DISPLAY_ID)) {
+                String versionStr = getProperty(KEY_DISPLAY_ID);
+                Matcher matcher = Pattern.compile("amigo([\\d.]+)[a-zA-Z]*").matcher(versionStr); // "amigo3.5.1"
+                if (!TextUtils.isEmpty(versionStr) && matcher.find()) {
+                    try {
+                        String version = matcher.group(1);
+                        rom.setVersion(version);
+                        rom.setBaseVersion(Integer.parseInt(version.split("\\.")[0]));
+                    } catch (Exception e) {
+                        e.printStackTrace();
+                    }
+                }
+            }
+        } else if (containsKey(KEY_SONY_PROTOCOL_TYPE) || containsKey(KEY_SONY_ENCRYPTED_DATA)) {
+            // Sony
+            rom = ROM.Sony;
+        } else if (containsKey(KEY_YULONG_VERSION_RELEASE) || containsKey(KEY_YULONG_VERSION_TAG)) {
+            // YuLong
+            rom = ROM.YuLong;
+        } else if (containsKey(KEY_SENSE_BUILD_STAGE) || containsKey(KEY_SENSE_BLUETOOTH_SAP)) {
+            // Sense
+            rom = ROM.Sense;
+        } else if (containsKey(KEY_LG_SW_VERSION) || containsKey(KEY_LG_SW_VERSION_SHORT)
+                || containsKey(KEY_LG_FACTORY_VERSION)) {
+            // LG
+            rom = ROM.LG;
+        } else if (containsKey(KEY_LENOVO_DEVICE) || containsKey(KEY_LENOVO_PLATFORM)
+                || containsKey(KEY_LENOVO_ADB)) {
+            // Lenovo
+            rom = ROM.Lenovo;
+        } else if (containsKey(KEY_DISPLAY_ID)) {
+            String displayId = getProperty(KEY_DISPLAY_ID);
+            if (!TextUtils.isEmpty(displayId)) {
+                if (displayId.contains(VALUE_FLYME_DISPLAY_ID_CONTAIN)) {
+                    return ROM.Flyme;
+                } else if (displayId.contains(VALUE_AMIGO_DISPLAY_ID_CONTAIN)) {
+                    return ROM.AmigoOS;
+                }
+            }
+        } else if (containsKey(KEY_BASE_OS_VERSION)) {
+            String baseOsVersion = getProperty(KEY_BASE_OS_VERSION);
+            if (!TextUtils.isEmpty(baseOsVersion)) {
+                if (baseOsVersion.contains(VALUE_COLOROS_BASE_OS_VERSION_CONTAIN)) {
+                    return ROM.ColorOS;
+                } else if (baseOsVersion.contains(VALUE_SAMSUNG_BASE_OS_VERSION_CONTAIN)) {
+                    return ROM.SamSung;
+                }
+            }
+        } else if (containsKey(KEY_CLIENT_ID_BASE)) {
+            String clientIdBase = getProperty(KEY_CLIENT_ID_BASE);
+            switch (clientIdBase) {
+                case VALUE_MIUI_CLIENT_ID_BASE:
+                    return ROM.MIUI;
+                case VALUE_COLOROS_CLIENT_ID_BASE:
+                    return ROM.ColorOS;
+                case VALUE_FUNTOUCHOS_CLIENT_ID_BASE:
+                    return ROM.FuntouchOS;
+                case VALUE_SAMSUNG_CLIENT_ID_BASE:
+                    return ROM.SamSung;
+                case VALUE_SONY_CLIENT_ID_BASE:
+                    return ROM.Sony;
+                case VALUE_YULONG_CLIENT_ID_BASE:
+                    return ROM.YuLong;
+                case VALUE_SENSE_CLIENT_ID_BASE:
+                    return ROM.Sense;
+                case VALUE_LENOVO_CLIENT_ID_BASE:
+                    return ROM.Lenovo;
+                case VALUE_AMIGO_CLIENT_ID_BASE:
+                    return ROM.AmigoOS;
+                default:
+                    break;
             }
         }
         return rom;
     }
+
+    /**
+     * @param propName
+     * @return
+     */
+    private static boolean containsKey(String propName) {
+        if (TextUtils.isEmpty(getProperty(propName))) {
+            return false;
+        }
+        return true;
+    }
+
+    private static String getProperty(String propName) {
+        String value = null;
+        Object roSecureObj;
+        try {
+            roSecureObj = Class.forName("android.os.SystemProperties")
+                    .getMethod("get", String.class)
+                    .invoke(null, propName);
+            if (roSecureObj != null) value = (String) roSecureObj;
+        } catch (Exception e) {
+            value = null;
+        } finally {
+            return value;
+        }
+    }
+
 
     public enum ROM {
         MIUI, // 小米

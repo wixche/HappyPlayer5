@@ -563,57 +563,7 @@ public class LrcActivity extends BaseActivity {
                 if (mManyLineLyricsView.getLyricsReader() == null) {
                     return;
                 }
-                int extraLrcType = mManyLineLyricsView.getExtraLrcType();
-                if (extraLrcType == AbstractLrcView.EXTRALRCTYPE_NOLRC) {
-                    mExtraLrcTypeHandler.sendEmptyMessage(NOEXTRALRC);
-                } else if (extraLrcType == AbstractLrcView.EXTRALRCTYPE_TRANSLATELRC) {
-                    if (mConfigInfo.getExtraLrcStatus() == ConfigInfo.EXTRALRCSTATUS_SHOWTRANSLATELRC) {
-                        mExtraLrcTypeHandler.sendEmptyMessage(HASTRANSLATELRC);
-                        mManyLineLyricsView.setExtraLrcStatus(AbstractLrcView.EXTRALRCSTATUS_SHOWTRANSLATELRC);
-                    } else {
-                        Message msg = Message.obtain();
-                        msg.what = HASTRANSLATELRC;
-                        msg.obj = "";
-                        mExtraLrcTypeHandler.sendMessage(msg);
-                        mManyLineLyricsView.setExtraLrcStatus(AbstractLrcView.EXTRALRCSTATUS_NOSHOWEXTRALRC);
-                    }
-                } else if (extraLrcType == AbstractLrcView.EXTRALRCTYPE_TRANSLITERATIONLRC) {
-
-                    if (mConfigInfo.getExtraLrcStatus() == ConfigInfo.EXTRALRCSTATUS_SHOWTRANSLITERATIONLRC) {
-                        mExtraLrcTypeHandler.sendEmptyMessage(HASTRANSLITERATIONLRC);
-                        mManyLineLyricsView.setExtraLrcStatus(AbstractLrcView.EXTRALRCSTATUS_SHOWTRANSLITERATIONLRC);
-                    } else {
-                        Message msg = Message.obtain();
-                        msg.what = HASTRANSLITERATIONLRC;
-                        msg.obj = "";
-                        mExtraLrcTypeHandler.sendMessage(msg);
-                        mManyLineLyricsView.setExtraLrcStatus(AbstractLrcView.EXTRALRCSTATUS_NOSHOWEXTRALRC);
-                    }
-
-                } else if (extraLrcType == AbstractLrcView.EXTRALRCTYPE_BOTH) {
-                    if (mConfigInfo.getExtraLrcStatus() == ConfigInfo.EXTRALRCSTATUS_SHOWTRANSLITERATIONLRC) {
-
-                        Message msg = Message.obtain();
-                        msg.what = HASTRANSLATEANDTRANSLITERATIONLRC;
-                        msg.obj = ConfigInfo.EXTRALRCSTATUS_SHOWTRANSLITERATIONLRC;
-                        mExtraLrcTypeHandler.sendMessage(msg);
-                        mManyLineLyricsView.setExtraLrcStatus(AbstractLrcView.EXTRALRCSTATUS_SHOWTRANSLITERATIONLRC);
-                    } else if (mConfigInfo.getExtraLrcStatus() == ConfigInfo.EXTRALRCSTATUS_SHOWTRANSLATELRC) {
-                        Message msg = Message.obtain();
-                        msg.what = HASTRANSLATEANDTRANSLITERATIONLRC;
-                        msg.obj = ConfigInfo.EXTRALRCSTATUS_SHOWTRANSLATELRC;
-                        mExtraLrcTypeHandler.sendMessage(msg);
-                        mManyLineLyricsView.setExtraLrcStatus(AbstractLrcView.EXTRALRCSTATUS_SHOWTRANSLATELRC);
-
-                    } else {
-                        Message msg = Message.obtain();
-                        msg.what = HASTRANSLATEANDTRANSLITERATIONLRC;
-                        msg.obj = ConfigInfo.EXTRALRCSTATUS_NOSHOWEXTRALRC;
-                        mExtraLrcTypeHandler.sendMessage(msg);
-                        mManyLineLyricsView.setExtraLrcStatus(AbstractLrcView.EXTRALRCSTATUS_NOSHOWEXTRALRC);
-
-                    }
-                }
+                changeLrcTypeIcon();
             }
         });
 
@@ -771,6 +721,63 @@ public class LrcActivity extends BaseActivity {
                 }
             }
         });
+    }
+
+    /**
+     * 改变歌词类型图标
+     */
+    private void changeLrcTypeIcon() {
+        int extraLrcType = mManyLineLyricsView.getExtraLrcType();
+        if (extraLrcType == AbstractLrcView.EXTRALRCTYPE_NOLRC) {
+            mExtraLrcTypeHandler.sendEmptyMessage(NOEXTRALRC);
+        } else if (extraLrcType == AbstractLrcView.EXTRALRCTYPE_TRANSLATELRC) {
+            if (mConfigInfo.getExtraLrcStatus() == ConfigInfo.EXTRALRCSTATUS_SHOWTRANSLATELRC) {
+                mExtraLrcTypeHandler.sendEmptyMessage(HASTRANSLATELRC);
+                mManyLineLyricsView.setExtraLrcStatus(AbstractLrcView.EXTRALRCSTATUS_SHOWTRANSLATELRC);
+            } else {
+                Message msg = Message.obtain();
+                msg.what = HASTRANSLATELRC;
+                msg.obj = "";
+                mExtraLrcTypeHandler.sendMessage(msg);
+                mManyLineLyricsView.setExtraLrcStatus(AbstractLrcView.EXTRALRCSTATUS_NOSHOWEXTRALRC);
+            }
+        } else if (extraLrcType == AbstractLrcView.EXTRALRCTYPE_TRANSLITERATIONLRC) {
+
+            if (mConfigInfo.getExtraLrcStatus() == ConfigInfo.EXTRALRCSTATUS_SHOWTRANSLITERATIONLRC) {
+                mExtraLrcTypeHandler.sendEmptyMessage(HASTRANSLITERATIONLRC);
+                mManyLineLyricsView.setExtraLrcStatus(AbstractLrcView.EXTRALRCSTATUS_SHOWTRANSLITERATIONLRC);
+            } else {
+                Message msg = Message.obtain();
+                msg.what = HASTRANSLITERATIONLRC;
+                msg.obj = "";
+                mExtraLrcTypeHandler.sendMessage(msg);
+                mManyLineLyricsView.setExtraLrcStatus(AbstractLrcView.EXTRALRCSTATUS_NOSHOWEXTRALRC);
+            }
+
+        } else if (extraLrcType == AbstractLrcView.EXTRALRCTYPE_BOTH) {
+            if (mConfigInfo.getExtraLrcStatus() == ConfigInfo.EXTRALRCSTATUS_SHOWTRANSLITERATIONLRC) {
+
+                Message msg = Message.obtain();
+                msg.what = HASTRANSLATEANDTRANSLITERATIONLRC;
+                msg.obj = ConfigInfo.EXTRALRCSTATUS_SHOWTRANSLITERATIONLRC;
+                mExtraLrcTypeHandler.sendMessage(msg);
+                mManyLineLyricsView.setExtraLrcStatus(AbstractLrcView.EXTRALRCSTATUS_SHOWTRANSLITERATIONLRC);
+            } else if (mConfigInfo.getExtraLrcStatus() == ConfigInfo.EXTRALRCSTATUS_SHOWTRANSLATELRC) {
+                Message msg = Message.obtain();
+                msg.what = HASTRANSLATEANDTRANSLITERATIONLRC;
+                msg.obj = ConfigInfo.EXTRALRCSTATUS_SHOWTRANSLATELRC;
+                mExtraLrcTypeHandler.sendMessage(msg);
+                mManyLineLyricsView.setExtraLrcStatus(AbstractLrcView.EXTRALRCSTATUS_SHOWTRANSLATELRC);
+
+            } else {
+                Message msg = Message.obtain();
+                msg.what = HASTRANSLATEANDTRANSLITERATIONLRC;
+                msg.obj = ConfigInfo.EXTRALRCSTATUS_NOSHOWEXTRALRC;
+                mExtraLrcTypeHandler.sendMessage(msg);
+                mManyLineLyricsView.setExtraLrcStatus(AbstractLrcView.EXTRALRCSTATUS_NOSHOWEXTRALRC);
+
+            }
+        }
     }
 
 
@@ -1886,6 +1893,11 @@ public class LrcActivity extends BaseActivity {
                 if (curSingerAudioInfo != null && curSingerAudioInfo.getHash().equals(singerHash)) {
                     mUIHandler.sendEmptyMessage(MESSAGE_CODE_SINGER_RELOAD);
                 }
+                break;
+            case AudioBroadcastReceiver.ACTION_CODE_LOCK_LRC_CHANGE:
+                //锁屏歌词发生改变
+                changeLrcTypeIcon();
+
                 break;
         }
     }

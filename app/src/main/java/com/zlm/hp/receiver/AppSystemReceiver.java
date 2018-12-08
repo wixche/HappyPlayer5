@@ -53,6 +53,13 @@ public class AppSystemReceiver {
      */
     public static final int ACTION_CODE_TIMER_UPDATE = 2;
 
+    /**
+     * 关闭屏幕
+     */
+    public static final int ACTION_CODE_SCREEN_OFF = 3;
+
+    private final String ACTION_SCREEN_OFF = Intent.ACTION_SCREEN_OFF;
+
 
     private BroadcastReceiver mBroadcastReceiver;
     private IntentFilter mIntentFilter;
@@ -61,6 +68,7 @@ public class AppSystemReceiver {
     public AppSystemReceiver() {
         mIntentFilter = new IntentFilter();
         mIntentFilter.addAction(RECEIVER_ACTION);
+        mIntentFilter.addAction(ACTION_SCREEN_OFF);
     }
 
     /**
@@ -76,6 +84,9 @@ public class AppSystemReceiver {
 
                 if (mReceiverListener != null) {
                     int code = intent.getIntExtra(ACTION_CODE_KEY, -1);
+                    if (intent.getAction().equals(ACTION_SCREEN_OFF)) {
+                        code = ACTION_CODE_SCREEN_OFF;
+                    }
                     if (code != -1) {
                         mReceiverListener.onReceive(context, intent, code);
                     }

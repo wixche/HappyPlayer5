@@ -86,11 +86,30 @@ public class AudioPlayerService extends Service {
      */
     private Notification mPlayBarNotification;
 
+    /**
+     * 焦点
+     */
+    private AudioManager mAudioManager;
+
+    //注册OnAudioFocusChangeListener监听
+    AudioManager.OnAudioFocusChangeListener mOfChangeListener = new AudioManager.OnAudioFocusChangeListener() {
+        public void onAudioFocusChange(int focusChange) {
+            if (focusChange == AudioManager.AUDIOFOCUS_GAIN) {
+            } else {
+                //已经失去音频焦点
+                if (AudioPlayerManager.newInstance(mContext).getPlayStatus() == AudioPlayerManager.PLAYING) {
+                    AudioPlayerManager.newInstance(mContext).pause();
+                }
+            }
+        }
+    };
+
     @Override
     public void onCreate() {
         super.onCreate();
 
         mContext = getApplicationContext();
+        mAudioManager = (AudioManager) mContext.getSystemService(Context.AUDIO_SERVICE);
         mAudioBroadcastReceiver = new AudioBroadcastReceiver();
         mAudioBroadcastReceiver.setReceiverListener(new AudioBroadcastReceiver.AudioReceiverListener() {
             @Override
@@ -145,6 +164,13 @@ public class AudioPlayerService extends Service {
                     case AudioBroadcastReceiver.ACTION_CODE_STOP:
 
                         if (code == AudioBroadcastReceiver.ACTION_CODE_STOP) {
+                            //更新暂停时的进度
+                            if (mMediaPlayer != null) {
+                                ConfigInfo configInfoTemp = ConfigInfo.obtain();
+                                AudioInfo curAudioInfo = AudioPlayerManager.newInstance(mContext).getCurSong(configInfoTemp.getPlayHash());
+                                if (curAudioInfo != null)
+                                    curAudioInfo.setPlayProgress((int) mMediaPlayer.getCurrentPosition());
+                            }
                             releasePlayer();
                         }
 
@@ -527,6 +553,9 @@ public class AudioPlayerService extends Service {
     public void onDestroy() {
         super.onDestroy();
 
+        if (mAudioManager != null)
+            mAudioManager.abandonAudioFocus(mOfChangeListener);
+
         releaseHandle();
         releasePlayer();
         //关闭通知栏
@@ -561,6 +590,12 @@ public class AudioPlayerService extends Service {
      * @param audioInfo
      */
     private void handleSong(final AudioInfo audioInfo) {
+
+        //在播放的时候为AudioManager添加获取焦点的监听
+        mAudioManager.requestAudioFocus(mOfChangeListener,
+                AudioManager.STREAM_MUSIC,
+                AudioManager.AUDIOFOCUS_GAIN);
+
         this.mAudioInfo = audioInfo;
         try {
             String fileName = audioInfo.getTitle();
@@ -672,10 +707,12 @@ public class AudioPlayerService extends Service {
      * 释放播放器
      */
     private void releasePlayer() {
+
         //移除
         mWorkerHandler.removeMessages(MESSAGE_WHAT_LOADPLAYPROGRESSDATA);
 
         if (mMediaPlayer != null) {
+
             if (mMediaPlayer.isPlaying()) {
                 mMediaPlayer.stop();
             }

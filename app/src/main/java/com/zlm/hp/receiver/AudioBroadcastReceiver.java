@@ -143,12 +143,16 @@ public class AudioBroadcastReceiver {
      * 通知栏 桌面歌词显示
      */
     public static final int ACTION_CODE_NOTIFY_DESLRC_SHOW_ACTION = 21;
-    public static final int ACTION_CODE_NOTIFY_DESLRC_SHOW = 22;
 
     /**
      * 通知栏 歌手头像加载完成
      */
-    public static final int ACTION_CODE_NOTIFY_SINGERICONLOADED = 23;
+    public static final int ACTION_CODE_NOTIFY_SINGERICONLOADED = 22;
+
+    /**
+     * 锁屏歌词切换
+     */
+    public static final int ACTION_CODE_LOCK_LRC_CHANGE = 23;
 
     private BroadcastReceiver mBroadcastReceiver;
     private IntentFilter mIntentFilter;

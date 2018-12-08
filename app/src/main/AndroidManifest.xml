@@ -60,7 +60,15 @@
         <service
             android:name="com.zlm.hp.service.FloatService"
             android:enabled="true"
-            android:exported="true"></service>
+            android:exported="true" />
+
+        <activity
+            android:name=".LockActivity"
+            android:excludeFromRecents="true"
+            android:launchMode="singleInstance"
+            android:screenOrientation="portrait"
+            android:taskAffinity="com.zlm.lockscreen"
+            android:theme="@style/LockScreenTheme" />
     </application>
 
 </manifest>

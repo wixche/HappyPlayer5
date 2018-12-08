@@ -40,6 +40,7 @@ import com.zlm.hp.application.HPApplication;
 import com.zlm.hp.async.AsyncHandlerTask;
 import com.zlm.hp.audio.utils.MediaUtil;
 import com.zlm.hp.constants.ConfigInfo;
+import com.zlm.hp.constants.Constants;
 import com.zlm.hp.db.util.DownloadThreadInfoDB;
 import com.zlm.hp.entity.AudioInfo;
 import com.zlm.hp.entity.TimerInfo;
@@ -63,6 +64,7 @@ import com.zlm.hp.util.AppOpsUtils;
 import com.zlm.hp.util.ColorUtil;
 import com.zlm.hp.util.ImageUtil;
 import com.zlm.hp.util.IntentUtil;
+import com.zlm.hp.util.PreferencesUtil;
 import com.zlm.hp.util.TimeUtil;
 import com.zlm.hp.util.ToastUtil;
 import com.zlm.hp.widget.IconfontImageButtonTextView;
@@ -555,6 +557,20 @@ public class MainActivity extends BaseActivity {
                         }
                         //更新
                         break;
+                    case AppSystemReceiver.ACTION_CODE_SCREEN_OFF:
+                        //关闭屏幕
+                        if (mConfigInfo.isShowLockScreenLrc()) {
+
+                            Intent lockIntent = new Intent(MainActivity.this,
+                                    LockActivity.class);
+                            lockIntent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
+
+                            startActivity(lockIntent);
+                            //去掉动画
+                            overridePendingTransition(0, 0);
+                        }
+
+                        break;
                 }
             }
         });
@@ -610,6 +626,69 @@ public class MainActivity extends BaseActivity {
         mWifiSwitchButton.setChecked(mConfigInfo.isWifi());
         mDesktoplrcSwitchButton.setChecked(mConfigInfo.isShowDesktopLrc());
         mLocklrcSwitchButton.setChecked(mConfigInfo.isShowLockScreenLrc());
+
+        //wifi
+        mWifiSwitchButton.setOnCheckedChangeListener(new SwitchButton.OnCheckedChangeListener() {
+            @Override
+            public void onCheckedChanged(SwitchButton view, boolean isChecked) {
+                if (mConfigInfo.isWifi() != isChecked)
+                    mConfigInfo.setWifi(isChecked).save();
+            }
+        });
+
+        //桌面
+        mDesktoplrcSwitchButton.setOnCheckedChangeListener(new SwitchButton.OnCheckedChangeListener() {
+            @Override
+            public void onCheckedChanged(SwitchButton view, boolean isChecked) {
+                if (isChecked) {
+                    if (!hasShowFloatWindowPermission()) return;
+                }
+                if (mConfigInfo.isShowDesktopLrc() != isChecked) {
+                    mConfigInfo.setShowDesktopLrc(isChecked).save();
+                    //
+                    AudioBroadcastReceiver.sendReceiver(mContext, AudioBroadcastReceiver.ACTION_CODE_NOTIFY_DESLRC);
+                }
+            }
+        });
+
+        //锁屏
+        mLocklrcSwitchButton.setOnCheckedChangeListener(new SwitchButton.OnCheckedChangeListener() {
+            @Override
+            public void onCheckedChanged(SwitchButton view, boolean isChecked) {
+                boolean askLockPermission = PreferencesUtil.getBoolean(mContext, Constants.ASK_LOCK_PERMISSION, true);
+                if (askLockPermission) {
+                    //弹出窗口显示
+
+                    String tipMsg = getString(R.string.locklrc_tip);
+                    DialogUIUtils.showMdAlert(MainActivity.this, getString(R.string.tip_title), tipMsg, new DialogUIListener() {
+                        @Override
+                        public void onPositive() {
+
+                            PreferencesUtil.putBoolean(mContext, Constants.ASK_LOCK_PERMISSION, false);
+
+                            //跳转权限设置页面
+                            IntentUtil.gotoPermissionSetting(MainActivity.this);
+                            mLocklrcSwitchButton.setChecked(false);
+                        }
+
+                        @Override
+                        public void onNegative() {
+                            mLocklrcSwitchButton.setChecked(false);
+                        }
+
+                        @Override
+                        public void onCancle() {
+                            mLocklrcSwitchButton.setChecked(false);
+                        }
+                    }).setCancelable(true, false).show();
+
+                    return;
+                }
+
+                if (mConfigInfo.isShowLockScreenLrc() != isChecked)
+                    mConfigInfo.setShowLockScreenLrc(isChecked).save();
+            }
+        });
     }
 
     @Override
@@ -912,13 +991,6 @@ public class MainActivity extends BaseActivity {
             }
         });
         mWifiSwitchButton = findViewById(R.id.wifi_switch);
-        mWifiSwitchButton.setOnCheckedChangeListener(new SwitchButton.OnCheckedChangeListener() {
-            @Override
-            public void onCheckedChanged(SwitchButton view, boolean isChecked) {
-                if (mConfigInfo.isWifi() != isChecked)
-                    mConfigInfo.setWifi(isChecked).save();
-            }
-        });
 
         //桌面歌词开关
         mDesktoplrcLR = findViewById(R.id.desktoplrc_lr);
@@ -930,19 +1002,6 @@ public class MainActivity extends BaseActivity {
             }
         });
         mDesktoplrcSwitchButton = findViewById(R.id.desktoplrc_switch);
-        mDesktoplrcSwitchButton.setOnCheckedChangeListener(new SwitchButton.OnCheckedChangeListener() {
-            @Override
-            public void onCheckedChanged(SwitchButton view, boolean isChecked) {
-                if (isChecked) {
-                    if (!hasShowFloatWindowPermission()) return;
-                }
-                if (mConfigInfo.isShowDesktopLrc() != isChecked) {
-                    mConfigInfo.setShowDesktopLrc(isChecked).save();
-                    //
-                    AudioBroadcastReceiver.sendReceiver(mContext, AudioBroadcastReceiver.ACTION_CODE_NOTIFY_DESLRC);
-                }
-            }
-        });
 
         //锁屏歌词开关
         mLocklrcLR = findViewById(R.id.locklrc_lr);
@@ -954,13 +1013,7 @@ public class MainActivity extends BaseActivity {
             }
         });
         mLocklrcSwitchButton = findViewById(R.id.locklrc_switch);
-        mLocklrcSwitchButton.setOnCheckedChangeListener(new SwitchButton.OnCheckedChangeListener() {
-            @Override
-            public void onCheckedChanged(SwitchButton view, boolean isChecked) {
-                if (mConfigInfo.isShowLockScreenLrc() != isChecked)
-                    mConfigInfo.setShowLockScreenLrc(isChecked).save();
-            }
-        });
+
     }
 
     /**

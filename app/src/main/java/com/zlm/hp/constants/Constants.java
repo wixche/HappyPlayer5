@@ -33,4 +33,9 @@ public class Constants {
      */
     public final static String DEVICE_ID = "DeviceID";
 
+
+    /**
+     * 锁屏权限
+     */
+    public final static String ASK_LOCK_PERMISSION = "AskLockPermission";
 }
