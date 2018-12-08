@@ -291,9 +291,9 @@ public class FloatService extends Service {
         // 设置窗体焦点及触摸：
         boolean desktopLyricsIsMove = mConfigInfo.isDesktopLrcCanMove();
         if (desktopLyricsIsMove) {
-            mLayout.flags = WindowManager.LayoutParams.FLAG_NOT_TOUCH_MODAL;
+            mLayout.flags = WindowManager.LayoutParams.FLAG_NOT_FOCUSABLE | WindowManager.LayoutParams.FLAG_NOT_TOUCH_MODAL;
         } else {
-            mLayout.flags = WindowManager.LayoutParams.FLAG_NOT_TOUCHABLE;
+            mLayout.flags = WindowManager.LayoutParams.FLAG_NOT_FOCUSABLE | WindowManager.LayoutParams.FLAG_NOT_TOUCHABLE;
         }
 
         mWindowY = mLayout.y;
@@ -860,9 +860,9 @@ public class FloatService extends Service {
             case AudioBroadcastReceiver.ACTION_CODE_NOTIFY_LOCK:
             case AudioBroadcastReceiver.ACTION_CODE_NOTIFY_UNLOCK:
                 if (mConfigInfo.isDesktopLrcCanMove()) {
-                    mLayout.flags = WindowManager.LayoutParams.FLAG_NOT_TOUCH_MODAL;
+                    mLayout.flags = WindowManager.LayoutParams.FLAG_NOT_FOCUSABLE | WindowManager.LayoutParams.FLAG_NOT_TOUCH_MODAL;
                 } else {
-                    mLayout.flags = WindowManager.LayoutParams.FLAG_NOT_TOUCHABLE;
+                    mLayout.flags = WindowManager.LayoutParams.FLAG_NOT_FOCUSABLE | WindowManager.LayoutParams.FLAG_NOT_TOUCHABLE;
                 }
                 if (mFloatLinearLayout.getParent() != null) {
                     mWindowManager.updateViewLayout(mFloatLinearLayout, mLayout);

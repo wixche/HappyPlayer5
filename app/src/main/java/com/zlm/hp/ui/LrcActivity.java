@@ -1961,11 +1961,11 @@ public class LrcActivity extends BaseActivity {
     }
 
     @Override
-    protected void onDestroy() {
+    public void finish() {
         mSingerImageView.release();
         mManyLineLyricsView.release();
         destroyReceiver();
-        super.onDestroy();
+        super.finish();
     }
 
     /**
