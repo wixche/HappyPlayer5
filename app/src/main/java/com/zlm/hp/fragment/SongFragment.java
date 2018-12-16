@@ -93,6 +93,17 @@ public class SongFragment extends BaseFragment {
      * 最新
      */
     public static final int SONG_TYPE_LAST = 3;
+
+    /**
+     * 喜欢
+     */
+    public static final int SONG_TYPE_LIKE = 4;
+
+    /**
+     * 最近
+     */
+    public static final int SONG_TYPE_RECENT = 5;
+
     /**
      * 网络歌曲类型
      */
@@ -197,6 +208,8 @@ public class SongFragment extends BaseFragment {
 
                 break;
             case SONG_TYPE_LOCAL:
+            case SONG_TYPE_LIKE:
+            case SONG_TYPE_RECENT:
                 title = bundle.getString(DATA_KEY);
                 mRecyclerView.setLoadMoreEnabled(false);
                 break;
@@ -244,6 +257,12 @@ public class SongFragment extends BaseFragment {
                             AudioInfo initAudioInfo = initBundle.getParcelable(AudioBroadcastReceiver.ACTION_DATA_KEY);
                             ((AudioAdapter) (mAdapter.getInnerAdapter())).reshViewHolder(initAudioInfo);
                         }
+                        break;
+                    case AudioBroadcastReceiver.ACTION_CODE_UPDATE_LOCAL:
+                    case AudioBroadcastReceiver.ACTION_CODE_UPDATE_LIKE:
+                    case AudioBroadcastReceiver.ACTION_CODE_UPDATE_RECENT:
+                        //歌曲更新
+                        loadRefreshData();
                         break;
                 }
             }
@@ -408,9 +427,18 @@ public class SongFragment extends BaseFragment {
 
                 break;
             case SONG_TYPE_LOCAL:
+            case SONG_TYPE_LIKE:
+            case SONG_TYPE_RECENT:
                 httpReturnResult = new HttpReturnResult();
                 httpReturnResult.setStatus(HttpClient.HTTP_OK);
-                List<AudioInfo> audioInfos = AudioInfoDB.getLocalAudios(mContext);
+                List<AudioInfo> audioInfos = null;
+                if(mSongType == SONG_TYPE_LOCAL){
+                    audioInfos = AudioInfoDB.getLocalAudios(mContext);
+                }else if(mSongType == SONG_TYPE_LIKE){
+                    audioInfos = AudioInfoDB.getLikeAudios(mContext);
+                }else if(mSongType == SONG_TYPE_RECENT){
+                    audioInfos = AudioInfoDB.getRecentAudios(mContext);
+                }
                 if (audioInfos == null) {
                     audioInfos = new ArrayList<AudioInfo>();
                 }

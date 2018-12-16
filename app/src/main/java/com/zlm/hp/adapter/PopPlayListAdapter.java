@@ -14,11 +14,14 @@ import android.widget.TextView;
 
 import com.zlm.hp.async.AsyncHandlerTask;
 import com.zlm.hp.constants.ConfigInfo;
+import com.zlm.hp.db.util.AudioInfoDB;
 import com.zlm.hp.entity.AudioInfo;
 import com.zlm.hp.handler.WeakRefHandler;
 import com.zlm.hp.manager.AudioPlayerManager;
+import com.zlm.hp.receiver.AudioBroadcastReceiver;
 import com.zlm.hp.ui.R;
 import com.zlm.hp.util.ImageUtil;
+import com.zlm.hp.util.ToastUtil;
 import com.zlm.hp.widget.IconfontTextView;
 
 import java.util.List;
@@ -67,7 +70,7 @@ public class PopPlayListAdapter extends RecyclerView.Adapter<RecyclerView.ViewHo
      * @param viewHolder
      * @param audioInfo
      */
-    private void reshViewHolder(final int position, PopListViewHolder viewHolder, final AudioInfo audioInfo) {
+    private void reshViewHolder(final int position, final PopListViewHolder viewHolder, final AudioInfo audioInfo) {
 
         if (audioInfo.getHash().equals(mConfigInfo.getPlayHash())) {
             mOldPlayHash = audioInfo.getHash();
@@ -83,12 +86,61 @@ public class PopPlayListAdapter extends RecyclerView.Adapter<RecyclerView.ViewHo
             });
 
 
-
             viewHolder.getSongIndexTv().setVisibility(View.INVISIBLE);
         } else {
             viewHolder.getSongIndexTv().setVisibility(View.VISIBLE);
             viewHolder.getSingPicImg().setVisibility(View.INVISIBLE);
         }
+
+        //喜欢/不喜欢
+        if (AudioInfoDB.isLikeAudioExists(mContext, audioInfo.getHash())) {
+            viewHolder.getUnLikeTv().setVisibility(View.INVISIBLE);
+            viewHolder.getLikedImg().setVisibility(View.VISIBLE);
+        } else {
+            viewHolder.getUnLikeTv().setVisibility(View.VISIBLE);
+            viewHolder.getLikedImg().setVisibility(View.INVISIBLE);
+        }
+        //不喜欢
+        viewHolder.getUnLikeTv().setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                if (audioInfo != null) {
+                    if (!AudioInfoDB.isLikeAudioExists(mContext, audioInfo.getHash())) {
+                        boolean result = AudioInfoDB.addLikeAudio(mContext, audioInfo);
+                        if (result) {
+                            viewHolder.getUnLikeTv().setVisibility(View.INVISIBLE);
+                            viewHolder.getLikedImg().setVisibility(View.VISIBLE);
+                            ToastUtil.showTextToast(mContext, mContext.getResources().getString(R.string.like_tip_text));
+
+                            //更新喜欢歌曲广播
+                            AudioBroadcastReceiver.sendReceiver(mContext, AudioBroadcastReceiver.ACTION_CODE_UPDATE_LIKE);
+                        }
+                    }
+                }
+            }
+        });
+
+        //喜欢
+        viewHolder.getLikedImg().setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                if (audioInfo != null) {
+                    if (AudioInfoDB.isLikeAudioExists(mContext, audioInfo.getHash())) {
+                        boolean result = AudioInfoDB.deleteLikeAudio(mContext, audioInfo.getHash());
+                        if (result) {
+                            viewHolder.getUnLikeTv().setVisibility(View.VISIBLE);
+                            viewHolder.getLikedImg().setVisibility(View.INVISIBLE);
+
+                            ToastUtil.showTextToast(mContext, mContext.getResources().getString(R.string.unlike_tip_text));
+
+                            //更新喜欢歌曲广播
+                            AudioBroadcastReceiver.sendReceiver(mContext, AudioBroadcastReceiver.ACTION_CODE_UPDATE_LIKE);
+                        }
+                    }
+                }
+            }
+        });
+
 
         //显示歌曲索引
         viewHolder.getSongIndexTv().setText(((position + 1) < 10 ? "0" + (position + 1) : (position + 1) + ""));

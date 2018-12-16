@@ -24,6 +24,7 @@ import android.widget.RemoteViews;
 import com.zlm.hp.async.AsyncHandlerTask;
 import com.zlm.hp.constants.ConfigInfo;
 import com.zlm.hp.constants.ResourceConstants;
+import com.zlm.hp.db.util.AudioInfoDB;
 import com.zlm.hp.entity.AudioInfo;
 import com.zlm.hp.handler.WeakRefHandler;
 import com.zlm.hp.manager.AudioPlayerManager;
@@ -31,11 +32,13 @@ import com.zlm.hp.receiver.AudioBroadcastReceiver;
 import com.zlm.hp.ui.MainActivity;
 import com.zlm.hp.ui.R;
 import com.zlm.hp.util.AppOpsUtils;
+import com.zlm.hp.util.DateUtil;
 import com.zlm.hp.util.ImageUtil;
 import com.zlm.hp.util.ResourceUtil;
 import com.zlm.hp.util.ToastUtil;
 
 import java.io.File;
+import java.util.Date;
 
 import tv.danmaku.ijk.media.player.IMediaPlayer;
 import tv.danmaku.ijk.media.player.IjkMediaPlayer;
@@ -67,8 +70,6 @@ public class AudioPlayerService extends Service {
      * 播放器
      */
     private IjkMediaPlayer mMediaPlayer;
-
-    private AudioInfo mAudioInfo;
 
     /**
      * 加载当前播放进度
@@ -116,13 +117,13 @@ public class AudioPlayerService extends Service {
             public void onReceive(Context context, final Intent intent, final int code) {
                 switch (code) {
                     case AudioBroadcastReceiver.ACTION_CODE_NOTIFY_PLAY:
-                        if (mAudioInfo != null) {
-                            AudioPlayerManager.newInstance(mContext).play(mAudioInfo.getPlayProgress());
+                        if (getCurAudioInfo() != null) {
+                            AudioPlayerManager.newInstance(mContext).play(getCurAudioInfo().getPlayProgress());
                         }
 
                         break;
                     case AudioBroadcastReceiver.ACTION_CODE_NOTIFY_PAUSE:
-                        if (mAudioInfo != null) {
+                        if (getCurAudioInfo() != null) {
                             AudioPlayerManager.newInstance(mContext).pause();
                         }
                         break;
@@ -186,7 +187,7 @@ public class AudioPlayerService extends Service {
                         //
                         Bundle notifySingerLoadedBundle = intent.getBundleExtra(AudioBroadcastReceiver.ACTION_BUNDLEKEY);
                         final AudioInfo curAudioInfo = notifySingerLoadedBundle.getParcelable(AudioBroadcastReceiver.ACTION_DATA_KEY);
-                        if (curAudioInfo != null && mAudioInfo != null && curAudioInfo.getHash().equals(mAudioInfo.getHash())) {
+                        if (curAudioInfo != null && getCurAudioInfo() != null && curAudioInfo.getHash().equals(getCurAudioInfo().getHash())) {
                             mUIHandler.post(new Runnable() {
                                 @Override
                                 public void run() {
@@ -263,11 +264,11 @@ public class AudioPlayerService extends Service {
     private void loadNotificationData() {
         //加载数据
         ConfigInfo configInfo = ConfigInfo.obtain();
-        mAudioInfo = AudioPlayerManager.newInstance(mContext).getCurSong(configInfo.getPlayHash());
-        if (mAudioInfo != null) {
-            doNotification(mAudioInfo, AudioBroadcastReceiver.ACTION_CODE_INIT, true);
+        AudioInfo audioInfo = AudioPlayerManager.newInstance(mContext).getCurSong(configInfo.getPlayHash());
+        if (audioInfo != null) {
+            doNotification(audioInfo, AudioBroadcastReceiver.ACTION_CODE_INIT, true);
         } else {
-            doNotification(mAudioInfo, AudioBroadcastReceiver.ACTION_CODE_NULL, false);
+            doNotification(audioInfo, AudioBroadcastReceiver.ACTION_CODE_NULL, false);
         }
     }
 
@@ -279,10 +280,10 @@ public class AudioPlayerService extends Service {
         switch (msg.what) {
             case MESSAGE_WHAT_LOADPLAYPROGRESSDATA:
 
-                if (mAudioInfo != null && mMediaPlayer != null && mMediaPlayer.isPlaying()) {
+                if (getCurAudioInfo() != null && mMediaPlayer != null && mMediaPlayer.isPlaying()) {
 
-                    mAudioInfo.setPlayProgress((int) mMediaPlayer.getCurrentPosition());
-                    AudioBroadcastReceiver.sendPlayingReceiver(mContext, mAudioInfo);
+                    getCurAudioInfo().setPlayProgress((int) mMediaPlayer.getCurrentPosition());
+                    AudioBroadcastReceiver.sendPlayingReceiver(mContext, getCurAudioInfo());
                 }
                 //
                 mWorkerHandler.sendEmptyMessageDelayed(MESSAGE_WHAT_LOADPLAYPROGRESSDATA, 1000);
@@ -389,7 +390,7 @@ public class AudioPlayerService extends Service {
                 mNotifyPlayBarRemoteViews.setImageViewResource(R.id.singPic,
                         R.mipmap.bpz);// 显示专辑封面图片
 
-                mNotifyPlayBarRemoteViews.setTextViewText(R.id.songName,
+                mNotifyPlayBarRemoteViews.setTextViewText(R.id.titleName,
                         getString(R.string.def_text));
                 mNotifyPlayBarRemoteViews.setViewVisibility(R.id.play,
                         View.VISIBLE);
@@ -596,7 +597,17 @@ public class AudioPlayerService extends Service {
                 AudioManager.STREAM_MUSIC,
                 AudioManager.AUDIOFOCUS_GAIN);
 
-        this.mAudioInfo = audioInfo;
+        //添加到最近播放列表中去
+        if (AudioInfoDB.isRecentAudioExists(mContext, audioInfo.getHash())) {
+            AudioInfoDB.updateRecentAudio(mContext, audioInfo.getHash(), DateUtil.parseDateToString(new Date()));
+        } else {
+            boolean addResult = AudioInfoDB.addRecentAudio(mContext, audioInfo);
+            if (addResult) {
+                //更新最近歌曲广播
+                AudioBroadcastReceiver.sendReceiver(mContext, AudioBroadcastReceiver.ACTION_CODE_UPDATE_RECENT);
+            }
+        }
+
         try {
             String fileName = audioInfo.getTitle();
             String filePath = ResourceUtil.getFilePath(mContext, ResourceConstants.PATH_AUDIO, fileName + "." + audioInfo.getFileExt());
@@ -619,7 +630,7 @@ public class AudioPlayerService extends Service {
                 public void onSeekComplete(IMediaPlayer mp) {
 
                     //发送播放中广播
-                    AudioBroadcastReceiver.sendPlayReceiver(mContext, mAudioInfo);
+                    AudioBroadcastReceiver.sendPlayReceiver(mContext, audioInfo);
                     mWorkerHandler.removeMessages(MESSAGE_WHAT_LOADPLAYPROGRESSDATA);
                     mWorkerHandler.sendEmptyMessage(MESSAGE_WHAT_LOADPLAYPROGRESSDATA);
 
@@ -649,12 +660,12 @@ public class AudioPlayerService extends Service {
             mMediaPlayer.setOnPreparedListener(new IMediaPlayer.OnPreparedListener() {
                 @Override
                 public void onPrepared(IMediaPlayer mp) {
-                    if (mAudioInfo.getPlayProgress() != 0) {
-                        mMediaPlayer.seekTo(mAudioInfo.getPlayProgress());
+                    if (audioInfo.getPlayProgress() != 0) {
+                        mMediaPlayer.seekTo(audioInfo.getPlayProgress());
                     } else {
 
                         //发送播放中广播
-                        AudioBroadcastReceiver.sendPlayReceiver(mContext, mAudioInfo);
+                        AudioBroadcastReceiver.sendPlayReceiver(mContext, audioInfo);
                         mWorkerHandler.removeMessages(MESSAGE_WHAT_LOADPLAYPROGRESSDATA);
                         mWorkerHandler.sendEmptyMessage(MESSAGE_WHAT_LOADPLAYPROGRESSDATA);
 
@@ -723,6 +734,16 @@ public class AudioPlayerService extends Service {
         System.gc();
 
 
+    }
+
+    /**
+     * 获取当前的播放歌曲
+     *
+     * @return
+     */
+    private AudioInfo getCurAudioInfo() {
+        ConfigInfo configInfo = ConfigInfo.obtain();
+        return AudioPlayerManager.newInstance(mContext).getCurSong(configInfo.getPlayHash());
     }
 
     /**

@@ -42,6 +42,16 @@ public class FragmentReceiver {
     public static final int ACTION_CODE_OPEN_LOCALFRAGMENT = 3;
 
     /**
+     * 打开喜欢歌曲
+     */
+    public static final int ACTION_CODE_OPEN_LIKEFRAGMENT = 4;
+
+    /**
+     * 打开最近歌曲
+     */
+    public static final int ACTION_CODE_OPEN_RECENTFRAGMENT = 5;
+
+    /**
      * fragment的receiver的action
      */
     private static final String RECEIVER_ACTION = "com.zlm.hp.receiver.fragment.action";
@@ -138,6 +148,31 @@ public class FragmentReceiver {
         bundle.putString(SongFragment.DATA_KEY, title);
         sendReceiver(context, FragmentReceiver.ACTION_CODE_OPEN_LOCALFRAGMENT, SongFragment.ARGUMENTS_KEY, bundle);
     }
+
+    /**
+     * 发打开喜欢歌曲广播
+     *
+     * @param context
+     */
+    public static void sendLikeFragmentReceiver(Context context, String title) {
+        Bundle bundle = new Bundle();
+        bundle.putInt(SongFragment.SONGTYPE_KEY, SongFragment.SONG_TYPE_LIKE);
+        bundle.putString(SongFragment.DATA_KEY, title);
+        sendReceiver(context, FragmentReceiver.ACTION_CODE_OPEN_LIKEFRAGMENT, SongFragment.ARGUMENTS_KEY, bundle);
+    }
+
+    /**
+     * 发打开最近歌曲广播
+     *
+     * @param context
+     */
+    public static void sendRecentFragmentReceiver(Context context, String title) {
+        Bundle bundle = new Bundle();
+        bundle.putInt(SongFragment.SONGTYPE_KEY, SongFragment.SONG_TYPE_RECENT);
+        bundle.putString(SongFragment.DATA_KEY, title);
+        sendReceiver(context, FragmentReceiver.ACTION_CODE_OPEN_RECENTFRAGMENT, SongFragment.ARGUMENTS_KEY, bundle);
+    }
+
 
     /**
      * 取消注册广播

@@ -25,6 +25,7 @@ import com.zlm.hp.adapter.PopPlayListAdapter;
 import com.zlm.hp.async.AsyncHandlerTask;
 import com.zlm.hp.audio.utils.MediaUtil;
 import com.zlm.hp.constants.ConfigInfo;
+import com.zlm.hp.db.util.AudioInfoDB;
 import com.zlm.hp.db.util.DownloadThreadInfoDB;
 import com.zlm.hp.entity.AudioInfo;
 import com.zlm.hp.lyrics.LyricsReader;
@@ -174,6 +175,11 @@ public class LrcActivity extends BaseActivity {
     private IconfontTextView mModeRandomTv;
     private IconfontTextView mModeSingleTv;
 
+    /**
+     * 喜欢
+     */
+    private IconfontImageButtonTextView mLikeMenuBtn;
+    private IconfontImageButtonTextView mUnLikeMenuBtn;
 
     ////////////////////////////////////////////////////////////////////////////
 
@@ -408,7 +414,7 @@ public class LrcActivity extends BaseActivity {
         mRotateLayout.addIgnoreView(mLrcPlaybarLinearLayout);
 
         //返回按钮
-        ImageView backImg = findViewById(R.id.backImg);
+        final ImageView backImg = findViewById(R.id.backImg);
         backImg.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
@@ -718,6 +724,52 @@ public class LrcActivity extends BaseActivity {
                         initPopPlayListViews();
                     }
                     showPopPlayListView();
+                }
+            }
+        });
+
+        //喜欢
+        mLikeMenuBtn = findViewById(R.id.liked_menu);
+        mLikeMenuBtn.setConvert(true);
+        mLikeMenuBtn.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                AudioInfo audioInfo = AudioPlayerManager.newInstance(mContext).getCurSong(mConfigInfo.getPlayHash());
+                if (audioInfo != null) {
+                    if (AudioInfoDB.isLikeAudioExists(mContext, audioInfo.getHash())) {
+                        boolean result = AudioInfoDB.deleteLikeAudio(mContext, audioInfo.getHash());
+                        if (result) {
+                            mUnLikeMenuBtn.setVisibility(View.VISIBLE);
+                            mLikeMenuBtn.setVisibility(View.GONE);
+                            ToastUtil.showTextToast(mContext, getString(R.string.unlike_tip_text));
+
+                            //更新喜欢歌曲广播
+                            AudioBroadcastReceiver.sendReceiver(mContext, AudioBroadcastReceiver.ACTION_CODE_UPDATE_LIKE);
+                        }
+                    }
+                }
+            }
+        });
+
+        //不喜欢
+        mUnLikeMenuBtn = findViewById(R.id.unlike_menu);
+        mUnLikeMenuBtn.setConvert(true);
+        mUnLikeMenuBtn.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                AudioInfo audioInfo = AudioPlayerManager.newInstance(mContext).getCurSong(mConfigInfo.getPlayHash());
+                if (audioInfo != null) {
+                    if (!AudioInfoDB.isLikeAudioExists(mContext, audioInfo.getHash())) {
+                        boolean result = AudioInfoDB.addLikeAudio(mContext, audioInfo);
+                        if (result) {
+                            mUnLikeMenuBtn.setVisibility(View.GONE);
+                            mLikeMenuBtn.setVisibility(View.VISIBLE);
+                            ToastUtil.showTextToast(mContext, getString(R.string.like_tip_text));
+
+                            //更新喜欢歌曲广播
+                            AudioBroadcastReceiver.sendReceiver(mContext, AudioBroadcastReceiver.ACTION_CODE_UPDATE_LIKE);
+                        }
+                    }
                 }
             }
         });
@@ -1698,6 +1750,10 @@ public class LrcActivity extends BaseActivity {
                 mSingerImageView.setVisibility(View.INVISIBLE);
                 mSingerImageView.resetData();
 
+                //喜欢/不喜欢
+                mUnLikeMenuBtn.setVisibility(View.VISIBLE);
+                mLikeMenuBtn.setVisibility(View.GONE);
+
                 if (mAdapter != null)
                     mAdapter.reshViewHolder(null);
 
@@ -1710,6 +1766,15 @@ public class LrcActivity extends BaseActivity {
                     mSingerNameTextView.setText(initAudioInfo.getSingerName());
                     mPauseBtn.setVisibility(View.INVISIBLE);
                     mPlayBtn.setVisibility(View.VISIBLE);
+
+                    //喜欢/不喜欢
+                    if (AudioInfoDB.isLikeAudioExists(mContext, initAudioInfo.getHash())) {
+                        mUnLikeMenuBtn.setVisibility(View.GONE);
+                        mLikeMenuBtn.setVisibility(View.VISIBLE);
+                    } else {
+                        mUnLikeMenuBtn.setVisibility(View.VISIBLE);
+                        mLikeMenuBtn.setVisibility(View.GONE);
+                    }
 
                     //
                     mSongProgressTv.setText(MediaUtil.formatTime((int) initAudioInfo.getPlayProgress()));
@@ -1898,6 +1963,18 @@ public class LrcActivity extends BaseActivity {
                 //锁屏歌词发生改变
                 changeLrcTypeIcon();
 
+                break;
+            case AudioBroadcastReceiver.ACTION_CODE_UPDATE_LIKE:
+                //喜欢/不喜欢
+                AudioInfo curAudioInfoTemp2 = AudioPlayerManager.newInstance(mContext).getCurSong(mConfigInfo.getPlayHash());
+                if (curAudioInfoTemp2 == null) return;
+                if (AudioInfoDB.isLikeAudioExists(mContext, curAudioInfoTemp2.getHash())) {
+                    mUnLikeMenuBtn.setVisibility(View.GONE);
+                    mLikeMenuBtn.setVisibility(View.VISIBLE);
+                } else {
+                    mUnLikeMenuBtn.setVisibility(View.VISIBLE);
+                    mLikeMenuBtn.setVisibility(View.GONE);
+                }
                 break;
         }
     }

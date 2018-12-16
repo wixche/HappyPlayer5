@@ -35,7 +35,7 @@
     <string name="tab_localmusic">本地音乐</string>
     <string name="tab_like">喜欢</string>
     <string name="tab_download">下载</string>
-    <string name="tab_centent">最近</string>
+    <string name="tab_recent">最近</string>
     <string name="tab_wifi">仅wifi联网</string>
     <string name="tab_wifi_img">&#xe8a0;</string>
     <string name="tab_desktoplrc">桌面歌词</string>
@@ -58,7 +58,9 @@
     <string name="make_lrc_img">&#xe62e;</string>
     <string name="lrc_to_video">歌词图片生成器</string>
     <string name="lrc_to_video_img">&#xe646;</string>
-
+    <string name="mv_img">&#xe604;</string>
+    <string name="like_tip_text">已添加收藏</string>
+    <string name="unlike_tip_text">取消成功</string>
 
     <string name="timer_power_off">定时关闭</string>
     <string name="timer_power_off_img">&#xe688;</string>

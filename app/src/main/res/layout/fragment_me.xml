@@ -204,7 +204,7 @@
 
                 <LinearLayout
 
-                    android:id="@+id/tab_centent_music"
+                    android:id="@+id/tab_recent_music"
                     android:layout_width="0dp"
                     android:layout_height="@dimen/item_height"
                     android:layout_weight="1"
@@ -240,7 +240,7 @@
                             android:layout_centerHorizontal="true"
                             android:layout_centerInParent="true"
                             android:gravity="center_horizontal|center_vertical"
-                            android:text="@string/tab_centent"
+                            android:text="@string/tab_recent"
                             android:textColor="@color/def_bar_title_color" />
                     </RelativeLayout>
 

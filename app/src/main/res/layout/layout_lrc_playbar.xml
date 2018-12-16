@@ -10,6 +10,19 @@
         android:orientation="horizontal">
 
         <com.zlm.hp.widget.IconfontImageButtonTextView
+            android:id="@+id/mv_menu"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:layout_alignParentStart="true"
+            android:layout_alignParentTop="true"
+            android:layout_weight="1"
+            android:gravity="center_vertical|center_horizontal"
+            android:text="@string/mv_img"
+            android:textColor="#FFF"
+            android:textSize="@dimen/title_icon_size" />
+
+
+        <com.zlm.hp.widget.IconfontImageButtonTextView
             android:id="@+id/unlike_menu"
             android:layout_width="match_parent"
             android:layout_height="match_parent"

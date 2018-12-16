@@ -35,6 +35,17 @@ public class AudioInfo implements Parcelable {
      */
     public static final int TYPE_LOCAL = 0;
     public static final int TYPE_NET = 1;
+    //最近-本地
+    public static final int TYPE_RECENT_LOCAL = 2;
+    //最近-网络
+    public static final int TYPE_RECENT_NET = 3;
+
+    /**
+     * 喜欢（网络-本地）
+     */
+    public static final int TYPE_LIKE_LOCAL = 4;
+    public static final int TYPE_LIKE_NET = 5;
+
     /**
      * 类型
      */

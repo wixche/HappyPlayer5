@@ -154,6 +154,21 @@ public class AudioBroadcastReceiver {
      */
     public static final int ACTION_CODE_LOCK_LRC_CHANGE = 23;
 
+    /**
+     * 更新本地歌曲
+     */
+    public static final int ACTION_CODE_UPDATE_LOCAL = 24;
+
+    /**
+     * 更新喜欢歌曲
+     */
+    public static final int ACTION_CODE_UPDATE_LIKE = 25;
+
+    /**
+     * 更新最近歌曲
+     */
+    public static final int ACTION_CODE_UPDATE_RECENT = 26;
+
     private BroadcastReceiver mBroadcastReceiver;
     private IntentFilter mIntentFilter;
     private AudioReceiverListener mReceiverListener;

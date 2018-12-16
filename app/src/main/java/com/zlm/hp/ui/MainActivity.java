@@ -328,6 +328,8 @@ public class MainActivity extends BaseActivity {
                         break;
                     case FragmentReceiver.ACTION_CODE_OPEN_SPECIALFRAGMENT:
                     case FragmentReceiver.ACTION_CODE_OPEN_LOCALFRAGMENT:
+                    case FragmentReceiver.ACTION_CODE_OPEN_LIKEFRAGMENT:
+                    case FragmentReceiver.ACTION_CODE_OPEN_RECENTFRAGMENT:
 
                         Bundle bundle = intent.getBundleExtra(SongFragment.ARGUMENTS_KEY);
                         SongFragment songFragment = SongFragment.newInstance();
