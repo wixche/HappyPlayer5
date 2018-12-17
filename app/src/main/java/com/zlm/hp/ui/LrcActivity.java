@@ -435,6 +435,9 @@ public class LrcActivity extends BaseActivity {
         mManyLineLyricsView.setOnLrcClickListener(new ManyLyricsView.OnLrcClickListener() {
             @Override
             public void onLrcPlayClicked(int progress) {
+                if(isFinishing()){
+                    return;
+                }
                 //
                 AudioInfo audioInfo = AudioPlayerManager.newInstance(mContext).getCurSong(mConfigInfo.getPlayHash());
                 if (audioInfo != null && progress <= audioInfo.getDuration()) {

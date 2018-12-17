@@ -379,4 +379,140 @@ public class AudioInfoDB {
         return false;
     }
 
+    /**
+     * 获取下载歌曲个数
+     *
+     * @param context
+     * @return
+     */
+    public static int getDownloadAudioCount(Context context) {
+        Cursor cursor = null;
+        int count = 0;
+        try {
+            String args[] = {AudioInfo.TYPE_NET + "", AudioInfo.STATUS_FINISH + ""};
+            String sql = "select count(*) from " + AudioInfoDao.TABLENAME + " WHERE " + AudioInfoDao.Properties.Type.columnName + "=? and " + AudioInfoDao.Properties.Status.columnName +
+                    "=?";
+            cursor = DBHelper.getInstance(context).getWritableDatabase().rawQuery(sql, args);
+            cursor.moveToFirst();
+            count = cursor.getInt(0);
+        } catch (Exception e) {
+            e.printStackTrace();
+        } finally {
+            if (cursor != null) {
+                cursor.close();
+            }
+        }
+        return count;
+    }
+
+    /**
+     * 删除下载歌曲
+     *
+     * @param context
+     */
+    public static boolean deleteDownloadAudio(Context context, String hash) {
+        try {
+            String sql = "DELETE FROM ";
+            sql += AudioInfoDao.TABLENAME;
+            sql += " where " + AudioInfoDao.Properties.Type.columnName + "=? and " + AudioInfoDao.Properties.Hash.columnName + "=?";
+
+            String args[] = {AudioInfo.TYPE_NET + "", hash};
+            DBHelper.getInstance(context).getWritableDatabase().execSQL(sql, args);
+            return true;
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+        return false;
+    }
+
+    /**
+     * 判断当前歌曲是否是下载歌曲
+     *
+     * @param context
+     * @param hash
+     * @return
+     */
+    public static boolean isDownloadAudioExists(Context context, String hash) {
+        Cursor cursor = null;
+        try {
+            String args[] = {AudioInfo.TYPE_NET + "", hash, AudioInfo.STATUS_DOWNLOADING + "", AudioInfo.STATUS_FINISH + ""};
+            String sql = "select * from " + AudioInfoDao.TABLENAME;
+            sql += " where " + AudioInfoDao.Properties.Type.columnName + "=? and " + AudioInfoDao.Properties.Hash.columnName + "=? and (" + AudioInfoDao.Properties.Status.columnName + " =? or " + AudioInfoDao.Properties.Status.columnName + " =?)";
+            cursor = DBHelper.getInstance(context).getWritableDatabase().rawQuery(sql, args);
+            if (cursor.moveToNext()) {
+                return true;
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
+        } finally {
+            if (cursor != null) {
+                cursor.close();
+            }
+        }
+        return false;
+
+    }
+
+    /**
+     * 判断当前歌曲是否是下载完成歌曲
+     *
+     * @param context
+     * @param hash
+     * @return
+     */
+    public static boolean isDownloadedAudioExists(Context context, String hash) {
+        Cursor cursor = null;
+        try {
+            String args[] = {AudioInfo.TYPE_NET + "", hash, AudioInfo.STATUS_FINISH + ""};
+            String sql = "select * from " + AudioInfoDao.TABLENAME;
+            sql += " where " + AudioInfoDao.Properties.Type.columnName + "=? and " + AudioInfoDao.Properties.Hash.columnName + "=? and " + AudioInfoDao.Properties.Status.columnName + " =?";
+            cursor = DBHelper.getInstance(context).getWritableDatabase().rawQuery(sql, args);
+            if (cursor.moveToNext()) {
+                return true;
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
+        } finally {
+            if (cursor != null) {
+                cursor.close();
+            }
+        }
+        return false;
+
+    }
+
+    /**
+     * 获取下载中音频列表
+     *
+     * @param context
+     * @return
+     */
+    public static List<AudioInfo> getDownloadingAudios(Context context) {
+        try {
+            List<AudioInfo> audioInfos = DBHelper.getInstance(context).getDaoSession().getAudioInfoDao().queryBuilder().where(new WhereCondition.StringCondition(AudioInfoDao.Properties.Type.columnName + "=? and " + AudioInfoDao.Properties.Status.columnName +
+                    "=?", AudioInfo.TYPE_NET + "", AudioInfo.STATUS_DOWNLOADING + "")).orderDesc(AudioInfoDao.Properties.CreateTime).list();
+            return audioInfos;
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+        return new ArrayList<AudioInfo>();
+    }
+
+    /**
+     * 获取下载完成音频列表
+     *
+     * @param context
+     * @return
+     */
+    public static List<AudioInfo> getDownloadedAudios(Context context) {
+        try {
+            List<AudioInfo> audioInfos = DBHelper.getInstance(context).getDaoSession().getAudioInfoDao().queryBuilder().where(new WhereCondition.StringCondition(AudioInfoDao.Properties.Type.columnName + "=? and " + AudioInfoDao.Properties.Status.columnName +
+                    "=?", AudioInfo.TYPE_NET + "", AudioInfo.STATUS_FINISH + "")).orderDesc(AudioInfoDao.Properties.CreateTime).list();
+            return audioInfos;
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+        return new ArrayList<AudioInfo>();
+    }
+
 }

@@ -238,6 +238,7 @@ public class AudioPlayerManager {
      */
     public synchronized void playDownloadingNetSong(AudioInfo audioInfo) {
         mPlayStatus = PLAYING;
+        audioInfo.setPlayProgress(0);
         AudioBroadcastReceiver.sendPlayNetSongReceiver(mContext, audioInfo);
     }
 

@@ -65,6 +65,21 @@ public class MeFragment extends BaseFragment {
     private final int LOAD_RECENT_AUDIO_COUNT = 2;
 
     /**
+     * 下载
+     */
+    private LinearLayout mDownloadMusicLL;
+
+    /**
+     * 下载音乐个数
+     */
+    private TextView mDownloadCountTv;
+
+    /**
+     * 加载下载歌曲的个数
+     */
+    private final int LOAD_DOWNLOAD_AUDIO_COUNT = 3;
+
+    /**
      * 音频广播
      */
     private AudioBroadcastReceiver mAudioBroadcastReceiver;
@@ -90,6 +105,7 @@ public class MeFragment extends BaseFragment {
         mWorkerHandler.sendEmptyMessage(LOAD_LOCAL_AUDIO_COUNT);
         mWorkerHandler.sendEmptyMessage(LOAD_LIKE_AUDIO_COUNT);
         mWorkerHandler.sendEmptyMessage(LOAD_RECENT_AUDIO_COUNT);
+        mWorkerHandler.sendEmptyMessage(LOAD_DOWNLOAD_AUDIO_COUNT);
     }
 
     @Override
@@ -141,6 +157,16 @@ public class MeFragment extends BaseFragment {
         });
         mRecentCountTv = mainView.findViewById(R.id.recent_music_count);
 
+        //下载音乐
+        mDownloadMusicLL = mainView.findViewById(R.id.tab_download_music);
+        mDownloadMusicLL.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                FragmentReceiver.sendDownloadFragmentReceiver(mContext);
+            }
+        });
+        mDownloadCountTv = mainView.findViewById(R.id.download_music_count);
+
         //广播
         mAudioBroadcastReceiver = new AudioBroadcastReceiver();
         mAudioBroadcastReceiver.setReceiverListener(new AudioBroadcastReceiver.AudioReceiverListener() {
@@ -168,6 +194,11 @@ public class MeFragment extends BaseFragment {
                         //喜欢歌曲更新
                         mWorkerHandler.sendEmptyMessage(LOAD_LIKE_AUDIO_COUNT);
                         break;
+                    case AudioBroadcastReceiver.ACTION_CODE_UPDATE_DOWNLOAD:
+
+                        //下载歌曲更新
+                        mWorkerHandler.sendEmptyMessage(LOAD_DOWNLOAD_AUDIO_COUNT);
+                        break;
                 }
             }
         });
@@ -194,6 +225,11 @@ public class MeFragment extends BaseFragment {
                 int recentCount = (int) msg.obj;
                 mRecentCountTv.setText(recentCount + "");
 
+                break;
+            case LOAD_DOWNLOAD_AUDIO_COUNT:
+
+                int downloadCount = (int) msg.obj;
+                mDownloadCountTv.setText(downloadCount + "");
                 break;
         }
     }
@@ -229,6 +265,15 @@ public class MeFragment extends BaseFragment {
                 recentMsg.obj = recentCount;
 
                 mUIHandler.sendMessage(recentMsg);
+                break;
+
+            case LOAD_DOWNLOAD_AUDIO_COUNT:
+                int downloadCount = AudioInfoDB.getDownloadAudioCount(mContext);
+                Message downloadMsg = Message.obtain();
+                downloadMsg.what = LOAD_DOWNLOAD_AUDIO_COUNT;
+                downloadMsg.obj = downloadCount;
+
+                mUIHandler.sendMessage(downloadMsg);
                 break;
         }
     }

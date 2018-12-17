@@ -169,6 +169,12 @@ public class AudioBroadcastReceiver {
      */
     public static final int ACTION_CODE_UPDATE_RECENT = 26;
 
+    /**
+     * 更新下载歌曲
+     */
+    public static final int ACTION_CODE_UPDATE_DOWNLOAD = 27;
+
+
     private BroadcastReceiver mBroadcastReceiver;
     private IntentFilter mIntentFilter;
     private AudioReceiverListener mReceiverListener;

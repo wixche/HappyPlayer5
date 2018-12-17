@@ -44,6 +44,7 @@ import com.zlm.hp.constants.Constants;
 import com.zlm.hp.db.util.DownloadThreadInfoDB;
 import com.zlm.hp.entity.AudioInfo;
 import com.zlm.hp.entity.TimerInfo;
+import com.zlm.hp.fragment.DownloadMusicFragment;
 import com.zlm.hp.fragment.LastSongFragment;
 import com.zlm.hp.fragment.MeFragment;
 import com.zlm.hp.fragment.RecommendFragment;
@@ -336,6 +337,12 @@ public class MainActivity extends BaseActivity {
                         songFragment.setArguments(bundle);
 
                         mSlidingMenuOnListener.addAndShowFragment(songFragment);
+                        break;
+                    case FragmentReceiver.ACTION_CODE_OPEN_DOWNLOADFRAGMENT:
+
+                        DownloadMusicFragment downloadMusicFragment = DownloadMusicFragment.newInstance();
+                        mSlidingMenuOnListener.addAndShowFragment(downloadMusicFragment);
+
                         break;
 
                     case FragmentReceiver.ACTION_CODE_CLOSE_FRAGMENT:

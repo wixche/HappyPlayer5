@@ -259,10 +259,24 @@ public class SongFragment extends BaseFragment {
                         }
                         break;
                     case AudioBroadcastReceiver.ACTION_CODE_UPDATE_LOCAL:
+                        if (mSongType == SONG_TYPE_LOCAL) {
+                            //歌曲更新
+                            mWorkerHandler.sendEmptyMessage(LOADREFRESHDATA);
+                        }
+                        break;
+
                     case AudioBroadcastReceiver.ACTION_CODE_UPDATE_LIKE:
+                        if (mSongType == SONG_TYPE_LIKE) {
+                            //歌曲更新
+                            mWorkerHandler.sendEmptyMessage(LOADREFRESHDATA);
+                        }
+                        break;
+
                     case AudioBroadcastReceiver.ACTION_CODE_UPDATE_RECENT:
-                        //歌曲更新
-                        loadRefreshData();
+                        if (mSongType == SONG_TYPE_RECENT) {
+                            //歌曲更新
+                            mWorkerHandler.sendEmptyMessage(LOADREFRESHDATA);
+                        }
                         break;
                 }
             }
@@ -432,11 +446,11 @@ public class SongFragment extends BaseFragment {
                 httpReturnResult = new HttpReturnResult();
                 httpReturnResult.setStatus(HttpClient.HTTP_OK);
                 List<AudioInfo> audioInfos = null;
-                if(mSongType == SONG_TYPE_LOCAL){
+                if (mSongType == SONG_TYPE_LOCAL) {
                     audioInfos = AudioInfoDB.getLocalAudios(mContext);
-                }else if(mSongType == SONG_TYPE_LIKE){
+                } else if (mSongType == SONG_TYPE_LIKE) {
                     audioInfos = AudioInfoDB.getLikeAudios(mContext);
-                }else if(mSongType == SONG_TYPE_RECENT){
+                } else if (mSongType == SONG_TYPE_RECENT) {
                     audioInfos = AudioInfoDB.getRecentAudios(mContext);
                 }
                 if (audioInfos == null) {

@@ -92,6 +92,31 @@ public class PopPlayListAdapter extends RecyclerView.Adapter<RecyclerView.ViewHo
             viewHolder.getSingPicImg().setVisibility(View.INVISIBLE);
         }
 
+        //下载完成/下载
+        if (audioInfo.getType() == AudioInfo.TYPE_LOCAL || AudioInfoDB.isDownloadedAudioExists(mContext, audioInfo.getHash())) {
+            viewHolder.getDownloadImg().setVisibility(View.INVISIBLE);
+            viewHolder.getDownloadedImg().setVisibility(View.VISIBLE);
+        } else {
+            viewHolder.getDownloadImg().setVisibility(View.VISIBLE);
+            viewHolder.getDownloadedImg().setVisibility(View.INVISIBLE);
+        }
+        //未下载
+        viewHolder.getDownloadImg().setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+
+            }
+        });
+
+        //已下载
+        viewHolder.getDownloadedImg().setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+
+            }
+        });
+
+
         //喜欢/不喜欢
         if (AudioInfoDB.isLikeAudioExists(mContext, audioInfo.getHash())) {
             viewHolder.getUnLikeTv().setVisibility(View.INVISIBLE);

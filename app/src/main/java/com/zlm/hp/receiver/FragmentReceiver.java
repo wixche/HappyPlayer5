@@ -52,6 +52,11 @@ public class FragmentReceiver {
     public static final int ACTION_CODE_OPEN_RECENTFRAGMENT = 5;
 
     /**
+     * 打开下载歌曲
+     */
+    public static final int ACTION_CODE_OPEN_DOWNLOADFRAGMENT = 6;
+
+    /**
      * fragment的receiver的action
      */
     private static final String RECEIVER_ACTION = "com.zlm.hp.receiver.fragment.action";
@@ -171,6 +176,16 @@ public class FragmentReceiver {
         bundle.putInt(SongFragment.SONGTYPE_KEY, SongFragment.SONG_TYPE_RECENT);
         bundle.putString(SongFragment.DATA_KEY, title);
         sendReceiver(context, FragmentReceiver.ACTION_CODE_OPEN_RECENTFRAGMENT, SongFragment.ARGUMENTS_KEY, bundle);
+    }
+
+    /**
+     * 发打开下载歌曲广播
+     *
+     * @param context
+     */
+    public static void sendDownloadFragmentReceiver(Context context) {
+        Bundle bundle = new Bundle();
+        sendReceiver(context, FragmentReceiver.ACTION_CODE_OPEN_DOWNLOADFRAGMENT, SongFragment.ARGUMENTS_KEY, bundle);
     }
 
 
