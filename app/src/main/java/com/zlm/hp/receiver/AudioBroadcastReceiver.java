@@ -79,7 +79,7 @@ public class AudioBroadcastReceiver {
 
 
     /**
-     * 网络歌曲下载中
+     * 在线歌曲下载中
      */
     public static final int ACTION_CODE_DOWNLOADONLINESONG = 8;
 
@@ -174,6 +174,35 @@ public class AudioBroadcastReceiver {
      */
     public static final int ACTION_CODE_UPDATE_DOWNLOAD = 27;
 
+    /**
+     * 歌曲下载等待中
+     */
+    public static final int ACTION_CODE_DOWNLOAD_WAIT = 28;
+
+    /**
+     * 歌曲下载中
+     */
+    public static final int ACTION_CODE_DOWNLOAD_SONG = 29;
+
+    /**
+     * 歌曲暂停中
+     */
+    public static final int ACTION_CODE_DOWNLOAD_PAUSE = 30;
+
+    /**
+     * 歌曲取消中
+     */
+    public static final int ACTION_CODE_DOWNLOAD_CANCEL = 31;
+
+    /**
+     * 歌曲完成
+     */
+    public static final int ACTION_CODE_DOWNLOAD_FINISH = 32;
+
+    /**
+     * 歌曲下载出错
+     */
+    public static final int ACTION_CODE_DOWNLOAD_ERROR = 33;
 
     private BroadcastReceiver mBroadcastReceiver;
     private IntentFilter mIntentFilter;
@@ -312,7 +341,7 @@ public class AudioBroadcastReceiver {
     }
 
     /**
-     * 网络歌曲下载中
+     * 在线歌曲下载中
      *
      * @param context
      * @param task
@@ -323,6 +352,79 @@ public class AudioBroadcastReceiver {
         sendReceiver(context, ACTION_CODE_DOWNLOADONLINESONG, ACTION_BUNDLEKEY, bundle);
 
     }
+
+    /**
+     * 歌曲下载中
+     * @param context
+     * @param task
+     */
+    public static void sendDownloadingSongReceiver(Context context, DownloadTask task) {
+        Bundle bundle = new Bundle();
+        bundle.putParcelable(ACTION_DATA_KEY, task);
+        sendReceiver(context, ACTION_CODE_DOWNLOAD_SONG, ACTION_BUNDLEKEY, bundle);
+
+    }
+
+    /**
+     * 歌曲等待中
+     * @param context
+     * @param task
+     */
+    public static void sendDownloadWaitReceiver(Context context, DownloadTask task) {
+        Bundle bundle = new Bundle();
+        bundle.putParcelable(ACTION_DATA_KEY, task);
+        sendReceiver(context, ACTION_CODE_DOWNLOAD_WAIT, ACTION_BUNDLEKEY, bundle);
+
+    }
+
+    /**
+     * 歌曲暂停中
+     * @param context
+     * @param task
+     */
+    public static void sendDownloadPauseReceiver(Context context, DownloadTask task) {
+        Bundle bundle = new Bundle();
+        bundle.putParcelable(ACTION_DATA_KEY, task);
+        sendReceiver(context, ACTION_CODE_DOWNLOAD_PAUSE, ACTION_BUNDLEKEY, bundle);
+
+    }
+
+    /**
+     * 歌曲暂停中
+     * @param context
+     * @param task
+     */
+    public static void sendDownloadCancelReceiver(Context context, DownloadTask task) {
+        Bundle bundle = new Bundle();
+        bundle.putParcelable(ACTION_DATA_KEY, task);
+        sendReceiver(context, ACTION_CODE_DOWNLOAD_CANCEL, ACTION_BUNDLEKEY, bundle);
+
+    }
+
+    /**
+     * 歌曲完成
+     * @param context
+     * @param task
+     */
+    public static void sendDownloadFinishReceiver(Context context, DownloadTask task) {
+        Bundle bundle = new Bundle();
+        bundle.putParcelable(ACTION_DATA_KEY, task);
+        sendReceiver(context, ACTION_CODE_DOWNLOAD_FINISH, ACTION_BUNDLEKEY, bundle);
+
+    }
+
+    /**
+     * 歌曲出错
+     * @param context
+     * @param task
+     */
+    public static void sendDownloadErrorReceiver(Context context, DownloadTask task) {
+        Bundle bundle = new Bundle();
+        bundle.putParcelable(ACTION_DATA_KEY, task);
+        sendReceiver(context, ACTION_CODE_DOWNLOAD_ERROR, ACTION_BUNDLEKEY, bundle);
+
+    }
+
 
     /**
      * seekto歌曲

@@ -18,6 +18,7 @@ import com.zlm.hp.db.util.AudioInfoDB;
 import com.zlm.hp.entity.AudioInfo;
 import com.zlm.hp.handler.WeakRefHandler;
 import com.zlm.hp.manager.AudioPlayerManager;
+import com.zlm.hp.manager.DownloadAudioManager;
 import com.zlm.hp.receiver.AudioBroadcastReceiver;
 import com.zlm.hp.ui.R;
 import com.zlm.hp.util.ImageUtil;
@@ -104,15 +105,13 @@ public class PopPlayListAdapter extends RecyclerView.Adapter<RecyclerView.ViewHo
         viewHolder.getDownloadImg().setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-
-            }
-        });
-
-        //已下载
-        viewHolder.getDownloadedImg().setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-
+                boolean flag = DownloadAudioManager.newInstance(mContext).isDownloadAudioExists(audioInfo.getHash());
+                if(flag){
+                    ToastUtil.showTextToast(mContext, mContext.getResources().getString(R.string.undownload_tip_text));
+                }else{
+                    ToastUtil.showTextToast(mContext, mContext.getResources().getString(R.string.download_tip_text));
+                    DownloadAudioManager.newInstance(mContext).addTask(audioInfo);
+                }
             }
         });
 
@@ -131,14 +130,11 @@ public class PopPlayListAdapter extends RecyclerView.Adapter<RecyclerView.ViewHo
             public void onClick(View v) {
                 if (audioInfo != null) {
                     if (!AudioInfoDB.isLikeAudioExists(mContext, audioInfo.getHash())) {
-                        boolean result = AudioInfoDB.addLikeAudio(mContext, audioInfo);
+                        boolean result = AudioInfoDB.addLikeAudio(mContext, audioInfo, true);
                         if (result) {
                             viewHolder.getUnLikeTv().setVisibility(View.INVISIBLE);
                             viewHolder.getLikedImg().setVisibility(View.VISIBLE);
                             ToastUtil.showTextToast(mContext, mContext.getResources().getString(R.string.like_tip_text));
-
-                            //更新喜欢歌曲广播
-                            AudioBroadcastReceiver.sendReceiver(mContext, AudioBroadcastReceiver.ACTION_CODE_UPDATE_LIKE);
                         }
                     }
                 }
@@ -151,15 +147,12 @@ public class PopPlayListAdapter extends RecyclerView.Adapter<RecyclerView.ViewHo
             public void onClick(View v) {
                 if (audioInfo != null) {
                     if (AudioInfoDB.isLikeAudioExists(mContext, audioInfo.getHash())) {
-                        boolean result = AudioInfoDB.deleteLikeAudio(mContext, audioInfo.getHash());
+                        boolean result = AudioInfoDB.deleteLikeAudio(mContext, audioInfo.getHash(),true);
                         if (result) {
                             viewHolder.getUnLikeTv().setVisibility(View.VISIBLE);
                             viewHolder.getLikedImg().setVisibility(View.INVISIBLE);
 
                             ToastUtil.showTextToast(mContext, mContext.getResources().getString(R.string.unlike_tip_text));
-
-                            //更新喜欢歌曲广播
-                            AudioBroadcastReceiver.sendReceiver(mContext, AudioBroadcastReceiver.ACTION_CODE_UPDATE_LIKE);
                         }
                     }
                 }

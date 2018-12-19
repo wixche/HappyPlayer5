@@ -490,7 +490,7 @@ public class MainActivity extends BaseActivity {
                         String hash = mConfigInfo.getPlayHash();
                         AudioInfo audioInfo = AudioPlayerManager.newInstance(mContext).getCurSong(hash);
                         if (audioInfo != null && downloadingTask != null && !TextUtils.isEmpty(hash) && hash.equals(downloadingTask.getTaskId())) {
-                            int downloadedSize = DownloadThreadInfoDB.getDownloadedSize(mContext, downloadingTask.getTaskId(), OnLineAudioManager.threadNum);
+                            int downloadedSize = DownloadThreadInfoDB.getDownloadedSize(mContext, downloadingTask.getTaskId(), OnLineAudioManager.mThreadNum);
                             double pre = downloadedSize * 1.0 / audioInfo.getFileSize();
                             int downloadProgress = (int) (mMusicSeekBar.getMax() * pre);
                             mMusicSeekBar.setSecondaryProgress(downloadProgress);

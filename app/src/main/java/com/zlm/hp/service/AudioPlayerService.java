@@ -601,11 +601,7 @@ public class AudioPlayerService extends Service {
         if (AudioInfoDB.isRecentAudioExists(mContext, audioInfo.getHash())) {
             AudioInfoDB.updateRecentAudio(mContext, audioInfo.getHash(), DateUtil.parseDateToString(new Date()));
         } else {
-            boolean addResult = AudioInfoDB.addRecentAudio(mContext, audioInfo);
-            if (addResult) {
-                //更新最近歌曲广播
-                AudioBroadcastReceiver.sendReceiver(mContext, AudioBroadcastReceiver.ACTION_CODE_UPDATE_RECENT);
-            }
+            AudioInfoDB.addRecentAudio(mContext, audioInfo,true);
         }
 
         try {

@@ -47,6 +47,11 @@ public class DownloadTask implements Parcelable {
      * 错误
      */
     public static final int STATUS_ERROR = 5;
+
+    /**
+     * 完成
+     */
+    public static final int STATUS_FINISH = 6;
     /**
      * 任务id
      */

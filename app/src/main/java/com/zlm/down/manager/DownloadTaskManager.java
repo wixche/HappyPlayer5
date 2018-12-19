@@ -43,6 +43,7 @@ public class DownloadTaskManager {
         @Override
         public void taskWaiting(DownloadTask task) {
             if (mIDownloadTaskEvent != null) {
+                task.setStatus(DownloadTask.STATUS_WAIT);
                 mIDownloadTaskEvent.taskWaiting(task);
             }
         }
@@ -50,6 +51,7 @@ public class DownloadTaskManager {
         @Override
         public void taskDownloading(DownloadTask task, int downloadedSize) {
             if (mIDownloadTaskEvent != null) {
+                task.setStatus(DownloadTask.STATUS_DOWNLOADING);
                 mIDownloadTaskEvent.taskDownloading(task, downloadedSize);
             }
         }
@@ -60,6 +62,7 @@ public class DownloadTaskManager {
             removeTask(task);
 
             if (mIDownloadTaskEvent != null) {
+                task.setStatus(DownloadTask.STATUS_PAUSE);
                 mIDownloadTaskEvent
                         .taskPause(task, downloadedSize);
             }
@@ -69,6 +72,7 @@ public class DownloadTaskManager {
         public void taskCancel(DownloadTask task) {
             removeTask(task);
             if (mIDownloadTaskEvent != null) {
+                task.setStatus(DownloadTask.STATUS_CANCEL);
                 mIDownloadTaskEvent
                         .taskCancel(task);
             }
@@ -79,6 +83,7 @@ public class DownloadTaskManager {
 
             removeTask(task);
             if (mIDownloadTaskEvent != null) {
+                task.setStatus(DownloadTask.STATUS_FINISH);
                 mIDownloadTaskEvent
                         .taskFinish(task, downloadedSize);
             }
@@ -89,6 +94,7 @@ public class DownloadTaskManager {
             removeTask(task);
 
             if (mIDownloadTaskEvent != null) {
+                task.setStatus(DownloadTask.STATUS_ERROR);
                 mIDownloadTaskEvent
                         .taskError(task, msg);
             }
@@ -249,5 +255,9 @@ public class DownloadTaskManager {
                 break;
             }
         }
+    }
+
+    public List<DownloadTask> getDownloadTasks() {
+        return mDownloadTasks;
     }
 }

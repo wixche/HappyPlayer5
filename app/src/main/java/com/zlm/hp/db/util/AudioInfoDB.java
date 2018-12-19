@@ -6,6 +6,7 @@ import android.database.Cursor;
 import com.zlm.hp.db.DBHelper;
 import com.zlm.hp.db.dao.AudioInfoDao;
 import com.zlm.hp.entity.AudioInfo;
+import com.zlm.hp.receiver.AudioBroadcastReceiver;
 import com.zlm.hp.util.DateUtil;
 
 import org.greenrobot.greendao.query.WhereCondition;
@@ -28,9 +29,12 @@ public class AudioInfoDB {
      * @param audioInfo
      * @return
      */
-    public static boolean addAudioInfo(Context context, AudioInfo audioInfo) {
+    public static boolean addAudioInfo(Context context, AudioInfo audioInfo, boolean notifyData) {
         try {
             DBHelper.getInstance(context).getDaoSession().getAudioInfoDao().insert(audioInfo);
+            if (notifyData) {
+                AudioBroadcastReceiver.sendReceiver(context, AudioBroadcastReceiver.ACTION_CODE_UPDATE_LOCAL);
+            }
             return true;
         } catch (Exception e) {
             e.printStackTrace();
@@ -104,7 +108,7 @@ public class AudioInfoDB {
      * @param context
      * @param audioInfo
      */
-    public static boolean addLikeAudio(Context context, AudioInfo audioInfo) {
+    public static boolean addLikeAudio(Context context, AudioInfo audioInfo, boolean notifyData) {
         int type = audioInfo.getType();
         try {
             if (type == AudioInfo.TYPE_LOCAL) {
@@ -114,6 +118,9 @@ public class AudioInfoDB {
             }
             audioInfo.setCreateTime(DateUtil.parseDateToString(new Date()));
             DBHelper.getInstance(context).getDaoSession().getAudioInfoDao().insert(audioInfo);
+            if (notifyData) {
+                AudioBroadcastReceiver.sendReceiver(context, AudioBroadcastReceiver.ACTION_CODE_UPDATE_LIKE);
+            }
             return true;
         } catch (Exception e) {
             e.printStackTrace();
@@ -155,7 +162,7 @@ public class AudioInfoDB {
      *
      * @param context
      */
-    public static boolean deleteLikeAudio(Context context, String hash) {
+    public static boolean deleteLikeAudio(Context context, String hash, boolean notifyData) {
         try {
             String sql = "DELETE FROM ";
             sql += AudioInfoDao.TABLENAME;
@@ -163,6 +170,9 @@ public class AudioInfoDB {
 
             String args[] = {AudioInfo.TYPE_LIKE_LOCAL + "", AudioInfo.TYPE_LIKE_NET + "", hash};
             DBHelper.getInstance(context).getWritableDatabase().execSQL(sql, args);
+            if (notifyData) {
+                AudioBroadcastReceiver.sendReceiver(context, AudioBroadcastReceiver.ACTION_CODE_UPDATE_LIKE);
+            }
             return true;
         } catch (Exception e) {
             e.printStackTrace();
@@ -235,7 +245,7 @@ public class AudioInfoDB {
      * @param context
      * @param audioInfo
      */
-    public static boolean addRecentAudio(Context context, AudioInfo audioInfo) {
+    public static boolean addRecentAudio(Context context, AudioInfo audioInfo, boolean notifyData) {
         int type = audioInfo.getType();
         try {
             if (type == AudioInfo.TYPE_LOCAL) {
@@ -245,6 +255,9 @@ public class AudioInfoDB {
             }
             audioInfo.setCreateTime(DateUtil.parseDateToString(new Date()));
             DBHelper.getInstance(context).getDaoSession().getAudioInfoDao().insert(audioInfo);
+            if (notifyData) {
+                AudioBroadcastReceiver.sendReceiver(context, AudioBroadcastReceiver.ACTION_CODE_UPDATE_RECENT);
+            }
             return true;
         } catch (Exception e) {
             e.printStackTrace();
@@ -286,7 +299,7 @@ public class AudioInfoDB {
      *
      * @param context
      */
-    public static boolean deleteRecentAudio(Context context, String hash) {
+    public static boolean deleteRecentAudio(Context context, String hash, boolean notifyData) {
         try {
             String sql = "DELETE FROM ";
             sql += AudioInfoDao.TABLENAME;
@@ -294,6 +307,9 @@ public class AudioInfoDB {
 
             String args[] = {AudioInfo.TYPE_RECENT_LOCAL + "", AudioInfo.TYPE_RECENT_NET + "", hash};
             DBHelper.getInstance(context).getWritableDatabase().execSQL(sql, args);
+            if (notifyData) {
+                AudioBroadcastReceiver.sendReceiver(context, AudioBroadcastReceiver.ACTION_CODE_UPDATE_RECENT);
+            }
             return true;
         } catch (Exception e) {
             e.printStackTrace();
@@ -406,18 +422,73 @@ public class AudioInfoDB {
     }
 
     /**
+     * 添加下载歌曲
+     *
+     * @param context
+     * @param audioInfo
+     */
+    public static boolean addDownloadAudio(Context context, AudioInfo audioInfo, boolean notifyData) {
+        try {
+            audioInfo.setStatus(AudioInfo.STATUS_DOWNLOADING);
+            audioInfo.setCreateTime(DateUtil.parseDateToString(new Date()));
+            DBHelper.getInstance(context).getDaoSession().getAudioInfoDao().insert(audioInfo);
+            if (notifyData) {
+                AudioBroadcastReceiver.sendReceiver(context, AudioBroadcastReceiver.ACTION_CODE_UPDATE_DOWNLOAD);
+            }
+            return true;
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+        return false;
+    }
+    /**
+     * 更新下载歌曲时间
+     */
+    public static boolean addDownloadedAudio(Context context, String hash, boolean notifyData) {
+       boolean flag = updateDownloadAudio(context,hash,DateUtil.parseDateToString(new Date()), AudioInfo.STATUS_FINISH);
+        if (notifyData) {
+            AudioBroadcastReceiver.sendReceiver(context, AudioBroadcastReceiver.ACTION_CODE_UPDATE_LOCAL);
+        }
+        return flag;
+    }
+
+    /**
+     * 更新下载歌曲时间
+     */
+    public static boolean updateDownloadAudio(Context context, String hash, String createTime,int status) {
+        try {
+
+            String sql = "UPDATE ";
+            sql += AudioInfoDao.TABLENAME;
+            sql += " SET " + AudioInfoDao.Properties.CreateTime.columnName + " =?,"+ AudioInfoDao.Properties.Status.columnName + " =?";
+            sql += " where " + AudioInfoDao.Properties.Hash.columnName + "=? and " + AudioInfoDao.Properties.Type.columnName + "=?";
+
+            String args[] = {createTime,status + "", hash, AudioInfo.TYPE_NET + ""};
+            DBHelper.getInstance(context).getWritableDatabase().execSQL(sql, args);
+            return true;
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+        return false;
+    }
+
+
+    /**
      * 删除下载歌曲
      *
      * @param context
      */
-    public static boolean deleteDownloadAudio(Context context, String hash) {
+    public static boolean deleteDownloadAudio(Context context, String hash, boolean notifyData) {
         try {
             String sql = "DELETE FROM ";
             sql += AudioInfoDao.TABLENAME;
-            sql += " where " + AudioInfoDao.Properties.Type.columnName + "=? and " + AudioInfoDao.Properties.Hash.columnName + "=?";
+            sql += " where " + AudioInfoDao.Properties.Type.columnName + "=? and " + AudioInfoDao.Properties.Hash.columnName + "=? and (" + AudioInfoDao.Properties.Status.columnName + " =? or " + AudioInfoDao.Properties.Status.columnName + " =?)";
 
-            String args[] = {AudioInfo.TYPE_NET + "", hash};
+            String args[] = {AudioInfo.TYPE_NET + "", hash, AudioInfo.STATUS_DOWNLOADING + "", AudioInfo.STATUS_FINISH + ""};
             DBHelper.getInstance(context).getWritableDatabase().execSQL(sql, args);
+            if (notifyData) {
+                AudioBroadcastReceiver.sendReceiver(context, AudioBroadcastReceiver.ACTION_CODE_UPDATE_DOWNLOAD);
+            }
             return true;
         } catch (Exception e) {
             e.printStackTrace();

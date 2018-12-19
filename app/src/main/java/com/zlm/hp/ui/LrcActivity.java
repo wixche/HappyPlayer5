@@ -740,15 +740,12 @@ public class LrcActivity extends BaseActivity {
                 AudioInfo audioInfo = AudioPlayerManager.newInstance(mContext).getCurSong(mConfigInfo.getPlayHash());
                 if (audioInfo != null) {
                     if (AudioInfoDB.isLikeAudioExists(mContext, audioInfo.getHash())) {
-                        boolean result = AudioInfoDB.deleteLikeAudio(mContext, audioInfo.getHash());
+                        boolean result = AudioInfoDB.deleteLikeAudio(mContext, audioInfo.getHash(),true);
                         if (result) {
                             mUnLikeMenuBtn.setVisibility(View.VISIBLE);
                             mLikeMenuBtn.setVisibility(View.GONE);
                             ToastUtil.showTextToast(mContext, getString(R.string.unlike_tip_text));
-
-                            //更新喜欢歌曲广播
-                            AudioBroadcastReceiver.sendReceiver(mContext, AudioBroadcastReceiver.ACTION_CODE_UPDATE_LIKE);
-                        }
+                         }
                     }
                 }
             }
@@ -763,14 +760,11 @@ public class LrcActivity extends BaseActivity {
                 AudioInfo audioInfo = AudioPlayerManager.newInstance(mContext).getCurSong(mConfigInfo.getPlayHash());
                 if (audioInfo != null) {
                     if (!AudioInfoDB.isLikeAudioExists(mContext, audioInfo.getHash())) {
-                        boolean result = AudioInfoDB.addLikeAudio(mContext, audioInfo);
+                        boolean result = AudioInfoDB.addLikeAudio(mContext, audioInfo,true);
                         if (result) {
                             mUnLikeMenuBtn.setVisibility(View.GONE);
                             mLikeMenuBtn.setVisibility(View.VISIBLE);
                             ToastUtil.showTextToast(mContext, getString(R.string.like_tip_text));
-
-                            //更新喜欢歌曲广播
-                            AudioBroadcastReceiver.sendReceiver(mContext, AudioBroadcastReceiver.ACTION_CODE_UPDATE_LIKE);
                         }
                     }
                 }
@@ -1894,7 +1888,7 @@ public class LrcActivity extends BaseActivity {
                 String hash = mConfigInfo.getPlayHash();
                 AudioInfo audioInfo = AudioPlayerManager.newInstance(mContext).getCurSong(hash);
                 if (audioInfo != null && downloadingTask != null && !TextUtils.isEmpty(hash) && hash.equals(downloadingTask.getTaskId())) {
-                    int downloadedSize = DownloadThreadInfoDB.getDownloadedSize(mContext, downloadingTask.getTaskId(), OnLineAudioManager.threadNum);
+                    int downloadedSize = DownloadThreadInfoDB.getDownloadedSize(mContext, downloadingTask.getTaskId(), OnLineAudioManager.mThreadNum);
                     double pre = downloadedSize * 1.0 / audioInfo.getFileSize();
                     int downloadProgress = (int) (mMusicSeekBar.getMax() * pre);
                     mMusicSeekBar.setSecondaryProgress(downloadProgress);

@@ -210,10 +210,10 @@ public class AudioPlayerManager {
                     audioFile = new File(filePath);
                     if (!audioFile.exists()) {
                         //临时文件不存在，删除数据库中的数据
-                        DownloadThreadInfoDB.delete(mContext, audioInfo.getHash(), OnLineAudioManager.threadNum);
+                        DownloadThreadInfoDB.delete(mContext, audioInfo.getHash(), OnLineAudioManager.mThreadNum);
                     }
                     mPlayStatus = PLAYINGNET;
-                    int downloadedSize = DownloadThreadInfoDB.getDownloadedSize(mContext, audioInfo.getHash(), OnLineAudioManager.threadNum);
+                    int downloadedSize = DownloadThreadInfoDB.getDownloadedSize(mContext, audioInfo.getHash(), OnLineAudioManager.mThreadNum);
                     if (downloadedSize == audioInfo.getFileSize()) {
                         mPlayStatus = PLAYING;
                         //设置文件路径
