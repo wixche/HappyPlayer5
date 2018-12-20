@@ -1926,15 +1926,13 @@ public class LrcActivity extends BaseActivity {
 
             case AudioBroadcastReceiver.ACTION_CODE_DOWNLOAD_FINISH:
             case AudioBroadcastReceiver.ACTION_CODE_DOWNLOADONEDLINESONG:
-                if (mAdapter == null) {
-                    return;
-                }
                 //网络歌曲下载完成
                 Bundle downloadedBundle = intent.getBundleExtra(AudioBroadcastReceiver.ACTION_BUNDLEKEY);
                 DownloadTask downloadedTask = downloadedBundle.getParcelable(AudioBroadcastReceiver.ACTION_DATA_KEY);
                 String downloadedHash = downloadedTask.getTaskId();
                 if (downloadedTask != null && !TextUtils.isEmpty(downloadedHash)) {
-                    mAdapter.reshViewHolder(downloadedHash);
+                    if (mAdapter != null)
+                        mAdapter.reshViewHolder(downloadedHash);
                     if (code == AudioBroadcastReceiver.ACTION_CODE_DOWNLOAD_FINISH) {
                         AudioInfo downloadedAudioInfo = AudioPlayerManager.newInstance(mContext).getCurSong(downloadedHash);
                         if (downloadedHash.equals(downloadedAudioInfo.getHash())) {
