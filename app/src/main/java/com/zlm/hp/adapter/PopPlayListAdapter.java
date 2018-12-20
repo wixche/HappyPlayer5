@@ -15,10 +15,12 @@ import android.widget.TextView;
 import com.zlm.hp.async.AsyncHandlerTask;
 import com.zlm.hp.constants.ConfigInfo;
 import com.zlm.hp.db.util.AudioInfoDB;
+import com.zlm.hp.db.util.DownloadThreadInfoDB;
 import com.zlm.hp.entity.AudioInfo;
 import com.zlm.hp.handler.WeakRefHandler;
 import com.zlm.hp.manager.AudioPlayerManager;
 import com.zlm.hp.manager.DownloadAudioManager;
+import com.zlm.hp.manager.OnLineAudioManager;
 import com.zlm.hp.receiver.AudioBroadcastReceiver;
 import com.zlm.hp.ui.R;
 import com.zlm.hp.util.ImageUtil;
@@ -93,22 +95,29 @@ public class PopPlayListAdapter extends RecyclerView.Adapter<RecyclerView.ViewHo
             viewHolder.getSingPicImg().setVisibility(View.INVISIBLE);
         }
 
-        //下载完成/下载
+        //下载完成
         if (audioInfo.getType() == AudioInfo.TYPE_LOCAL || AudioInfoDB.isDownloadedAudioExists(mContext, audioInfo.getHash())) {
             viewHolder.getDownloadImg().setVisibility(View.INVISIBLE);
             viewHolder.getDownloadedImg().setVisibility(View.VISIBLE);
+            viewHolder.getIslocalImg().setVisibility(View.VISIBLE);
         } else {
             viewHolder.getDownloadImg().setVisibility(View.VISIBLE);
             viewHolder.getDownloadedImg().setVisibility(View.INVISIBLE);
+            int downloadedSize = DownloadThreadInfoDB.getDownloadedSize(mContext, audioInfo.getHash(), OnLineAudioManager.mThreadNum);
+            if (downloadedSize >= audioInfo.getFileSize()) {
+                viewHolder.getIslocalImg().setVisibility(View.VISIBLE);
+            } else {
+                viewHolder.getIslocalImg().setVisibility(View.GONE);
+            }
         }
         //未下载
         viewHolder.getDownloadImg().setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
                 boolean flag = DownloadAudioManager.newInstance(mContext).isDownloadAudioExists(audioInfo.getHash());
-                if(flag){
+                if (flag) {
                     ToastUtil.showTextToast(mContext, mContext.getResources().getString(R.string.undownload_tip_text));
-                }else{
+                } else {
                     ToastUtil.showTextToast(mContext, mContext.getResources().getString(R.string.download_tip_text));
                     DownloadAudioManager.newInstance(mContext).addTask(audioInfo);
                 }
@@ -147,7 +156,7 @@ public class PopPlayListAdapter extends RecyclerView.Adapter<RecyclerView.ViewHo
             public void onClick(View v) {
                 if (audioInfo != null) {
                     if (AudioInfoDB.isLikeAudioExists(mContext, audioInfo.getHash())) {
-                        boolean result = AudioInfoDB.deleteLikeAudio(mContext, audioInfo.getHash(),true);
+                        boolean result = AudioInfoDB.deleteLikeAudio(mContext, audioInfo.getHash(), true);
                         if (result) {
                             viewHolder.getUnLikeTv().setVisibility(View.VISIBLE);
                             viewHolder.getLikedImg().setVisibility(View.INVISIBLE);
@@ -191,31 +200,18 @@ public class PopPlayListAdapter extends RecyclerView.Adapter<RecyclerView.ViewHo
 
     /***
      * 刷新
-     * @param audioInfo
      */
-    public void reshViewHolder(AudioInfo audioInfo) {
+    public void reshViewHolder(String playHash) {
         int oldIndex = getAudioIndex(mOldPlayHash);
         if (oldIndex != -1) {
             notifyItemChanged(oldIndex);
         }
-        int newIndex = getAudioIndex(audioInfo);
+        int newIndex = getAudioIndex(playHash);
         if (newIndex != -1) {
             notifyItemChanged(newIndex);
         }
     }
 
-    /**
-     * 获取歌曲索引
-     *
-     * @param audioInfo
-     * @return
-     */
-    private int getAudioIndex(AudioInfo audioInfo) {
-        if (audioInfo == null) {
-            return -1;
-        }
-        return getAudioIndex(audioInfo.getHash());
-    }
 
     /**
      * 获取歌曲索引

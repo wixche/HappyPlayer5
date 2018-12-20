@@ -261,12 +261,7 @@ public class LockActivity extends BaseActivity {
 
     @Override
     protected void preInitStatusBar() {
-
-        getWindow().addFlags(
-                WindowManager.LayoutParams.FLAG_DISMISS_KEYGUARD
-                        | WindowManager.LayoutParams.FLAG_SHOW_WHEN_LOCKED |
-                        WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON);
-
+        getWindow().addFlags(WindowManager.LayoutParams.FLAG_SHOW_WHEN_LOCKED);
         setStatusBarViewBG(Color.TRANSPARENT);
         super.preInitStatusBar();
     }

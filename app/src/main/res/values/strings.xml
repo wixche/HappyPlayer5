@@ -25,9 +25,9 @@
     <string name="help_txt">帮助与反馈</string>
     <string name="clear_cache_txt">清除缓存</string>
     <string name="clear_cache_tip">确定清空全部缓存?</string>
-    <string name="desktoplrc_tip">1.进入设置>更多应用>乐乐音乐>权限管理>显示悬浮窗\n\n2.开启允许</string>
+    <string name="desktoplrc_tip">该功能，需要手动向APP申请权限。\n1.进入设置>更多应用>乐乐音乐>权限管理>显示悬浮窗\n\n2.开启允许</string>
     <string name="locklrc_tip">1.部分机型需要开启锁屏显示权限，如锁屏后歌词没有显示，请按照如下步骤开启权限：\n\n2.进入设置>更多应用>乐乐音乐>权限管理>锁屏显示\n\n3.开启允许</string>
-
+    <string name="storage_tip">该权限是APP的基本权限，为了不影响APP正常运作，需要手动向APP申请权限。\n1.进入设置>更多应用>乐乐音乐>权限管理>读写存储\n\n2.开启允许</string>
 
     <string name="exit_app_tip">是否退出应用？</string>
 

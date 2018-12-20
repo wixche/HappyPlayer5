@@ -1,20 +1,28 @@
 package com.zlm.hp.ui;
 
+import android.Manifest;
 import android.content.Intent;
+import android.content.pm.PackageManager;
 import android.content.res.AssetFileDescriptor;
 import android.content.res.AssetManager;
 import android.graphics.Color;
 import android.media.MediaPlayer;
 import android.os.Bundle;
 import android.os.Message;
+import android.support.v4.app.ActivityCompat;
+import android.support.v4.content.PermissionChecker;
 import android.view.animation.Animation;
 import android.view.animation.AnimationUtils;
 
+import com.dou361.dialogui.DialogUIUtils;
+import com.dou361.dialogui.listener.DialogUIListener;
 import com.zlm.hp.constants.ConfigInfo;
 import com.zlm.hp.constants.Constants;
 import com.zlm.hp.db.util.AudioInfoDB;
 import com.zlm.hp.entity.AudioInfo;
+import com.zlm.hp.manager.ActivityManager;
 import com.zlm.hp.util.ColorUtil;
+import com.zlm.hp.util.IntentUtil;
 import com.zlm.hp.util.MediaUtil;
 import com.zlm.hp.util.PreferencesUtil;
 import com.zlm.hp.widget.IconfontTextView;
@@ -39,6 +47,29 @@ public class SplashActivity extends BaseActivity {
      * 跳转到home
      */
     private final int GOHOME = 2;
+
+    /**
+     * 检测权限
+     */
+    private final int PERMISSION = 3;
+
+    /**
+     * 读文件权限通知
+     */
+    private final int REQUEST_CODE_READSTORAGE = 0;
+    /**
+     * 写文件权限通知
+     */
+    private final int REQUEST_CODE_WRITESTORAGE = 1;
+    /**
+     * 读写文件权限通知
+     */
+    private int[] REQUESTCODES = {REQUEST_CODE_READSTORAGE, REQUEST_CODE_WRITESTORAGE};
+
+    /**
+     * 权限列表
+     */
+    private String[] PERMISSIONS = {Manifest.permission.READ_EXTERNAL_STORAGE, Manifest.permission.WRITE_EXTERNAL_STORAGE};
 
     /**
      * 问候语
@@ -74,7 +105,70 @@ public class SplashActivity extends BaseActivity {
         mIconImg.setAnimation(mAnimation);
         mAnimation.start();
 
-        mWorkerHandler.sendEmptyMessage(LOADTATA);
+        checkPermission();
+    }
+
+    /**
+     * 权限检测
+     */
+    private void checkPermission() {
+        for (int i = 0; i < PERMISSIONS.length; i++) {
+            String permission = PERMISSIONS[i];
+            int permissionCheck = PermissionChecker.checkSelfPermission(mContext, permission);
+            if (permissionCheck == PackageManager.PERMISSION_GRANTED) {
+                //有权限
+                if (i == PERMISSIONS.length - 1)
+                    mWorkerHandler.sendEmptyMessage(LOADTATA);
+            } else {
+                ActivityCompat.requestPermissions(this,
+                        new String[]{permission}, REQUESTCODES[i]);
+                break;
+            }
+        }
+    }
+
+    @Override
+    public void onRequestPermissionsResult(int requestCode,
+                                           String permissions[], int[] grantResults) {
+        switch (requestCode) {
+            case REQUEST_CODE_READSTORAGE:
+
+                int readPermissionCheck = PermissionChecker.checkSelfPermission(mContext, Manifest.permission.READ_EXTERNAL_STORAGE);
+                if (readPermissionCheck == PackageManager.PERMISSION_GRANTED) {
+                    checkPermission();
+                } else {
+                    alertNoStoragePermissionDialog();
+                }
+                break;
+            case REQUEST_CODE_WRITESTORAGE:
+
+                int writePermissionCheck = PermissionChecker.checkSelfPermission(mContext, Manifest.permission.WRITE_EXTERNAL_STORAGE);
+                if (writePermissionCheck == PackageManager.PERMISSION_GRANTED) {
+                    checkPermission();
+                } else {
+                    alertNoStoragePermissionDialog();
+                }
+                break;
+        }
+    }
+
+    private void alertNoStoragePermissionDialog() {
+        //弹出窗口显示
+
+        String tipMsg = getString(R.string.storage_tip);
+        DialogUIUtils.showMdAlert(this, getString(R.string.tip_title), tipMsg, new DialogUIListener() {
+            @Override
+            public void onPositive() {
+                //跳转权限设置页面
+                IntentUtil.gotoPermissionSetting(SplashActivity.this);
+                mWorkerHandler.sendEmptyMessageDelayed(PERMISSION, 5 * 1000);
+            }
+
+            @Override
+            public void onNegative() {
+                ActivityManager.getInstance().exit();
+            }
+        }).setCancelable(true, false).show();
     }
 
     @Override
@@ -93,6 +187,9 @@ public class SplashActivity extends BaseActivity {
         switch (msg.what) {
             case LOADTATA:
                 loadData();
+                break;
+            case PERMISSION:
+                checkPermission();
                 break;
         }
 

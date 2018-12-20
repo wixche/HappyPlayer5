@@ -35,6 +35,7 @@ import com.zlm.hp.lyrics.utils.LyricsIOUtils;
 import com.zlm.hp.lyrics.widget.AbstractLrcView;
 import com.zlm.hp.lyrics.widget.ManyLyricsView;
 import com.zlm.hp.manager.AudioPlayerManager;
+import com.zlm.hp.manager.DownloadAudioManager;
 import com.zlm.hp.manager.LyricsManager;
 import com.zlm.hp.manager.OnLineAudioManager;
 import com.zlm.hp.receiver.AudioBroadcastReceiver;
@@ -180,6 +181,10 @@ public class LrcActivity extends BaseActivity {
      */
     private IconfontImageButtonTextView mLikeMenuBtn;
     private IconfontImageButtonTextView mUnLikeMenuBtn;
+
+    //下载
+    private ImageView mDownloadImg;
+    private ImageView mDownloadedImg;
 
     ////////////////////////////////////////////////////////////////////////////
 
@@ -435,7 +440,7 @@ public class LrcActivity extends BaseActivity {
         mManyLineLyricsView.setOnLrcClickListener(new ManyLyricsView.OnLrcClickListener() {
             @Override
             public void onLrcPlayClicked(int progress) {
-                if(isFinishing()){
+                if (isFinishing()) {
                     return;
                 }
                 //
@@ -740,12 +745,12 @@ public class LrcActivity extends BaseActivity {
                 AudioInfo audioInfo = AudioPlayerManager.newInstance(mContext).getCurSong(mConfigInfo.getPlayHash());
                 if (audioInfo != null) {
                     if (AudioInfoDB.isLikeAudioExists(mContext, audioInfo.getHash())) {
-                        boolean result = AudioInfoDB.deleteLikeAudio(mContext, audioInfo.getHash(),true);
+                        boolean result = AudioInfoDB.deleteLikeAudio(mContext, audioInfo.getHash(), true);
                         if (result) {
                             mUnLikeMenuBtn.setVisibility(View.VISIBLE);
                             mLikeMenuBtn.setVisibility(View.GONE);
                             ToastUtil.showTextToast(mContext, getString(R.string.unlike_tip_text));
-                         }
+                        }
                     }
                 }
             }
@@ -760,7 +765,7 @@ public class LrcActivity extends BaseActivity {
                 AudioInfo audioInfo = AudioPlayerManager.newInstance(mContext).getCurSong(mConfigInfo.getPlayHash());
                 if (audioInfo != null) {
                     if (!AudioInfoDB.isLikeAudioExists(mContext, audioInfo.getHash())) {
-                        boolean result = AudioInfoDB.addLikeAudio(mContext, audioInfo,true);
+                        boolean result = AudioInfoDB.addLikeAudio(mContext, audioInfo, true);
                         if (result) {
                             mUnLikeMenuBtn.setVisibility(View.GONE);
                             mLikeMenuBtn.setVisibility(View.VISIBLE);
@@ -770,6 +775,39 @@ public class LrcActivity extends BaseActivity {
                 }
             }
         });
+
+        //未下载
+        mDownloadImg = findViewById(R.id.download_img);
+        mDownloadImg.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                AudioInfo audioInfo = AudioPlayerManager.newInstance(mContext).getCurSong(mConfigInfo.getPlayHash());
+                if (audioInfo != null) {
+                    boolean flag = DownloadAudioManager.newInstance(mContext).isDownloadAudioExists(audioInfo.getHash());
+                    if (flag) {
+                        ToastUtil.showTextToast(mContext, mContext.getResources().getString(R.string.undownload_tip_text));
+                    } else {
+                        ToastUtil.showTextToast(mContext, mContext.getResources().getString(R.string.download_tip_text));
+                        DownloadAudioManager.newInstance(mContext).addTask(audioInfo);
+                    }
+                }
+            }
+        });
+
+        mDownloadedImg = findViewById(R.id.downloaded_img);
+    }
+
+    /**
+     * 刷新下载视图
+     */
+    private void reshDownloadView(AudioInfo audioInfo) {
+        if (audioInfo != null && (audioInfo.getType() == AudioInfo.TYPE_LOCAL || AudioInfoDB.isDownloadedAudioExists(mContext, audioInfo.getHash()))) {
+            mDownloadImg.setVisibility(View.INVISIBLE);
+            mDownloadedImg.setVisibility(View.VISIBLE);
+        } else {
+            mDownloadImg.setVisibility(View.VISIBLE);
+            mDownloadedImg.setVisibility(View.INVISIBLE);
+        }
     }
 
     /**
@@ -1751,6 +1789,8 @@ public class LrcActivity extends BaseActivity {
                 mUnLikeMenuBtn.setVisibility(View.VISIBLE);
                 mLikeMenuBtn.setVisibility(View.GONE);
 
+                reshDownloadView(null);
+
                 if (mAdapter != null)
                     mAdapter.reshViewHolder(null);
 
@@ -1763,6 +1803,9 @@ public class LrcActivity extends BaseActivity {
                     mSingerNameTextView.setText(initAudioInfo.getSingerName());
                     mPauseBtn.setVisibility(View.INVISIBLE);
                     mPlayBtn.setVisibility(View.VISIBLE);
+
+                    //下载
+                    reshDownloadView(initAudioInfo);
 
                     //喜欢/不喜欢
                     if (AudioInfoDB.isLikeAudioExists(mContext, initAudioInfo.getHash())) {
@@ -1805,7 +1848,7 @@ public class LrcActivity extends BaseActivity {
                     ImageUtil.loadSingerImage(mContext, mSingerImageView, initAudioInfo.getSingerName(), mConfigInfo.isWifi(), new AsyncHandlerTask(mUIHandler, mWorkerHandler));
 
                     if (mAdapter != null) {
-                        mAdapter.reshViewHolder(initAudioInfo);
+                        mAdapter.reshViewHolder(initAudioInfo.getHash());
 
                         if (mIsShowPopPlayList) {
                             //定位
@@ -1879,6 +1922,27 @@ public class LrcActivity extends BaseActivity {
                     }
 
                 }
+                break;
+
+            case AudioBroadcastReceiver.ACTION_CODE_DOWNLOAD_FINISH:
+            case AudioBroadcastReceiver.ACTION_CODE_DOWNLOADONEDLINESONG:
+                if (mAdapter == null) {
+                    return;
+                }
+                //网络歌曲下载完成
+                Bundle downloadedBundle = intent.getBundleExtra(AudioBroadcastReceiver.ACTION_BUNDLEKEY);
+                DownloadTask downloadedTask = downloadedBundle.getParcelable(AudioBroadcastReceiver.ACTION_DATA_KEY);
+                String downloadedHash = downloadedTask.getTaskId();
+                if (downloadedTask != null && !TextUtils.isEmpty(downloadedHash)) {
+                    mAdapter.reshViewHolder(downloadedHash);
+                    if (code == AudioBroadcastReceiver.ACTION_CODE_DOWNLOAD_FINISH) {
+                        AudioInfo downloadedAudioInfo = AudioPlayerManager.newInstance(mContext).getCurSong(downloadedHash);
+                        if (downloadedHash.equals(downloadedAudioInfo.getHash())) {
+                            reshDownloadView(downloadedAudioInfo);
+                        }
+                    }
+                }
+
                 break;
 
             case AudioBroadcastReceiver.ACTION_CODE_DOWNLOADONLINESONG:

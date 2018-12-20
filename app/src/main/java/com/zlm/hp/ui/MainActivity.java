@@ -440,7 +440,7 @@ public class MainActivity extends BaseActivity {
                                     }
                                 }
 
-                                mAdapter.reshViewHolder(initAudioInfo);
+                                mAdapter.reshViewHolder(initAudioInfo.getHash());
                             }
                         } else {
                             if (mAdapter != null)
@@ -481,6 +481,21 @@ public class MainActivity extends BaseActivity {
                         if (seektoAudioInfo != null) {
                             mMusicSeekBar.setProgress(seektoAudioInfo.getPlayProgress());
                         }
+                        break;
+
+                    case AudioBroadcastReceiver.ACTION_CODE_DOWNLOAD_FINISH:
+                    case AudioBroadcastReceiver.ACTION_CODE_DOWNLOADONEDLINESONG:
+                        if (!mIsShowPopPlayList || mAdapter == null) {
+                            return;
+                        }
+                        //网络歌曲下载完成
+                        Bundle downloadedBundle = intent.getBundleExtra(AudioBroadcastReceiver.ACTION_BUNDLEKEY);
+                        DownloadTask downloadedTask = downloadedBundle.getParcelable(AudioBroadcastReceiver.ACTION_DATA_KEY);
+                        String downloadedHash = downloadedTask.getTaskId();
+                        if (downloadedTask != null && !TextUtils.isEmpty(downloadedHash)) {
+                            mAdapter.reshViewHolder(downloadedHash);
+                        }
+
                         break;
 
                     case AudioBroadcastReceiver.ACTION_CODE_DOWNLOADONLINESONG:

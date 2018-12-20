@@ -13,9 +13,11 @@ import android.widget.TextView;
 
 import com.zlm.hp.constants.ConfigInfo;
 import com.zlm.hp.db.util.AudioInfoDB;
+import com.zlm.hp.db.util.DownloadThreadInfoDB;
 import com.zlm.hp.entity.AudioInfo;
 import com.zlm.hp.fragment.SongFragment;
 import com.zlm.hp.manager.AudioPlayerManager;
+import com.zlm.hp.manager.OnLineAudioManager;
 import com.zlm.hp.ui.R;
 import com.zlm.hp.widget.IconfontImageButtonTextView;
 import com.zlm.hp.widget.ListItemRelativeLayout;
@@ -81,6 +83,20 @@ public class AudioAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> 
         viewHolder.getSongNameTv().setText(audioInfo.getSongName());
         viewHolder.getSingerNameTv().setText(audioInfo.getSingerName());
         viewHolder.getMenuLinearLayout().setVisibility(View.GONE);
+
+        //下载完成
+        if (audioInfo.getType() == AudioInfo.TYPE_LOCAL || AudioInfoDB.isDownloadedAudioExists(mContext, audioInfo.getHash())) {
+            viewHolder.getIslocalImg().setVisibility(View.VISIBLE);
+        } else {
+            int downloadedSize = DownloadThreadInfoDB.getDownloadedSize(mContext, audioInfo.getHash(), OnLineAudioManager.mThreadNum);
+            if (downloadedSize >= audioInfo.getFileSize()) {
+                viewHolder.getIslocalImg().setVisibility(View.VISIBLE);
+            } else {
+                viewHolder.getIslocalImg().setVisibility(View.GONE);
+            }
+        }
+
+
         viewHolder.getListItemRelativeLayout().setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
@@ -112,30 +128,16 @@ public class AudioAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> 
 
     /***
      * 刷新
-     * @param audioInfo
      */
-    public void reshViewHolder(AudioInfo audioInfo) {
+    public void reshViewHolder(String playHash) {
         int oldIndex = getAudioIndex(mOldPlayHash);
         if (oldIndex != -1) {
             notifyItemChanged(oldIndex);
         }
-        int newIndex = getAudioIndex(audioInfo);
+        int newIndex = getAudioIndex(playHash);
         if (newIndex != -1) {
             notifyItemChanged(newIndex);
         }
-    }
-
-    /**
-     * 获取歌曲索引
-     *
-     * @param audioInfo
-     * @return
-     */
-    private int getAudioIndex(AudioInfo audioInfo) {
-        if (audioInfo == null) {
-            return -1;
-        }
-        return getAudioIndex(audioInfo.getHash());
     }
 
     /**

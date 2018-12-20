@@ -5,6 +5,7 @@ import android.content.Intent;
 import android.os.Bundle;
 import android.os.Message;
 import android.support.v7.widget.LinearLayoutManager;
+import android.text.TextUtils;
 import android.view.View;
 import android.widget.ImageView;
 import android.widget.RelativeLayout;
@@ -14,6 +15,7 @@ import com.github.jdsjlzx.interfaces.OnLoadMoreListener;
 import com.github.jdsjlzx.interfaces.OnRefreshListener;
 import com.github.jdsjlzx.recyclerview.LRecyclerView;
 import com.github.jdsjlzx.recyclerview.LRecyclerViewAdapter;
+import com.zlm.down.entity.DownloadTask;
 import com.zlm.hp.adapter.AudioAdapter;
 import com.zlm.hp.constants.ConfigInfo;
 import com.zlm.hp.db.util.AudioInfoDB;
@@ -23,6 +25,7 @@ import com.zlm.hp.entity.SpecialInfo;
 import com.zlm.hp.http.APIHttpClient;
 import com.zlm.hp.http.HttpClient;
 import com.zlm.hp.http.HttpReturnResult;
+import com.zlm.hp.manager.AudioPlayerManager;
 import com.zlm.hp.receiver.AudioBroadcastReceiver;
 import com.zlm.hp.receiver.FragmentReceiver;
 import com.zlm.hp.ui.R;
@@ -255,7 +258,7 @@ public class SongFragment extends BaseFragment {
                                 return;
                             }
                             AudioInfo initAudioInfo = initBundle.getParcelable(AudioBroadcastReceiver.ACTION_DATA_KEY);
-                            ((AudioAdapter) (mAdapter.getInnerAdapter())).reshViewHolder(initAudioInfo);
+                            ((AudioAdapter) (mAdapter.getInnerAdapter())).reshViewHolder(initAudioInfo.getHash());
                         }
                         break;
                     case AudioBroadcastReceiver.ACTION_CODE_UPDATE_LOCAL:
@@ -278,6 +281,22 @@ public class SongFragment extends BaseFragment {
                             mWorkerHandler.sendEmptyMessage(LOADREFRESHDATA);
                         }
                         break;
+
+                    case AudioBroadcastReceiver.ACTION_CODE_DOWNLOAD_FINISH:
+                    case AudioBroadcastReceiver.ACTION_CODE_DOWNLOADONEDLINESONG:
+                        if (mAdapter == null) {
+                            return;
+                        }
+                        //网络歌曲下载完成
+                        Bundle downloadedBundle = intent.getBundleExtra(AudioBroadcastReceiver.ACTION_BUNDLEKEY);
+                        DownloadTask downloadedTask = downloadedBundle.getParcelable(AudioBroadcastReceiver.ACTION_DATA_KEY);
+                        String downloadedHash = downloadedTask.getTaskId();
+                        if (downloadedTask != null && !TextUtils.isEmpty(downloadedHash)) {
+                            ((AudioAdapter) (mAdapter.getInnerAdapter())).reshViewHolder(downloadedHash);
+                        }
+
+                        break;
+
                 }
             }
         });

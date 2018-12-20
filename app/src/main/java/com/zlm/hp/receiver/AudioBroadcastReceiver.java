@@ -204,6 +204,11 @@ public class AudioBroadcastReceiver {
      */
     public static final int ACTION_CODE_DOWNLOAD_ERROR = 33;
 
+    /**
+     * 在线歌曲下载完成
+     */
+    public static final int ACTION_CODE_DOWNLOADONEDLINESONG = 34;
+
     private BroadcastReceiver mBroadcastReceiver;
     private IntentFilter mIntentFilter;
     private AudioReceiverListener mReceiverListener;
@@ -352,6 +357,20 @@ public class AudioBroadcastReceiver {
         sendReceiver(context, ACTION_CODE_DOWNLOADONLINESONG, ACTION_BUNDLEKEY, bundle);
 
     }
+
+    /**
+     * 在线歌曲下载完成
+     *
+     * @param context
+     * @param task
+     */
+    public static void sendDownloadedOnlineSongReceiver(Context context, DownloadTask task) {
+        Bundle bundle = new Bundle();
+        bundle.putParcelable(ACTION_DATA_KEY, task);
+        sendReceiver(context, ACTION_CODE_DOWNLOADONEDLINESONG, ACTION_BUNDLEKEY, bundle);
+
+    }
+
 
     /**
      * 歌曲下载中
