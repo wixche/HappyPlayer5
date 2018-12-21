@@ -108,4 +108,4 @@ Apache 2.0. See the [LICENSE](https://github.com/zhangliangming/HappyPlayer5/blo
 
 - 支付宝
 
-![](https://i.imgur.com/4ubZBoE.png)
+![](https://i.imgur.com/HutwPUX.png)
