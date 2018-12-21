@@ -95,6 +95,9 @@
 # 声明 #
 仅用于学习用途
 
+# License #
+Apache 2.0. See the [LICENSE](https://github.com/zhangliangming/HappyPlayer5/blob/happy_player6/LICENSE) file for details.
+
 # 捐赠 #
 如果该项目对您有所帮助，欢迎您的赞赏
 
