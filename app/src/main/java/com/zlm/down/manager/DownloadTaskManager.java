@@ -11,6 +11,7 @@ import com.zlm.down.thread.DownloadTaskThreadManager;
 
 import java.util.ArrayList;
 import java.util.List;
+
 /**
  * @Description: 任务下载管理类
  * @author: zhangliangming
@@ -210,7 +211,9 @@ public class DownloadTaskManager {
                         mIDownloadTaskEvent.taskPause(task, 0);
                     }
                 }
-                mDownloadTasks.remove(i);
+                if (mDownloadTasks.size() > 0) {
+                    mDownloadTasks.remove(i);
+                }
                 break;
             }
         }
@@ -250,8 +253,10 @@ public class DownloadTaskManager {
         for (int i = 0; i < mDownloadTasks.size(); i++) {
             DownloadTask temp = mDownloadTasks.get(i);
             if (temp.getTaskId().equals(task.getTaskId())) {
-                mDownloadTasks.remove(i);
-                mWorkerHandler.removeCallbacks(temp.getDownloadTaskThreadManager());
+                if (mDownloadTasks.size() > 0) {
+                    mDownloadTasks.remove(i);
+                    mWorkerHandler.removeCallbacks(temp.getDownloadTaskThreadManager());
+                }
                 break;
             }
         }

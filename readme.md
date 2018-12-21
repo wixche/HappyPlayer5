@@ -5,7 +5,7 @@
 - android studio 3.1.4（正式版）
 - gradle-4.4
 - 小米2s手机
-- android 5.0系统
+- android 5.0系统以上
 
 # 音频格式 #
 目前用ijkplayer来测试如下音频格式，均可正常播放：aac，amr，ape，flac，m4r，mmf，mp2，mp3，ogg，wav，wma，wv
@@ -37,6 +37,9 @@
 - [LRecyclerView：RecyclerView上拉加载更多，下拉刷新](https://github.com/jdsjlzx/LRecyclerView "LRecyclerView")
 
 # 更新日志 #
+
+## 2018-12-22 ##
+- 添加下载页面
 
 ## 2018-12-16 ##
 - 添加最近和喜欢歌曲列表
@@ -97,8 +100,8 @@
 
 - 微信
 
-![](https://i.imgur.com/e3hERHh.png)
+![](https://i.imgur.com/l39CVlp.png)
 
 - 支付宝
 
-![](https://i.imgur.com/29AcEPA.png)
+![](https://i.imgur.com/4ubZBoE.png)

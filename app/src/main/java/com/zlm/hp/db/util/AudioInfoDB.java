@@ -405,9 +405,9 @@ public class AudioInfoDB {
         Cursor cursor = null;
         int count = 0;
         try {
-            String args[] = {AudioInfo.TYPE_NET + "", AudioInfo.STATUS_FINISH + ""};
-            String sql = "select count(*) from " + AudioInfoDao.TABLENAME + " WHERE " + AudioInfoDao.Properties.Type.columnName + "=? and " + AudioInfoDao.Properties.Status.columnName +
-                    "=?";
+            String args[] = {AudioInfo.TYPE_NET + "", AudioInfo.STATUS_DOWNLOADING + "", AudioInfo.STATUS_FINISH + ""};
+            String sql = "select count(*) from " + AudioInfoDao.TABLENAME + " WHERE " + AudioInfoDao.Properties.Type.columnName + "=? and (" + AudioInfoDao.Properties.Status.columnName +
+                    "=? or " + AudioInfoDao.Properties.Status.columnName + " =?)";
             cursor = DBHelper.getInstance(context).getWritableDatabase().rawQuery(sql, args);
             cursor.moveToFirst();
             count = cursor.getInt(0);

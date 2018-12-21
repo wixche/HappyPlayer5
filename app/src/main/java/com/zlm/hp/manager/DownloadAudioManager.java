@@ -52,7 +52,7 @@ public class DownloadAudioManager {
     /**
      * 线程个数
      */
-    public static final int mThreadNum = 3;
+    public static final int mThreadNum = 2;
 
     /**
      *
@@ -80,8 +80,8 @@ public class DownloadAudioManager {
                 if (task.getTaskFileSize() <= downloadedSize) {
                     return;
                 }
-                AudioBroadcastReceiver.sendDownloadingSongReceiver(mContext, task);
                 ZLog.d(new CodeLineUtil().getCodeLineInfo(), "task taskDownloading ->" + task.getTaskName() + " " + downloadedSize);
+                AudioBroadcastReceiver.sendDownloadingSongReceiver(mContext, task);
             }
 
             @Override
@@ -89,8 +89,8 @@ public class DownloadAudioManager {
                 if (task.getTaskFileSize() <= downloadedSize) {
                     return;
                 }
-                AudioBroadcastReceiver.sendDownloadPauseReceiver(mContext, task);
                 ZLog.d(new CodeLineUtil().getCodeLineInfo(), "task taskPause ->" + task.getTaskName() + " " + downloadedSize);
+                AudioBroadcastReceiver.sendDownloadPauseReceiver(mContext, task);
             }
 
             @Override
@@ -98,9 +98,9 @@ public class DownloadAudioManager {
                 //删除任务
                 if (DownloadTaskDB.isExists(mContext, task.getTaskId(), mThreadNum)) {
                     DownloadTaskDB.delete(mContext, task.getTaskId(), mThreadNum);
-                    AudioBroadcastReceiver.sendDownloadCancelReceiver(mContext, task);
                 }
                 ZLog.d(new CodeLineUtil().getCodeLineInfo(), "task taskCancel ->" + task.getTaskName());
+                AudioBroadcastReceiver.sendDownloadCancelReceiver(mContext, task);
             }
 
             @Override
@@ -108,19 +108,18 @@ public class DownloadAudioManager {
                 if (task.getTaskFileSize() > downloadedSize) {
                     return;
                 }
-                AudioBroadcastReceiver.sendDownloadFinishReceiver(mContext, task);
                 //添加本地歌曲
                 if (AudioInfoDB.isDownloadAudioExists(mContext, task.getTaskId())) {
                     AudioInfoDB.addDownloadedAudio(mContext, task.getTaskId(), true);
                 }
-
                 ZLog.d(new CodeLineUtil().getCodeLineInfo(), "task taskFinish ->" + task.getTaskName() + " " + downloadedSize);
+                AudioBroadcastReceiver.sendDownloadFinishReceiver(mContext, task);
             }
 
             @Override
             public void taskError(DownloadTask task, String msg) {
-                AppSystemReceiver.sendToastErrorMsgReceiver(mContext, msg);
                 ZLog.d(new CodeLineUtil().getCodeLineInfo(), "task taskError ->" + task.getTaskName());
+                AppSystemReceiver.sendToastErrorMsgReceiver(mContext, msg);
             }
 
             @Override
@@ -230,6 +229,14 @@ public class DownloadAudioManager {
         downloadTask.setThreadNum(mThreadNum);
         downloadTask.setCreateTime(new Date());
 
+        //添加音频
+        boolean flag = isDownloadAudioExists(audioInfo.getHash());
+        if (!flag) {
+            //避免重复添加任务
+            AudioInfoDB.addDownloadAudio(mContext, audioInfo, true);
+            //添加任务
+            DownloadTaskDB.add(mContext, downloadTask);
+        }
         //重新获取歌曲下载路径，防止下载地址失效
         mWorkerHandler.post(new Runnable() {
             @Override
@@ -252,10 +259,6 @@ public class DownloadAudioManager {
         apiHttpClient.getSongInfo(mContext, audioInfo.getHash(), audioInfo, ConfigInfo.obtain().isWifi());
         downloadTask.setTaskUrl(audioInfo.getDownloadUrl());
 
-        //添加音频
-        AudioInfoDB.addDownloadAudio(mContext, audioInfo, true);
-        //添加任务
-        DownloadTaskDB.add(mContext, downloadTask);
         //下载任务
         mDownloadTaskManager.addDownloadTask(downloadTask);
     }
@@ -298,6 +301,25 @@ public class DownloadAudioManager {
             }
         }
         return false;
+    }
+
+    /**
+     * 获取下载任务
+     *
+     * @param hash
+     * @return
+     */
+    public DownloadTask getDownloadTask(String hash) {
+        List<DownloadTask> downloadTasks = mDownloadTaskManager.getDownloadTasks();
+        if (downloadTasks != null) {
+            for (int i = 0; i < downloadTasks.size(); i++) {
+                DownloadTask downloadTask = downloadTasks.get(i);
+                if (downloadTask.getTaskId().equals(hash)) {
+                    return downloadTask;
+                }
+            }
+        }
+        return null;
     }
 
     /**

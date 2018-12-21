@@ -132,6 +132,7 @@ public class AudioAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> 
     public void reshViewHolder(String playHash) {
         int oldIndex = getAudioIndex(mOldPlayHash);
         if (oldIndex != -1) {
+            mOldPlayHash = "";
             notifyItemChanged(oldIndex);
         }
         int newIndex = getAudioIndex(playHash);

@@ -185,12 +185,12 @@ public class AudioBroadcastReceiver {
     public static final int ACTION_CODE_DOWNLOAD_SONG = 29;
 
     /**
-     * 歌曲暂停中
+     * 歌曲暂停
      */
     public static final int ACTION_CODE_DOWNLOAD_PAUSE = 30;
 
     /**
-     * 歌曲取消中
+     * 歌曲取消
      */
     public static final int ACTION_CODE_DOWNLOAD_CANCEL = 31;
 

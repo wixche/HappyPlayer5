@@ -87,7 +87,7 @@ public class DownloadTaskDB {
     public static void delete(Context context,String taskid,int threadNum) {
         try {
 
-            if(AudioInfoDB.isDownloadedAudioExists(context,taskid)){
+            if(AudioInfoDB.isDownloadAudioExists(context,taskid)){
                 //删除下载歌曲
                 AudioInfoDB.deleteDownloadAudio(context,taskid,true);
             }
