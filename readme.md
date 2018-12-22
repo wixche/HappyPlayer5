@@ -17,8 +17,8 @@ android5.0及以上
 - [SwipeBackLayout（右滑动关闭界面）](https://github.com/zhangliangming/SwipeBackLayout.git)
 - [RotateLayout（旋转界面）](https://github.com/zhangliangming/RotateLayout.git)
 - [SeekBar（进度条）](https://github.com/zhangliangming/SeekBar.git)
-- [HPLyrics（动感歌词解析和歌词显示库）](https://github.com/zhangliangming/HPLyrics.git)
-- [HPAudio（音频解析库）](https://github.com/zhangliangming/HPAudio.git)
+- [HPLyrics（动感歌词解析和歌词显示库：支持音译和翻译歌词）](https://github.com/zhangliangming/HPLyrics.git)
+- [HPAudio（音频解析库：支持wav、mp3、ape、ogg、wv和flac）](https://github.com/zhangliangming/HPAudio.git)
 - [Android仿酷狗SlidingMenuLayout界面实现](https://github.com/zhangliangming/SlidingMenuLayout.git)
 - [ijkplayer依赖包（支持无损）](https://github.com/zhangliangming/Player.git)
 
