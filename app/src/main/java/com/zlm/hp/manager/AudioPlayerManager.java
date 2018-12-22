@@ -181,9 +181,14 @@ public class AudioPlayerManager {
             audioInfo.setPlayProgress(0);
         }
 
+        //更新数据
         ConfigInfo configInfo = ConfigInfo.obtain();
         configInfo.setPlayHash(audioInfo.getHash());
+        AudioInfo curAudioInfo = getCurSong(configInfo.getAudioInfos(), audioInfo.getHash());
+        curAudioInfo.setPlayProgress(audioInfo.getPlayProgress());
         configInfo.save();
+
+        //
 
         if (!isSeekTo) {
             //发送play init 数据

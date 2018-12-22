@@ -167,8 +167,8 @@ public class AudioPlayerService extends Service {
                         if (code == AudioBroadcastReceiver.ACTION_CODE_STOP) {
                             //更新暂停时的进度
                             if (mMediaPlayer != null) {
-                                ConfigInfo configInfoTemp = ConfigInfo.obtain();
-                                AudioInfo curAudioInfo = AudioPlayerManager.newInstance(mContext).getCurSong(configInfoTemp.getPlayHash());
+
+                                AudioInfo curAudioInfo = getCurAudioInfo();
                                 if (curAudioInfo != null)
                                     curAudioInfo.setPlayProgress((int) mMediaPlayer.getCurrentPosition());
                             }
