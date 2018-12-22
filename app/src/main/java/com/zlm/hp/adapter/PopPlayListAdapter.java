@@ -168,6 +168,64 @@ public class PopPlayListAdapter extends RecyclerView.Adapter<RecyclerView.ViewHo
             }
         });
 
+        //从播放列表中移除
+        viewHolder.getDeleteTv().setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                //1.先判断是否是当前正在播放的歌曲
+                //2.移除歌曲
+                //3.发通知
+
+                String curHash = audioInfo.getHash();
+                //是否是正在播放歌曲
+                boolean flag = mConfigInfo.getPlayHash().equals(audioInfo.getHash());
+
+                //获取下一首歌曲
+                List<AudioInfo> audioInfos = mConfigInfo.getAudioInfos();
+                AudioInfo nextAudioInfo = null;
+                boolean hasNext = false;
+                int curHashIndex = -1;
+                for (int i = 0; i < audioInfos.size(); i++) {
+                    AudioInfo temp = audioInfos.get(i);
+                    if (hasNext) {
+                        nextAudioInfo = temp;
+                        break;
+                    }
+                    if (temp.getHash().equals(curHash)) {
+                        curHashIndex = i;
+                        if (!flag) break;
+                        hasNext = true;
+                    }
+                }
+
+                //播放器如果正在播放
+                if (flag)
+                    AudioPlayerManager.newInstance(mContext).stop();
+
+                //移除数据
+                if (curHashIndex != -1) {
+                    audioInfos.remove(curHashIndex);
+
+                    mConfigInfo.setAudioInfos(audioInfos);
+                    //发更新通知
+                    AudioBroadcastReceiver.sendReceiver(mContext, AudioBroadcastReceiver.ACTION_CODE_UPDATE_PLAYLIST);
+                }
+
+                //如果是正在播放歌曲，发播放下一首通知
+                if (!flag) return;
+                if (nextAudioInfo != null) {
+                    mConfigInfo.setPlayHash(nextAudioInfo.getHash());
+                    nextAudioInfo.setPlayProgress(0);
+                    AudioBroadcastReceiver.sendPlayInitReceiver(mContext, nextAudioInfo);
+                } else {
+                    mConfigInfo.setPlayHash("");
+                    AudioBroadcastReceiver.sendNullReceiver(mContext);
+                }
+
+                mConfigInfo.save();
+
+            }
+        });
 
         //显示歌曲索引
         viewHolder.getSongIndexTv().setText(((position + 1) < 10 ? "0" + (position + 1) : (position + 1) + ""));
@@ -287,6 +345,11 @@ public class PopPlayListAdapter extends RecyclerView.Adapter<RecyclerView.ViewHo
          */
         private ImageView likeImg;
 
+        /**
+         * 删除
+         */
+        private IconfontTextView deleteTv;
+
 
         public PopListViewHolder(View view) {
             super(view);
@@ -363,5 +426,11 @@ public class PopPlayListAdapter extends RecyclerView.Adapter<RecyclerView.ViewHo
             return likeImg;
         }
 
+        public IconfontTextView getDeleteTv() {
+            if (deleteTv == null) {
+                deleteTv = view.findViewById(R.id.delete);
+            }
+            return deleteTv;
+        }
     }
 }

@@ -209,6 +209,12 @@ public class AudioBroadcastReceiver {
      */
     public static final int ACTION_CODE_DOWNLOADONEDLINESONG = 34;
 
+
+    /**
+     * 更新播放列表歌曲
+     */
+    public static final int ACTION_CODE_UPDATE_PLAYLIST = 35;
+
     private BroadcastReceiver mBroadcastReceiver;
     private IntentFilter mIntentFilter;
     private AudioReceiverListener mReceiverListener;

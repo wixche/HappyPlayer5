@@ -1931,7 +1931,7 @@ public class LrcActivity extends BaseActivity {
                 DownloadTask downloadedTask = downloadedBundle.getParcelable(AudioBroadcastReceiver.ACTION_DATA_KEY);
                 String downloadedHash = downloadedTask.getTaskId();
                 if (downloadedTask != null && !TextUtils.isEmpty(downloadedHash)) {
-                    if (mAdapter != null)
+                    if (mIsShowPopPlayList && mAdapter != null)
                         mAdapter.reshViewHolder(downloadedHash);
                     if (code == AudioBroadcastReceiver.ACTION_CODE_DOWNLOAD_FINISH) {
                         AudioInfo downloadedAudioInfo = AudioPlayerManager.newInstance(mContext).getCurSong(downloadedHash);
@@ -1940,6 +1940,19 @@ public class LrcActivity extends BaseActivity {
                         }
                     }
                 }
+
+                break;
+
+            case AudioBroadcastReceiver.ACTION_CODE_UPDATE_PLAYLIST:
+                if (!mIsShowPopPlayList || mAdapter == null) {
+                    return;
+                }
+
+                //设置当前歌曲数据
+                List<AudioInfo> audioInfoList = mConfigInfo.getAudioInfos();
+                mPopListSizeTv.setText(audioInfoList.size() + "");
+
+                mAdapter.notifyDataSetChanged();
 
                 break;
 

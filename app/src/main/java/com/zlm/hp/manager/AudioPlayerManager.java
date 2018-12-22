@@ -269,6 +269,17 @@ public class AudioPlayerManager {
     }
 
     /**
+     * 停止
+     */
+    public synchronized void stop() {
+        mPlayStatus = STOP;
+        //暂停在线任务
+        mOnLineAudioManager.pauseTask();
+        AudioBroadcastReceiver.sendStopReceiver(mContext);
+
+    }
+
+    /**
      * 下一首
      */
     public synchronized void next() {
@@ -493,7 +504,7 @@ public class AudioPlayerManager {
      *
      * @return
      */
-    private AudioInfo getCurSong(List<AudioInfo> audioInfoList, String hash) {
+    public AudioInfo getCurSong(List<AudioInfo> audioInfoList, String hash) {
         AudioInfo curAudioInfo = null;
         if (audioInfoList == null || TextUtils.isEmpty(hash)) return null;
         for (int i = 0; i < audioInfoList.size(); i++) {

@@ -498,6 +498,19 @@ public class MainActivity extends BaseActivity {
 
                         break;
 
+                    case AudioBroadcastReceiver.ACTION_CODE_UPDATE_PLAYLIST:
+                        if (!mIsShowPopPlayList || mAdapter == null) {
+                            return;
+                        }
+
+                        //设置当前歌曲数据
+                        List<AudioInfo> audioInfoList = mConfigInfo.getAudioInfos();
+                        mPopListSizeTv.setText(audioInfoList.size() + "");
+
+                        mAdapter.notifyDataSetChanged();
+
+                        break;
+
                     case AudioBroadcastReceiver.ACTION_CODE_DOWNLOADONLINESONG:
                         //网络歌曲下载中
                         Bundle downloadOnlineSongBundle = intent.getBundleExtra(AudioBroadcastReceiver.ACTION_BUNDLEKEY);
