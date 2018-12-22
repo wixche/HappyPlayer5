@@ -211,6 +211,8 @@ public class PopPlayListAdapter extends RecyclerView.Adapter<RecyclerView.ViewHo
                     AudioBroadcastReceiver.sendReceiver(mContext, AudioBroadcastReceiver.ACTION_CODE_UPDATE_PLAYLIST);
                 }
 
+                ToastUtil.showTextToast(mContext, mContext.getResources().getString(R.string.remove_success_tip_text));
+
                 //如果是正在播放歌曲，发播放下一首通知
                 if (!flag) return;
                 if (nextAudioInfo != null) {
