@@ -148,8 +148,8 @@ public class DownloadMusicAdapter extends RecyclerView.Adapter<RecyclerView.View
         } else {
             if (downloadTask.getStatus() == DownloadTask.STATUS_WAIT) {
                 //等待下载
-                viewHolder.getDownloadingImg().setVisibility(View.VISIBLE);
-                viewHolder.getDownloadPauseImg().setVisibility(View.INVISIBLE);
+                viewHolder.getDownloadingImg().setVisibility(View.INVISIBLE);
+                viewHolder.getDownloadPauseImg().setVisibility(View.VISIBLE);
                 viewHolder.getOpTipTv().setText(mContext.getString(R.string.download_wait_text));
             } else if (downloadTask.getStatus() == DownloadTask.STATUS_DOWNLOADING) {
 
