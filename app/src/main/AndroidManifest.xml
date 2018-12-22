@@ -53,10 +53,7 @@
         <activity android:name=".SearchLrcActivity" />
         <activity android:name=".TimerPowerOffActivity" />
 
-        <service
-            android:name="com.zlm.hp.service.FloatService"
-            android:enabled="true"
-            android:exported="true" />
+        <service android:name="com.zlm.hp.service.FloatService" />
 
         <activity
             android:name=".LockActivity"
