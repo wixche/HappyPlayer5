@@ -1,19 +1,14 @@
 # 简介 #
-乐乐音乐6.0主要是基于ijkplayer框架开发的Android音乐播放器，它支持多种音频格式和动感歌词，界面高仿酷狗。
+乐乐音乐6.0主要是基于ijkplayer框架开发的Android音乐播放器，它支持多种音频格式和动感歌词。
 
-# 开发环境 #
-- android studio 3.1.4（正式版）
-- gradle-4.4
-- 小米2s手机
-- android 5.0系统以上
+# 运行环境 #
+android5.0及以上
 
 # 音频格式 #
 目前用ijkplayer来测试如下音频格式，均可正常播放：aac，amr，ape，flac，m4r，mmf，mp2，mp3，ogg，wav，wma，wv
 
 # 歌词格式 #
-- lrc：普通歌词
-- krc：酷狗歌词
-- ksc：卡拉OK歌词
+- lrc：普通歌词、 krc：酷狗歌词 、ksc：卡拉OK歌词
 - hrc：happy lyrics歌词，乐乐音乐自定义的动感歌词格式，可准确到歌词每个字。
 
 # 项目中抽出来的开源控件 #
@@ -31,10 +26,31 @@
 - bugly：崩溃日志收集
 - [SwitchButton：开关按钮](https://github.com/zcweng/SwitchButton.git "SwitchButton")
 - [LeakCanary：日志泄露分析](https://github.com/square/leakcanary "LeakCanary")
-- [Utils-Everywhere](https://github.com/SenhLinsh/Utils-Everywhere.git "Utils-Everywhere")
+- [Utils-Everywhere：适配打开权限设置界面](https://github.com/SenhLinsh/Utils-Everywhere.git "Utils-Everywhere")
 - [greenDAO：sqlite数据库框架](https://github.com/greenrobot/greenDAO "greenDAO")
 - [jjdxm_dialogui：弹出窗口框架](https://github.com/jjdxmashl/jjdxm_dialogui/ "jjdxm_dialogui")
 - [LRecyclerView：RecyclerView上拉加载更多，下拉刷新](https://github.com/jdsjlzx/LRecyclerView "LRecyclerView")
+
+# 部分效果预览 #
+
+[更多效果图，点击此次查看:https://pan.baidu.com/s/1YkZssna3TO9hKAOXwvxXiw 提取码: dgtc](https://pan.baidu.com/s/1YkZssna3TO9hKAOXwvxXiw)
+
+![新歌](https://i.imgur.com/4PzRnNz.png)
+
+![写真、歌词](https://i.imgur.com/DtIgAde.png)
+
+![锁屏/锁屏歌词](https://i.imgur.com/WmazYtx.png)
+
+![桌面歌词](https://i.imgur.com/TWb9KO8.png)
+
+# 客户端试用 #
+
+[更多版本客户端，点击此次查看:https://pan.baidu.com/s/1YkZssna3TO9hKAOXwvxXiw 提取码: dgtc](https://pan.baidu.com/s/1YkZssna3TO9hKAOXwvxXiw)
+
+# 后期将会修复、优化和新开发的功能 #
+- 制作歌词，该模块还没优化
+- 歌词转换器，添加视频字幕相互转换，方便后期应用于MV；添加批量转换
+- MV功能开发
 
 # 更新日志 #
 
