@@ -61,6 +61,7 @@
     <string name="mv_img">&#xe604;</string>
     <string name="like_tip_text">已添加收藏</string>
     <string name="unlike_tip_text">取消成功</string>
+    <string name="remove_success_tip_text">移除成功</string>
 
     <string name="download_tip_text">已添加到下载</string>
     <string name="undownload_tip_text">歌曲已添加!</string>

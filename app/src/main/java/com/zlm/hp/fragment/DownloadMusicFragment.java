@@ -167,6 +167,7 @@ public class DownloadMusicFragment extends BaseFragment {
             case MESSAGE_WHAT_LOADDATA:
 
                 if (mDatas != null) {
+                    mAdapter.resetMenuOpenIndex();
                     mAdapter.notifyDataSetChanged();
                 }
                 showContentView();

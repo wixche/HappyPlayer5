@@ -6,6 +6,7 @@ import android.database.Cursor;
 import com.zlm.hp.db.DBHelper;
 import com.zlm.hp.db.dao.AudioInfoDao;
 import com.zlm.hp.entity.AudioInfo;
+import com.zlm.hp.manager.DownloadAudioManager;
 import com.zlm.hp.receiver.AudioBroadcastReceiver;
 import com.zlm.hp.util.DateUtil;
 
@@ -155,6 +156,38 @@ public class AudioInfoDB {
             }
         }
         return count;
+    }
+
+    /**
+     * 删除歌曲
+     *
+     * @param context
+     */
+    public static boolean deleteAudio(Context context, String hash, boolean notifyData) {
+
+        //删除喜欢
+        //删除下载
+        //删除最近
+        //删除下载任务
+
+        deleteLikeAudio(context, hash, notifyData);
+        DownloadTaskDB.delete(context, hash, DownloadAudioManager.mThreadNum);
+        deleteRecentAudio(context, hash, notifyData);
+
+        try {
+            String sql = "DELETE FROM ";
+            sql += AudioInfoDao.TABLENAME;
+            sql += " where " + AudioInfoDao.Properties.Hash.columnName + "=?";
+            String args[] = {hash};
+            DBHelper.getInstance(context).getWritableDatabase().execSQL(sql, args);
+            if (notifyData) {
+                AudioBroadcastReceiver.sendReceiver(context, AudioBroadcastReceiver.ACTION_CODE_UPDATE_LOCAL);
+            }
+            return true;
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+        return false;
     }
 
     /**
@@ -441,11 +474,12 @@ public class AudioInfoDB {
         }
         return false;
     }
+
     /**
      * 更新下载歌曲时间
      */
     public static boolean addDownloadedAudio(Context context, String hash, boolean notifyData) {
-       boolean flag = updateDownloadAudio(context,hash,DateUtil.parseDateToString(new Date()), AudioInfo.STATUS_FINISH);
+        boolean flag = updateDownloadAudio(context, hash, DateUtil.parseDateToString(new Date()), AudioInfo.STATUS_FINISH);
         if (notifyData) {
             AudioBroadcastReceiver.sendReceiver(context, AudioBroadcastReceiver.ACTION_CODE_UPDATE_LOCAL);
         }
@@ -455,15 +489,15 @@ public class AudioInfoDB {
     /**
      * 更新下载歌曲时间
      */
-    public static boolean updateDownloadAudio(Context context, String hash, String createTime,int status) {
+    public static boolean updateDownloadAudio(Context context, String hash, String createTime, int status) {
         try {
 
             String sql = "UPDATE ";
             sql += AudioInfoDao.TABLENAME;
-            sql += " SET " + AudioInfoDao.Properties.CreateTime.columnName + " =?,"+ AudioInfoDao.Properties.Status.columnName + " =?";
+            sql += " SET " + AudioInfoDao.Properties.CreateTime.columnName + " =?," + AudioInfoDao.Properties.Status.columnName + " =?";
             sql += " where " + AudioInfoDao.Properties.Hash.columnName + "=? and " + AudioInfoDao.Properties.Type.columnName + "=?";
 
-            String args[] = {createTime,status + "", hash, AudioInfo.TYPE_NET + ""};
+            String args[] = {createTime, status + "", hash, AudioInfo.TYPE_NET + ""};
             DBHelper.getInstance(context).getWritableDatabase().execSQL(sql, args);
             return true;
         } catch (Exception e) {

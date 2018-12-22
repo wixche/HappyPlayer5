@@ -208,6 +208,7 @@ public class LastSongFragment extends BaseFragment {
             for (int i = 0; i < pageSize; i++) {
                 mDatas.add(lists.get(i));
             }
+            ((AudioAdapter) (mAdapter.getInnerAdapter())).resetMenuOpenIndex();
             mAdapter.notifyDataSetChanged();
         }
         mRecyclerView.refreshComplete(pageSize);

@@ -148,4 +148,22 @@ public class DownloadThreadInfoDB {
         }
         return false;
     }
+
+    /**
+     * 删除所有下载线程任务
+     */
+    public static boolean deleteAll(Context context, int threadNum) {
+        try {
+            String sql = "DELETE FROM ";
+            sql += DownloadThreadInfoDao.TABLENAME;
+            sql += " where " + DownloadThreadInfoDao.Properties.ThreadNum.columnName + "=?";
+
+            String args[] = {threadNum + ""};
+            DBHelper.getInstance(context).getWritableDatabase().execSQL(sql, args);
+            return true;
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+        return false;
+    }
 }

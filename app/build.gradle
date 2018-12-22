@@ -32,6 +32,11 @@ android {
     dexOptions {
         preDexLibraries = false
     }
+
+    productFlavors {
+    }
+
+
     //greendao设置相关参数
     greendao {
         schemaVersion 1

@@ -13,6 +13,8 @@ import com.dou361.dialogui.listener.DialogUIListener;
 import com.suke.widget.SwitchButton;
 import com.zlm.hp.constants.ConfigInfo;
 import com.zlm.hp.constants.ResourceConstants;
+import com.zlm.hp.db.util.DownloadThreadInfoDB;
+import com.zlm.hp.manager.OnLineAudioManager;
 import com.zlm.hp.util.FileUtil;
 import com.zlm.hp.util.ResourceUtil;
 import com.zlm.hp.widget.ListItemRelativeLayout;
@@ -191,6 +193,9 @@ public class SettingActivity extends BaseActivity {
      * 清空所有缓存
      */
     private void clearAllCache() {
+
+        //删除在线缓存
+        DownloadThreadInfoDB.deleteAll(mContext, OnLineAudioManager.mThreadNum);
 
         mWorkerHandler.sendEmptyMessage(UPDATE_CACHESIZE);
         /**

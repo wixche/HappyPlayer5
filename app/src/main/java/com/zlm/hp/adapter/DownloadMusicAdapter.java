@@ -54,6 +54,10 @@ public class DownloadMusicAdapter extends RecyclerView.Adapter<RecyclerView.View
 
     private ConfigInfo mConfigInfo;
     private String mOldPlayHash = "";
+    /**
+     * 菜单打开索引
+     */
+    private int mMenuOpenIndex = -1;
 
 
     public DownloadMusicAdapter(Context context, ArrayList<Category> datas) {
@@ -210,16 +214,109 @@ public class DownloadMusicAdapter extends RecyclerView.Adapter<RecyclerView.View
     }
 
     /**
+     *
+     */
+    public void resetMenuOpenIndex() {
+        mMenuOpenIndex = -1;
+    }
+
+
+    /**
      * 下载完成刷新ui
      *
      * @param position
      * @param viewHolder
      */
     private void reshViewHolder(final int position, final DownloadedMusicViewHolder viewHolder, final AudioInfo audioInfo) {
+
+        //1更多按钮点击事件
+        viewHolder.getItemMoreImg().setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                if (position != mMenuOpenIndex) {
+                    if (mMenuOpenIndex != -1) {
+                        notifyItemChanged(mMenuOpenIndex);
+                    }
+                    mMenuOpenIndex = position;
+                    notifyItemChanged(mMenuOpenIndex);
+                } else {
+                    if (mMenuOpenIndex != -1) {
+                        notifyItemChanged(mMenuOpenIndex);
+                        mMenuOpenIndex = -1;
+                    }
+                }
+            }
+        });
+        //2展开或者隐藏菜单
+        if (position == mMenuOpenIndex) {
+
+            //下载/未下载
+            viewHolder.getDownloadImg().setVisibility(View.GONE);
+            viewHolder.getDownloadedImg().setVisibility(View.GONE);
+            //删除
+            viewHolder.getDeleteImgBtn().setVisibility(View.VISIBLE);
+
+            //喜欢/不喜欢
+            if (AudioInfoDB.isLikeAudioExists(mContext, audioInfo.getHash())) {
+                viewHolder.getUnLikeImgBtn().setVisibility(View.GONE);
+                viewHolder.getLikedImgBtn().setVisibility(View.VISIBLE);
+            } else {
+                viewHolder.getUnLikeImgBtn().setVisibility(View.VISIBLE);
+                viewHolder.getLikedImgBtn().setVisibility(View.GONE);
+            }
+
+            viewHolder.getMenuLinearLayout().setVisibility(View.VISIBLE);
+        } else {
+            viewHolder.getMenuLinearLayout().setVisibility(View.GONE);
+        }
+
+        //喜欢/不喜欢
+        viewHolder.getUnLikeImgBtn().setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                if (audioInfo != null) {
+                    if (!AudioInfoDB.isLikeAudioExists(mContext, audioInfo.getHash())) {
+                        boolean result = AudioInfoDB.addLikeAudio(mContext, audioInfo, true);
+                        if (result) {
+                            viewHolder.getUnLikeImgBtn().setVisibility(View.GONE);
+                            viewHolder.getLikedImgBtn().setVisibility(View.VISIBLE);
+                            ToastUtil.showTextToast(mContext, mContext.getResources().getString(R.string.like_tip_text));
+                        }
+                    }
+                }
+            }
+        });
+        viewHolder.getLikedImgBtn().setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                if (audioInfo != null) {
+                    if (AudioInfoDB.isLikeAudioExists(mContext, audioInfo.getHash())) {
+                        boolean result = AudioInfoDB.deleteLikeAudio(mContext, audioInfo.getHash(), true);
+                        if (result) {
+                            viewHolder.getUnLikeImgBtn().setVisibility(View.VISIBLE);
+                            viewHolder.getLikedImgBtn().setVisibility(View.GONE);
+
+                            ToastUtil.showTextToast(mContext, mContext.getResources().getString(R.string.unlike_tip_text));
+                        }
+                    }
+                }
+            }
+        });
+
+        //删除
+        viewHolder.getDeleteImgBtn().setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                //隐藏更多菜单
+                mMenuOpenIndex = -1;
+                viewHolder.getMenuLinearLayout().setVisibility(View.GONE);
+                DownloadTaskDB.delete(mContext, audioInfo.getHash(), DownloadAudioManager.mThreadNum);
+                ToastUtil.showTextToast(mContext, mContext.getResources().getString(R.string.remove_success_tip_text));
+            }
+        });
+
         viewHolder.getSingerNameTv().setText(audioInfo.getSingerName());
         viewHolder.getSongNameTv().setText(audioInfo.getSongName());
-        viewHolder.getMenuLinearLayout().setVisibility(View.GONE);
-
 
         if (audioInfo.getHash().equals(mConfigInfo.getPlayHash())) {
             viewHolder.getStatusView().setVisibility(View.VISIBLE);
@@ -571,10 +668,6 @@ public class DownloadMusicAdapter extends RecyclerView.Adapter<RecyclerView.View
          * 下载按钮
          */
         private ImageView downloadImg;
-        /**
-         * 详情按钮
-         */
-        private IconfontImageButtonTextView detailImgBtn;
 
         /**
          * 删除按钮
@@ -685,14 +778,6 @@ public class DownloadMusicAdapter extends RecyclerView.Adapter<RecyclerView.View
                 downloadImg = view.findViewById(R.id.download_menu);
             }
             return downloadImg;
-        }
-
-        public IconfontImageButtonTextView getDetailImgBtn() {
-            if (detailImgBtn == null) {
-                detailImgBtn = view.findViewById(R.id.detail_menu);
-            }
-            detailImgBtn.setConvert(true);
-            return detailImgBtn;
         }
 
         public IconfontImageButtonTextView getDeleteImgBtn() {

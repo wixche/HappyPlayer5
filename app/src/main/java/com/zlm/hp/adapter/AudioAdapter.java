@@ -17,12 +17,16 @@ import com.zlm.hp.db.util.DownloadThreadInfoDB;
 import com.zlm.hp.entity.AudioInfo;
 import com.zlm.hp.fragment.SongFragment;
 import com.zlm.hp.manager.AudioPlayerManager;
+import com.zlm.hp.manager.DownloadAudioManager;
 import com.zlm.hp.manager.OnLineAudioManager;
+import com.zlm.hp.receiver.AudioBroadcastReceiver;
 import com.zlm.hp.ui.R;
+import com.zlm.hp.util.ToastUtil;
 import com.zlm.hp.widget.IconfontImageButtonTextView;
 import com.zlm.hp.widget.ListItemRelativeLayout;
 
 import java.util.ArrayList;
+import java.util.List;
 
 /**
  * @Description: 歌曲适配器
@@ -37,6 +41,11 @@ public class AudioAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> 
     private int mSongType;
     private String mOldPlayHash = "";
     private ConfigInfo mConfigInfo;
+
+    /**
+     * 菜单打开索引
+     */
+    private int mMenuOpenIndex = -1;
 
     public AudioAdapter(Context context, ArrayList<AudioInfo> datas, int songType) {
         this.mContext = context;
@@ -63,6 +72,14 @@ public class AudioAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> 
     }
 
     /**
+     *
+     */
+    public void resetMenuOpenIndex() {
+        mMenuOpenIndex = -1;
+    }
+
+
+    /**
      * 刷新ui
      *
      * @param position
@@ -70,6 +87,89 @@ public class AudioAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> 
      * @param audioInfo
      */
     private void reshViewHolder(final int position, final AudioViewHolder viewHolder, final AudioInfo audioInfo) {
+        //1更多按钮点击事件
+        viewHolder.getItemMoreImg().setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                if (position != mMenuOpenIndex) {
+                    if (mMenuOpenIndex != -1) {
+                        notifyItemChanged(mMenuOpenIndex);
+                    }
+                    mMenuOpenIndex = position;
+                    notifyItemChanged(mMenuOpenIndex);
+                } else {
+                    if (mMenuOpenIndex != -1) {
+                        notifyItemChanged(mMenuOpenIndex);
+                        mMenuOpenIndex = -1;
+                    }
+                }
+            }
+        });
+        //2展开或者隐藏菜单
+        if (position == mMenuOpenIndex) {
+            if (mSongType == SongFragment.SONG_TYPE_LOCAL) {
+                //本地歌曲
+                //喜欢/不喜欢
+                if (AudioInfoDB.isLikeAudioExists(mContext, audioInfo.getHash())) {
+                    viewHolder.getUnLikeImgBtn().setVisibility(View.GONE);
+                    viewHolder.getLikedImgBtn().setVisibility(View.VISIBLE);
+                } else {
+                    viewHolder.getUnLikeImgBtn().setVisibility(View.VISIBLE);
+                    viewHolder.getLikedImgBtn().setVisibility(View.GONE);
+                }
+                //下载/未下载
+                viewHolder.getDownloadImg().setVisibility(View.GONE);
+                viewHolder.getDownloadedImg().setVisibility(View.GONE);
+                //删除
+                viewHolder.getDeleteImgBtn().setVisibility(View.VISIBLE);
+            } else {
+                if (mSongType == SongFragment.SONG_TYPE_LIKE) {
+                    //喜欢
+                    viewHolder.getUnLikeImgBtn().setVisibility(View.GONE);
+                    viewHolder.getLikedImgBtn().setVisibility(View.GONE);
+                    //删除
+                    viewHolder.getDeleteImgBtn().setVisibility(View.VISIBLE);
+                } else {
+                    if (mSongType == SongFragment.SONG_TYPE_RECENT) {
+                        //删除
+                        viewHolder.getDeleteImgBtn().setVisibility(View.VISIBLE);
+                    } else {
+                        //删除
+                        viewHolder.getDeleteImgBtn().setVisibility(View.GONE);
+                    }
+                    //喜欢/不喜欢
+                    if (AudioInfoDB.isLikeAudioExists(mContext, audioInfo.getHash())) {
+                        viewHolder.getUnLikeImgBtn().setVisibility(View.GONE);
+                        viewHolder.getLikedImgBtn().setVisibility(View.VISIBLE);
+                    } else {
+                        viewHolder.getUnLikeImgBtn().setVisibility(View.VISIBLE);
+                        viewHolder.getLikedImgBtn().setVisibility(View.GONE);
+                    }
+                }
+
+                //下载完成
+                if (audioInfo.getType() == AudioInfo.TYPE_LOCAL || AudioInfoDB.isDownloadedAudioExists(mContext, audioInfo.getHash())) {
+                    viewHolder.getDownloadImg().setVisibility(View.INVISIBLE);
+                    viewHolder.getDownloadedImg().setVisibility(View.VISIBLE);
+                    viewHolder.getIslocalImg().setVisibility(View.VISIBLE);
+                } else {
+                    viewHolder.getDownloadImg().setVisibility(View.VISIBLE);
+                    viewHolder.getDownloadedImg().setVisibility(View.INVISIBLE);
+                    int downloadedSize = DownloadThreadInfoDB.getDownloadedSize(mContext, audioInfo.getHash(), OnLineAudioManager.mThreadNum);
+                    if (downloadedSize >= audioInfo.getFileSize()) {
+                        viewHolder.getIslocalImg().setVisibility(View.VISIBLE);
+                    } else {
+                        viewHolder.getIslocalImg().setVisibility(View.GONE);
+                    }
+                }
+            }
+
+            viewHolder.getMenuLinearLayout().setVisibility(View.VISIBLE);
+        } else {
+            viewHolder.getMenuLinearLayout().setVisibility(View.GONE);
+        }
+
+
         if (audioInfo.getHash().equals(mConfigInfo.getPlayHash())) {
             viewHolder.getStatusView().setVisibility(View.VISIBLE);
             mOldPlayHash = audioInfo.getHash();
@@ -82,7 +182,6 @@ public class AudioAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> 
         viewHolder.getSongIndexTv().setVisibility(View.VISIBLE);
         viewHolder.getSongNameTv().setText(audioInfo.getSongName());
         viewHolder.getSingerNameTv().setText(audioInfo.getSingerName());
-        viewHolder.getMenuLinearLayout().setVisibility(View.GONE);
 
         //下载完成
         if (audioInfo.getType() == AudioInfo.TYPE_LOCAL || AudioInfoDB.isDownloadedAudioExists(mContext, audioInfo.getHash())) {
@@ -100,6 +199,13 @@ public class AudioAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> 
         viewHolder.getListItemRelativeLayout().setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
+
+                //列表点击后，还原更多菜单
+                if (mMenuOpenIndex != -1) {
+                    notifyItemChanged(mMenuOpenIndex);
+                    mMenuOpenIndex = -1;
+                }
+
                 int oldIndex = getAudioIndex(mConfigInfo.getPlayHash());
                 if (oldIndex == position) {
                     AudioPlayerManager.newInstance(mContext).playOrPause();
@@ -120,6 +226,143 @@ public class AudioAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> 
                 int newIndex = getAudioIndex(audioInfo.getHash());
                 if (newIndex != -1) {
                     notifyItemChanged(newIndex);
+                }
+            }
+        });
+
+
+        //喜欢/不喜欢
+        viewHolder.getUnLikeImgBtn().setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                if (audioInfo != null) {
+                    if (!AudioInfoDB.isLikeAudioExists(mContext, audioInfo.getHash())) {
+                        boolean result = AudioInfoDB.addLikeAudio(mContext, audioInfo, true);
+                        if (result) {
+                            viewHolder.getUnLikeImgBtn().setVisibility(View.GONE);
+                            viewHolder.getLikedImgBtn().setVisibility(View.VISIBLE);
+                            ToastUtil.showTextToast(mContext, mContext.getResources().getString(R.string.like_tip_text));
+                        }
+                    }
+                }
+            }
+        });
+        viewHolder.getLikedImgBtn().setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                if (audioInfo != null) {
+                    if (AudioInfoDB.isLikeAudioExists(mContext, audioInfo.getHash())) {
+                        boolean result = AudioInfoDB.deleteLikeAudio(mContext, audioInfo.getHash(), true);
+                        if (result) {
+                            viewHolder.getUnLikeImgBtn().setVisibility(View.VISIBLE);
+                            viewHolder.getLikedImgBtn().setVisibility(View.GONE);
+
+                            ToastUtil.showTextToast(mContext, mContext.getResources().getString(R.string.unlike_tip_text));
+                        }
+                    }
+                }
+            }
+        });
+
+        //删除
+        viewHolder.getDeleteImgBtn().setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                //隐藏更多菜单
+                mMenuOpenIndex = -1;
+                viewHolder.getMenuLinearLayout().setVisibility(View.GONE);
+
+                if (mSongType == SongFragment.SONG_TYPE_LIKE) {
+                    //移除喜欢
+                    if (audioInfo != null) {
+                        if (AudioInfoDB.isLikeAudioExists(mContext, audioInfo.getHash())) {
+                            boolean result = AudioInfoDB.deleteLikeAudio(mContext, audioInfo.getHash(), true);
+                            if (result) {
+                                viewHolder.getUnLikeImgBtn().setVisibility(View.VISIBLE);
+                                viewHolder.getLikedImgBtn().setVisibility(View.GONE);
+
+                                ToastUtil.showTextToast(mContext, mContext.getResources().getString(R.string.unlike_tip_text));
+                            }
+                        }
+                    }
+                } else if (mSongType == SongFragment.SONG_TYPE_RECENT) {
+                    //最近移除
+                    if (audioInfo != null) {
+                        if (AudioInfoDB.isRecentAudioExists(mContext, audioInfo.getHash())) {
+                            boolean result = AudioInfoDB.deleteRecentAudio(mContext, audioInfo.getHash(), true);
+                            if (result) {
+                                ToastUtil.showTextToast(mContext, mContext.getResources().getString(R.string.remove_success_tip_text));
+                            }
+                        }
+                    }
+                } else {
+                    //本地歌曲删除
+                    //1.先判断是否是当前正在播放的歌曲
+                    //2.移除歌曲
+                    //3.发通知
+
+                    String curHash = audioInfo.getHash();
+                    //是否是正在播放歌曲
+                    boolean flag = mConfigInfo.getPlayHash().equals(audioInfo.getHash());
+                    //获取下一首歌曲
+                    List<AudioInfo> audioInfos = mConfigInfo.getAudioInfos();
+                    AudioInfo nextAudioInfo = null;
+                    boolean hasNext = false;
+                    int curHashIndex = -1;
+                    for (int i = 0; i < audioInfos.size(); i++) {
+                        AudioInfo temp = audioInfos.get(i);
+                        if (hasNext) {
+                            nextAudioInfo = temp;
+                            break;
+                        }
+                        if (temp.getHash().equals(curHash)) {
+                            curHashIndex = i;
+                            if (!flag) break;
+                            hasNext = true;
+                        }
+                    }
+
+                    //播放器如果正在播放
+                    if (flag)
+                        AudioPlayerManager.newInstance(mContext).stop();
+                    //移除数据
+                    if (curHashIndex != -1) {
+                        audioInfos.remove(curHashIndex);
+                        mConfigInfo.setAudioInfos(audioInfos);
+                    }
+
+                    //删除歌曲
+                    boolean deleteFlag = AudioInfoDB.deleteAudio(mContext, audioInfo.getHash(), true);
+                    if (deleteFlag) {
+                        ToastUtil.showTextToast(mContext, mContext.getResources().getString(R.string.remove_success_tip_text));
+                    }
+
+                    //如果是正在播放歌曲，发播放下一首通知
+                    if (!flag) return;
+                    if (nextAudioInfo != null) {
+                        mConfigInfo.setPlayHash(nextAudioInfo.getHash());
+                        nextAudioInfo.setPlayProgress(0);
+                        AudioBroadcastReceiver.sendPlayInitReceiver(mContext, nextAudioInfo);
+                    } else {
+                        mConfigInfo.setPlayHash("");
+                        AudioBroadcastReceiver.sendNullReceiver(mContext);
+                    }
+
+                    mConfigInfo.save();
+                }
+            }
+        });
+
+        //未下载
+        viewHolder.getDownloadImg().setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                boolean flag = DownloadAudioManager.newInstance(mContext).isDownloadAudioExists(audioInfo.getHash());
+                if (flag) {
+                    ToastUtil.showTextToast(mContext, mContext.getResources().getString(R.string.undownload_tip_text));
+                } else {
+                    ToastUtil.showTextToast(mContext, mContext.getResources().getString(R.string.download_tip_text));
+                    DownloadAudioManager.newInstance(mContext).addTask(audioInfo);
                 }
             }
         });
@@ -231,10 +474,6 @@ public class AudioAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> 
          * 下载按钮
          */
         private ImageView downloadImg;
-        /**
-         * 详情按钮
-         */
-        private IconfontImageButtonTextView detailImgBtn;
 
         /**
          * 删除按钮
@@ -345,14 +584,6 @@ public class AudioAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> 
                 downloadImg = view.findViewById(R.id.download_menu);
             }
             return downloadImg;
-        }
-
-        public IconfontImageButtonTextView getDetailImgBtn() {
-            if (detailImgBtn == null) {
-                detailImgBtn = view.findViewById(R.id.detail_menu);
-            }
-            detailImgBtn.setConvert(true);
-            return detailImgBtn;
         }
 
         public IconfontImageButtonTextView getDeleteImgBtn() {
