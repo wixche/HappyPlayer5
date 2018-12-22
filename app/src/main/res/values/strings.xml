@@ -36,6 +36,7 @@
     <string name="tab_like">喜欢</string>
     <string name="tab_download">下载</string>
     <string name="tab_recent">最近</string>
+    <string name="tab_search">搜索</string>
     <string name="tab_wifi">仅wifi联网</string>
     <string name="tab_wifi_img">&#xe8a0;</string>
     <string name="tab_desktoplrc">桌面歌词</string>
@@ -151,4 +152,7 @@
     <string name="download_pause_text">点击暂停</string>
     <string name="download_wait_text">等待下载</string>
     <string name="download_goon_text">点击继续下载</string>
+
+    <!-- TODO: Remove or change this placeholder text -->
+    <string name="hello_blank_fragment">Hello blank fragment</string>
 </resources>

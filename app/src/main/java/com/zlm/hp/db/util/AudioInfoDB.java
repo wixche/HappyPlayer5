@@ -120,7 +120,7 @@ public class AudioInfoDB {
             audioInfo.setCreateTime(DateUtil.parseDateToString(new Date()));
             DBHelper.getInstance(context).getDaoSession().getAudioInfoDao().insert(audioInfo);
             if (notifyData) {
-                AudioBroadcastReceiver.sendReceiver(context, AudioBroadcastReceiver.ACTION_CODE_UPDATE_LIKE);
+                AudioBroadcastReceiver.sendLikeReceiver(context, audioInfo.getHash());
             }
             return true;
         } catch (Exception e) {
@@ -204,7 +204,7 @@ public class AudioInfoDB {
             String args[] = {AudioInfo.TYPE_LIKE_LOCAL + "", AudioInfo.TYPE_LIKE_NET + "", hash};
             DBHelper.getInstance(context).getWritableDatabase().execSQL(sql, args);
             if (notifyData) {
-                AudioBroadcastReceiver.sendReceiver(context, AudioBroadcastReceiver.ACTION_CODE_UPDATE_LIKE);
+                AudioBroadcastReceiver.sendLikeReceiver(context, hash);
             }
             return true;
         } catch (Exception e) {

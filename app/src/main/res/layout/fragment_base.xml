@@ -10,12 +10,12 @@
         android:layout_height="wrap_content"
         android:visibility="gone" />
 
-    <include
-        android:id="@+id/title_view"
-        layout="@layout/layout_title"
+    <LinearLayout
+        android:id="@+id/title_view_parent"
         android:layout_width="match_parent"
         android:layout_height="@dimen/title_height"
-        android:visibility="gone" />
+        android:orientation="vertical"
+        android:visibility="gone"></LinearLayout>
 
     <RelativeLayout
         android:layout_width="match_parent"

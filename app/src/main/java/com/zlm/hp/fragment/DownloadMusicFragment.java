@@ -10,7 +10,7 @@ import android.support.v7.widget.RecyclerView;
 import android.text.TextUtils;
 import android.view.View;
 import android.widget.ImageView;
-import android.widget.RelativeLayout;
+import android.widget.LinearLayout;
 import android.widget.TextView;
 
 import com.zlm.down.entity.DownloadTask;
@@ -83,8 +83,8 @@ public class DownloadMusicFragment extends BaseFragment {
 
     private void initView(View mainView) {
         //显示标题视图
-        RelativeLayout titleRL = mainView.findViewById(R.id.title_view);
-        titleRL.setVisibility(View.VISIBLE);
+        LinearLayout titleLL = mainView.findViewById(R.id.title_view_parent);
+        titleLL.setVisibility(View.VISIBLE);
 
         TextView titleView = mainView.findViewById(R.id.title);
         titleView.setText(getString(R.string.tab_download));

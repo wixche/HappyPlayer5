@@ -102,6 +102,11 @@ public abstract class BaseFragment extends Fragment {
     private RefreshListener mRefreshListener;
 
     /**
+     * 标题视图
+     */
+    private int mTitleViewId = R.layout.layout_title;
+
+    /**
      * 初始化
      */
     private void init() {
@@ -156,6 +161,12 @@ public abstract class BaseFragment extends Fragment {
         mContentContainer.setLayoutResource(setContentLayoutResID());
         mContentContainer.inflate();
         mContentContainer.setVisibility(View.GONE);
+
+        //添加titleview
+        View titleView = inflater.inflate(mTitleViewId, container, false);
+        LinearLayout titleViewLL =  mainView.findViewById(R.id.title_view_parent);
+        LinearLayout.LayoutParams llp = new LinearLayout.LayoutParams(-1, -1);
+        titleViewLL.addView(titleView,llp);
 
         if (isAddStatusBarView) {
             initStatusBar(mainView);
@@ -359,6 +370,9 @@ public abstract class BaseFragment extends Fragment {
         this.mStatusBarViewBG = statusBarViewBG;
     }
 
+    public void setTitleViewId(int mTitleViewId) {
+        this.mTitleViewId = mTitleViewId;
+    }
 
     @Override
     public void setUserVisibleHint(boolean isVisibleToUser) {

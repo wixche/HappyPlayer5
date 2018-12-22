@@ -8,7 +8,7 @@ import android.support.v7.widget.LinearLayoutManager;
 import android.text.TextUtils;
 import android.view.View;
 import android.widget.ImageView;
-import android.widget.RelativeLayout;
+import android.widget.LinearLayout;
 import android.widget.TextView;
 
 import com.github.jdsjlzx.interfaces.OnLoadMoreListener;
@@ -25,7 +25,6 @@ import com.zlm.hp.entity.SpecialInfo;
 import com.zlm.hp.http.APIHttpClient;
 import com.zlm.hp.http.HttpClient;
 import com.zlm.hp.http.HttpReturnResult;
-import com.zlm.hp.manager.AudioPlayerManager;
 import com.zlm.hp.receiver.AudioBroadcastReceiver;
 import com.zlm.hp.receiver.FragmentReceiver;
 import com.zlm.hp.ui.R;
@@ -106,6 +105,11 @@ public class SongFragment extends BaseFragment {
      * 最近
      */
     public static final int SONG_TYPE_RECENT = 5;
+
+    /**
+     * 搜索
+     */
+    public static final int SONG_TYPE_SEARCH = 6;
 
     /**
      * 网络歌曲类型
@@ -219,8 +223,8 @@ public class SongFragment extends BaseFragment {
         }
 
         //显示标题视图
-        RelativeLayout titleRL = mainView.findViewById(R.id.title_view);
-        titleRL.setVisibility(View.VISIBLE);
+        LinearLayout titleLL = mainView.findViewById(R.id.title_view_parent);
+        titleLL.setVisibility(View.VISIBLE);
 
         TextView titleView = mainView.findViewById(R.id.title);
         titleView.setText(title);
@@ -272,6 +276,13 @@ public class SongFragment extends BaseFragment {
                         if (mSongType == SONG_TYPE_LIKE) {
                             //歌曲更新
                             mWorkerHandler.sendEmptyMessage(LOADREFRESHDATA);
+                        } else {
+                            //喜欢/不喜欢
+                            Bundle likeBundle = intent.getBundleExtra(AudioBroadcastReceiver.ACTION_BUNDLEKEY);
+                            String likeHash = likeBundle.getString(AudioBroadcastReceiver.ACTION_DATA_KEY);
+                            if (!TextUtils.isEmpty(likeHash)) {
+                                ((AudioAdapter) (mAdapter.getInnerAdapter())).reshViewHolder(likeHash);
+                            }
                         }
                         break;
 

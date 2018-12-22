@@ -2038,7 +2038,12 @@ public class LrcActivity extends BaseActivity {
                 break;
             case AudioBroadcastReceiver.ACTION_CODE_UPDATE_LIKE:
                 //喜欢/不喜欢
-                AudioInfo curAudioInfoTemp2 = AudioPlayerManager.newInstance(mContext).getCurSong(mConfigInfo.getPlayHash());
+                Bundle likeBundle = intent.getBundleExtra(AudioBroadcastReceiver.ACTION_BUNDLEKEY);
+                String likeHash = likeBundle.getString(AudioBroadcastReceiver.ACTION_DATA_KEY);
+                String curHash = mConfigInfo.getPlayHash();
+                if (!curHash.equals(likeHash)) return;
+
+                AudioInfo curAudioInfoTemp2 = AudioPlayerManager.newInstance(mContext).getCurSong(curHash);
                 if (curAudioInfoTemp2 == null) return;
                 if (AudioInfoDB.isLikeAudioExists(mContext, curAudioInfoTemp2.getHash())) {
                     mUnLikeMenuBtn.setVisibility(View.GONE);

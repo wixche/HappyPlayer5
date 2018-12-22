@@ -24,6 +24,7 @@ import android.view.ViewTreeObserver;
 import android.view.WindowManager;
 import android.view.animation.Animation;
 import android.view.animation.TranslateAnimation;
+import android.view.inputmethod.InputMethodManager;
 import android.widget.FrameLayout;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
@@ -48,6 +49,7 @@ import com.zlm.hp.fragment.DownloadMusicFragment;
 import com.zlm.hp.fragment.LastSongFragment;
 import com.zlm.hp.fragment.MeFragment;
 import com.zlm.hp.fragment.RecommendFragment;
+import com.zlm.hp.fragment.SearchFragment;
 import com.zlm.hp.fragment.SongFragment;
 import com.zlm.hp.fragment.SpecialFragment;
 import com.zlm.hp.manager.ActivityManager;
@@ -794,6 +796,14 @@ public class MainActivity extends BaseActivity {
             public void onMainPageScrolled(int leftx) {
                 mPlayerBarLL.setTranslationX(leftx);
             }
+
+            @Override
+            public void onHideFragment(Fragment fragment) {
+                if(fragment != null && fragment instanceof SearchFragment){
+                    //强制关闭输入法
+                    hideInput(mContext,mSlidingMenuLayout);
+                }
+            }
         });
 
         mViewPager = mainView.findViewById(R.id.viewpage);
@@ -821,6 +831,17 @@ public class MainActivity extends BaseActivity {
                 mSlidingMenuLayout.hideFragment();
             }
         };
+    }
+
+    /**
+     * 强制隐藏输入法键盘
+     *
+     * @param context Context
+     * @param view    EditText
+     */
+    private void hideInput(Context context, View view) {
+        InputMethodManager inputMethodManager = (InputMethodManager) context.getSystemService(Context.INPUT_METHOD_SERVICE);
+        inputMethodManager.hideSoftInputFromWindow(view.getWindowToken(), 0);
     }
 
     /**
@@ -949,6 +970,8 @@ public class MainActivity extends BaseActivity {
             @Override
             public void onClick(View view) {
 
+                SearchFragment searchFragment = SearchFragment.newInstance();
+                mSlidingMenuOnListener.addAndShowFragment(searchFragment);
 
             }
         });

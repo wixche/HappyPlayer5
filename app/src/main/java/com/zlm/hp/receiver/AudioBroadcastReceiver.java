@@ -529,6 +529,17 @@ public class AudioBroadcastReceiver {
         sendReceiver(context, ACTION_CODE_NOTIFY_SINGERICONLOADED, ACTION_BUNDLEKEY, bundle);
     }
 
+    /**
+     * 喜欢歌曲
+     * @param context
+     * @param hash
+     */
+    public static void sendLikeReceiver(Context context, String hash) {
+        Bundle bundle = new Bundle();
+        bundle.putString(ACTION_DATA_KEY, hash);
+        sendReceiver(context, ACTION_CODE_UPDATE_LIKE, ACTION_BUNDLEKEY, bundle);
+    }
+
 
     /**
      * 取消注册广播

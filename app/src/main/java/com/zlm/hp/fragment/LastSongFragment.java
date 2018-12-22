@@ -17,7 +17,6 @@ import com.zlm.hp.constants.ConfigInfo;
 import com.zlm.hp.entity.AudioInfo;
 import com.zlm.hp.http.APIHttpClient;
 import com.zlm.hp.http.HttpReturnResult;
-import com.zlm.hp.manager.AudioPlayerManager;
 import com.zlm.hp.receiver.AudioBroadcastReceiver;
 import com.zlm.hp.ui.R;
 import com.zlm.hp.util.HttpUtil;
@@ -157,6 +156,17 @@ public class LastSongFragment extends BaseFragment {
                             AudioInfo initAudioInfo = initBundle.getParcelable(AudioBroadcastReceiver.ACTION_DATA_KEY);
                             ((AudioAdapter) (mAdapter.getInnerAdapter())).reshViewHolder(initAudioInfo.getHash());
                         }
+                        break;
+
+                    case AudioBroadcastReceiver.ACTION_CODE_UPDATE_LIKE:
+
+                        //喜欢/不喜欢
+                        Bundle likeBundle = intent.getBundleExtra(AudioBroadcastReceiver.ACTION_BUNDLEKEY);
+                        String likeHash = likeBundle.getString(AudioBroadcastReceiver.ACTION_DATA_KEY);
+                        if (!TextUtils.isEmpty(likeHash)) {
+                            ((AudioAdapter) (mAdapter.getInnerAdapter())).reshViewHolder(likeHash);
+                        }
+
                         break;
 
                     case AudioBroadcastReceiver.ACTION_CODE_DOWNLOAD_FINISH:
