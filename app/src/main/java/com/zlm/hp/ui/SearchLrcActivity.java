@@ -116,7 +116,7 @@ public class SearchLrcActivity extends BaseActivity {
     @Override
     protected void initViews(Bundle savedInstanceState) {
         TextView titleView = findViewById(R.id.title);
-        titleView.setText("选择歌词");
+        titleView.setText(getString(R.string.select_lrc_text));
 
         //关闭
         IconfontTextView backTextView = findViewById(R.id.closebtn);

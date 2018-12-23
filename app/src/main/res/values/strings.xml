@@ -134,6 +134,9 @@
     <string name="play_song_text">请先播放歌曲</string>
     <string name="setting_song_text">歌词设置成功</string>
 
+    //
+    <string name="select_lrc_text">选择歌词</string>
+
     //歌曲详情窗口
     <string name="singer_text">歌手</string>
     <string name="fileext_text">格式</string>
