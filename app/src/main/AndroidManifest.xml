@@ -20,7 +20,7 @@
 
     <application
         android:name="com.zlm.hp.application.HPApplication"
-        android:allowBackup="true"
+        android:allowBackup="false"
         android:hardwareAccelerated="false"
         android:icon="@mipmap/ic_launcher"
         android:label="@string/app_name"
