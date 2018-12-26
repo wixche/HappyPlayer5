@@ -2116,6 +2116,9 @@ public class LrcActivity extends BaseActivity {
 
     @Override
     public void finish() {
+        if(mExtraLrcTypeHandler != null){
+            mExtraLrcTypeHandler.removeCallbacksAndMessages(null);
+        }
         mSingerImageView.release();
         mManyLineLyricsView.release();
         destroyReceiver();
