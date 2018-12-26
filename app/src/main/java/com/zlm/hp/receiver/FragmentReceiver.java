@@ -7,6 +7,7 @@ import android.content.IntentFilter;
 import android.os.Bundle;
 import android.text.TextUtils;
 
+import com.zlm.hp.constants.Constants;
 import com.zlm.hp.entity.RankInfo;
 import com.zlm.hp.entity.SpecialInfo;
 import com.zlm.hp.fragment.SongFragment;
@@ -94,7 +95,7 @@ public class FragmentReceiver {
                 }
             }
         };
-        context.registerReceiver(mBroadcastReceiver, mIntentFilter);
+        context.registerReceiver(mBroadcastReceiver, mIntentFilter, Constants.RECEIVER_PERMISSION, null);
     }
 
     /**
@@ -112,7 +113,7 @@ public class FragmentReceiver {
             intent.putExtra(bundleKey, bundleValue);
         }
         intent.setFlags(Intent.FLAG_INCLUDE_STOPPED_PACKAGES);
-        context.sendBroadcast(intent);
+        context.sendBroadcast(intent, Constants.RECEIVER_PERMISSION);
     }
 
     /**

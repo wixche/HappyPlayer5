@@ -7,6 +7,7 @@ import android.content.IntentFilter;
 import android.os.Bundle;
 import android.text.TextUtils;
 
+import com.zlm.hp.constants.Constants;
 import com.zlm.hp.entity.TimerInfo;
 
 /**
@@ -93,7 +94,7 @@ public class AppSystemReceiver {
                 }
             }
         };
-        context.registerReceiver(mBroadcastReceiver, mIntentFilter);
+        context.registerReceiver(mBroadcastReceiver, mIntentFilter, Constants.RECEIVER_PERMISSION, null);
     }
 
     /**
@@ -111,7 +112,7 @@ public class AppSystemReceiver {
             intent.putExtra(bundleKey, bundleValue);
         }
         intent.setFlags(Intent.FLAG_INCLUDE_STOPPED_PACKAGES);
-        context.sendBroadcast(intent);
+        context.sendBroadcast(intent, Constants.RECEIVER_PERMISSION);
     }
 
     /**

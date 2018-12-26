@@ -9,6 +9,7 @@ import android.text.TextUtils;
 
 import com.zlm.down.entity.DownloadTask;
 import com.zlm.hp.constants.ConfigInfo;
+import com.zlm.hp.constants.Constants;
 import com.zlm.hp.entity.AudioInfo;
 
 
@@ -243,7 +244,7 @@ public class AudioBroadcastReceiver {
                 }
             }
         };
-        context.registerReceiver(mBroadcastReceiver, mIntentFilter);
+        context.registerReceiver(mBroadcastReceiver, mIntentFilter, Constants.RECEIVER_PERMISSION, null);
     }
 
     /**
@@ -261,7 +262,7 @@ public class AudioBroadcastReceiver {
             intent.putExtra(bundleKey, bundleValue);
         }
         intent.setFlags(Intent.FLAG_INCLUDE_STOPPED_PACKAGES);
-        context.sendBroadcast(intent);
+        context.sendBroadcast(intent, Constants.RECEIVER_PERMISSION);
     }
 
 
@@ -380,6 +381,7 @@ public class AudioBroadcastReceiver {
 
     /**
      * 歌曲下载中
+     *
      * @param context
      * @param task
      */
@@ -392,6 +394,7 @@ public class AudioBroadcastReceiver {
 
     /**
      * 歌曲等待中
+     *
      * @param context
      * @param task
      */
@@ -404,6 +407,7 @@ public class AudioBroadcastReceiver {
 
     /**
      * 歌曲暂停中
+     *
      * @param context
      * @param task
      */
@@ -416,6 +420,7 @@ public class AudioBroadcastReceiver {
 
     /**
      * 歌曲暂停中
+     *
      * @param context
      * @param task
      */
@@ -428,6 +433,7 @@ public class AudioBroadcastReceiver {
 
     /**
      * 歌曲完成
+     *
      * @param context
      * @param task
      */
@@ -440,6 +446,7 @@ public class AudioBroadcastReceiver {
 
     /**
      * 歌曲出错
+     *
      * @param context
      * @param task
      */
@@ -531,6 +538,7 @@ public class AudioBroadcastReceiver {
 
     /**
      * 喜欢歌曲
+     *
      * @param context
      * @param hash
      */

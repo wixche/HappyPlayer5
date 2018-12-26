@@ -38,4 +38,9 @@ public class Constants {
      * 锁屏权限
      */
     public final static String ASK_LOCK_PERMISSION = "AskLockPermission";
+
+    /**
+     * 动态广播自定义权限
+     */
+    public final static String RECEIVER_PERMISSION = "com.zlm.hp.permissions.RECEIVER";
 }

@@ -6,7 +6,8 @@
     <com.github.jdsjlzx.recyclerview.LRecyclerView
         android:id="@+id/recyclerView"
         android:layout_width="match_parent"
-        android:layout_height="match_parent"></com.github.jdsjlzx.recyclerview.LRecyclerView>
+        android:layout_height="match_parent"
+        android:paddingBottom="@dimen/bar_height"></com.github.jdsjlzx.recyclerview.LRecyclerView>
 
 
 </android.support.constraint.ConstraintLayout>

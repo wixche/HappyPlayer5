@@ -123,5 +123,5 @@ dependencies {
     /**
      * 第三方上拉加载更多，下拉刷新
      */
-    implementation 'com.github.jdsjlzx:LRecyclerView:1.5.0'
+    implementation 'com.github.zhangliangming:LRecyclerView:v1.0'
 }
