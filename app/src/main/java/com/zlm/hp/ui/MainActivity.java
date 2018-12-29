@@ -990,7 +990,10 @@ public class MainActivity extends BaseActivity {
         mToolLL.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-
+                Intent intent = new Intent(MainActivity.this, ToolActivity.class);
+                startActivity(intent);
+                //去掉动画
+                overridePendingTransition(0, 0);
             }
         });
 

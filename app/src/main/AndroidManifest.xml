@@ -18,13 +18,12 @@
     <uses-permission android:name="android.permission.ACCESS_FINE_LOCATION" />
     <uses-permission android:name="android.permission.ACCESS_COARSE_LOCATION" />
 
-
     <!-- 动态广播自定义权限 -->
     <uses-permission android:name="com.zlm.hp.permissions.RECEIVER" />
+
     <permission
         android:name="com.zlm.hp.permissions.RECEIVER"
-        android:protectionLevel="signature" >
-    </permission>
+        android:protectionLevel="signature"></permission>
 
     <application
         android:name="com.zlm.hp.application.HPApplication"
@@ -70,6 +69,7 @@
             android:screenOrientation="portrait"
             android:taskAffinity="com.zlm.lockscreen"
             android:theme="@style/LockScreenTheme" />
+        <activity android:name=".ToolActivity"></activity>
     </application>
 
 </manifest>

@@ -36,7 +36,6 @@ android {
     productFlavors {
     }
 
-
     //greendao设置相关参数
     greendao {
         schemaVersion 1
@@ -52,9 +51,9 @@ dependencies {
     androidTestImplementation('com.android.support.test.espresso:espresso-core:2.2.2', {
         exclude group: 'com.android.support', module: 'support-annotations'
     })
-    implementation 'com.android.support:appcompat-v7:28.+'
-    implementation 'com.android.support:support-v4:28.+'
-    implementation 'com.android.support:recyclerview-v7:28.+'
+    implementation 'com.android.support:appcompat-v7:28.0.0'
+    implementation 'com.android.support:support-v4:28.0.0'
+    implementation 'com.android.support:recyclerview-v7:28.0.0'
     testImplementation 'junit:junit:4.12'
     implementation 'com.android.support:multidex:1.0.1'
     //第三方bugly
@@ -70,19 +69,19 @@ dependencies {
     /**
      * 右滑动关闭
      */
-    implementation 'com.github.zhangliangming:SwipeBackLayout:v3.0'
+    implementation 'com.github.zhangliangming:SwipeBackLayout:v3.1'
     /**
      * 旋转界面
      */
-    implementation 'com.github.zhangliangming:RotateLayout:v3.1'
+    implementation 'com.github.zhangliangming:RotateLayout:v3.2'
     /**
      * 进度条
      */
-    implementation 'com.github.zhangliangming:SeekBar:v3.6'
+    implementation 'com.github.zhangliangming:SeekBar:v3.7'
     /**
      * 歌词
      */
-    implementation 'com.github.zhangliangming:HPLyrics:v1.53'
+    implementation 'com.github.zhangliangming:HPLyrics:v1.57'
     /**
      * 音频
      */
@@ -98,7 +97,7 @@ dependencies {
     /**
      * SlidingMenuLayout
      */
-    implementation 'com.github.zhangliangming:SlidingMenuLayout:v1.13'
+    implementation 'com.github.zhangliangming:SlidingMenuLayout:v1.14'
     /**
      * 第三方switch-button
      */
@@ -119,9 +118,9 @@ dependencies {
      * 第三方弹出窗口：jjdxm_dialogui
      */
     implementation 'com.github.zhangliangming:Dialog:v1.0'
-
     /**
      * 第三方上拉加载更多，下拉刷新
      */
     implementation 'com.github.zhangliangming:LRecyclerView:v1.0'
+
 }
