@@ -23,7 +23,7 @@
 
     <permission
         android:name="com.zlm.hp.permissions.RECEIVER"
-        android:protectionLevel="signature"></permission>
+        android:protectionLevel="signature" />
 
     <application
         android:name="com.zlm.hp.application.HPApplication"
@@ -69,7 +69,9 @@
             android:screenOrientation="portrait"
             android:taskAffinity="com.zlm.lockscreen"
             android:theme="@style/LockScreenTheme" />
-        <activity android:name=".ToolActivity"></activity>
+        <activity android:name=".ToolActivity" />
+        <activity android:name=".tool.LrcConverterActivity" />
+        <activity android:name=".tool.FileManagerActivity"></activity>
     </application>
 
 </manifest>

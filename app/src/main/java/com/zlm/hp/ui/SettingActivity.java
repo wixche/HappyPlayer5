@@ -81,6 +81,8 @@ public class SettingActivity extends BaseActivity {
 
             @Override
             public void finishActivity() {
+                if (mLoadingDialog != null)
+                    DialogUIUtils.dismiss(mLoadingDialog);
                 finish();
                 overridePendingTransition(0, 0);
             }

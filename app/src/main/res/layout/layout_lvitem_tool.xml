@@ -1,0 +1,47 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:background="#fff"
+    android:descendantFocusability="blocksDescendants"
+    android:orientation="vertical">
+
+
+    <com.zlm.hp.widget.ListItemRelativeLayout
+        android:id="@+id/itemBG"
+        android:layout_width="match_parent"
+        android:layout_height="@dimen/songitem_height"
+        android:clickable="true">
+
+        <com.zlm.hp.widget.IconfontTextView
+            android:id="@+id/tool_icon"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_centerVertical="true"
+            android:layout_margin="10dp"
+            android:text="@string/tab_tool_img"
+            android:textColor="#888"
+            android:textSize="35dp" />
+
+        <TextView
+            android:id="@+id/tool_name"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_centerVertical="true"
+            android:layout_margin="10dp"
+            android:layout_toRightOf="@+id/tool_icon"
+            android:layout_weight="1"
+            android:ellipsize="marquee"
+            android:singleLine="true"
+            android:text="工具名称"
+            android:textColor="#000"
+            android:textSize="18dp" />
+
+        <com.zlm.hp.widget.DividerView
+            android:layout_width="match_parent"
+            android:layout_height="1.5dip"
+            android:layout_alignLeft="@+id/content"
+            android:layout_alignParentBottom="true" />
+    </com.zlm.hp.widget.ListItemRelativeLayout>
+
+</LinearLayout>

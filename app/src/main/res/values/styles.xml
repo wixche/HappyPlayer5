@@ -35,4 +35,9 @@
         <item name="android:textStyle">bold</item>
     </style>
 
+    <style name="radioButton" parent="AppTheme">
+        <item name="colorControlNormal">@android:color/darker_gray</item>
+        <item name="colorControlActivated">@android:color/holo_green_light</item>
+    </style>
+
 </resources>

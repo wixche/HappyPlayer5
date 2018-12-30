@@ -1,0 +1,7 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string-array name="tool">
+        <item>{\""toolName\"":\""歌词转换器\"",\""packageName\"":\""com.zlm.hp.ui.tool.LrcConverterActivity\""}</item>
+        <item>{\""toolName\"":\""歌词制作器\"",\""packageName\"":\""\""}</item>
+    </string-array>
+</resources>

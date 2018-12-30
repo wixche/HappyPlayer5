@@ -55,6 +55,7 @@
     <string name="tab_tool_img">&#xe61d;</string>
     <string name="lrc_converter">歌词转换器</string>
     <string name="lrc_converter_img">&#xe75b;</string>
+    <string name="select_file">选择文件</string>
     <string name="make_lrc">歌词制作器</string>
     <string name="make_lrc_img">&#xe62e;</string>
     <string name="lrc_to_video">歌词图片生成器</string>

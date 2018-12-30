@@ -37,6 +37,8 @@ android5.0及以上
 
 [更多效果图，点击此次查看:https://pan.baidu.com/s/1YkZssna3TO9hKAOXwvxXiw 提取码: dgtc](https://pan.baidu.com/s/1YkZssna3TO9hKAOXwvxXiw)
 
+![歌词转换器](https://i.imgur.com/rcwZtqF.png)
+
 ![新歌](https://i.imgur.com/4PzRnNz.png)
 
 ![写真、歌词](https://i.imgur.com/DtIgAde.png)
@@ -55,6 +57,8 @@ android5.0及以上
 - MV功能开发
 
 # 更新日志 #
+## 2018-12-30 ##
+- 添加歌词转换器
 
 ## 2018-12-22 ##
 - 添加下载页面、添加列表更多菜单功能、添加歌曲搜索功能
