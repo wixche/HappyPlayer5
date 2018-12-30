@@ -134,8 +134,9 @@
     <string name="select_song_text">请选择歌曲</string>
     <string name="play_song_text">请先播放歌曲</string>
     <string name="setting_song_text">歌词设置成功</string>
-
-    //
+    <string name="edit_lrc_text">编辑歌词</string>
+    <string name="play_lrc_text">敲打节奏</string>
+    <string name="pre_lrc_text">预览歌词</string>
     <string name="select_lrc_text">选择歌词</string>
 
     //歌曲详情窗口
@@ -150,13 +151,12 @@
 
     <string name="help_tip">Git：https://github.com/zhangliangming\nGithub：https://zhangliangming.github.io/\n简书：https://www.jianshu.com/u/1c6b49fb806b\nCSDN：https://mp.csdn.net/\n安卓巴士：http://www.apkbus.com/?278062\n联系方式：316257874@qq.com\n声明：仅用于学习用途</string>
 
-
+    //下载
     <string name="downloading_text">下载中</string>
     <string name="downloaded_text">下载完成</string>
     <string name="download_pause_text">点击暂停</string>
     <string name="download_wait_text">等待下载</string>
     <string name="download_goon_text">点击继续下载</string>
 
-    <!-- TODO: Remove or change this placeholder text -->
-    <string name="hello_blank_fragment">Hello blank fragment</string>
+
 </resources>

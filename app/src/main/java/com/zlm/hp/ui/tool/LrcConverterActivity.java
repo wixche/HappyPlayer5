@@ -22,7 +22,6 @@ import com.zlm.hp.lyrics.utils.FileUtils;
 import com.zlm.hp.lyrics.utils.LyricsIOUtils;
 import com.zlm.hp.ui.BaseActivity;
 import com.zlm.hp.ui.R;
-import com.zlm.hp.ui.SettingActivity;
 import com.zlm.hp.util.ResourceUtil;
 import com.zlm.libs.widget.SwipeBackLayout;
 

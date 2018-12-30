@@ -19,6 +19,10 @@
 
     </style>
 
+    <style name="MakeLrcTheme" parent="Base.Theme.AppCompat.Light">
+        <item name="android:windowNoTitle">true</item>
+    </style>
+
     <style name="LockScreenTheme" parent="AppTheme">
         <item name="android:colorBackgroundCacheHint">@null</item>
         <item name="android:backgroundDimEnabled">false</item>

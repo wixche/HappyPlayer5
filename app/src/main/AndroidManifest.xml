@@ -71,7 +71,11 @@
             android:theme="@style/LockScreenTheme" />
         <activity android:name=".ToolActivity" />
         <activity android:name=".tool.LrcConverterActivity" />
-        <activity android:name=".tool.FileManagerActivity"></activity>
+        <activity android:name=".tool.FileManagerActivity" />
+        <activity android:name=".MakeLrcSettingActivity" />
+        <activity
+            android:name=".MakeLrcActivity"
+            android:theme="@style/MakeLrcTheme"></activity>
     </application>
 
 </manifest>

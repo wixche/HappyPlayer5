@@ -21,7 +21,7 @@
             android:visibility="gone" />
 
         <include
-            layout="@layout/layout_search_lrc_title"
+            layout="@layout/layout_close_title"
             android:layout_width="match_parent"
             android:layout_height="@dimen/title_height"></include>
 

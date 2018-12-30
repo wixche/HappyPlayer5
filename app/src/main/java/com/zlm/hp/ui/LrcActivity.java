@@ -28,6 +28,7 @@ import com.zlm.hp.constants.ConfigInfo;
 import com.zlm.hp.db.util.AudioInfoDB;
 import com.zlm.hp.db.util.DownloadThreadInfoDB;
 import com.zlm.hp.entity.AudioInfo;
+import com.zlm.hp.entity.MakeInfo;
 import com.zlm.hp.lyrics.LyricsReader;
 import com.zlm.hp.lyrics.model.LyricsInfo;
 import com.zlm.hp.lyrics.model.LyricsTag;
@@ -1064,6 +1065,37 @@ public class LrcActivity extends BaseActivity {
     private void initMoreMenuView() {
         mViewStubMoreMenu = findViewById(R.id.vs_more_menu);
         mViewStubMoreMenu.inflate();
+
+        //制作歌词
+        ImageView makeLrcImg = findViewById(R.id.makelrc);
+        makeLrcImg.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                AudioInfo audioInfo = AudioPlayerManager.newInstance(mContext).getCurSong(mConfigInfo.getPlayHash());
+                if (audioInfo != null) {
+
+                    hideMoreMenuView();
+
+                    //如果当前歌曲正在播放，则停止播放
+                    if (AudioPlayerManager.newInstance(mContext).getPlayStatus() == AudioPlayerManager.PLAYING) {
+                        AudioPlayerManager.newInstance(mContext).pause();
+                    }
+
+                    //获取制作歌词所需的音频信息
+                    MakeInfo makeInfo = new MakeInfo();
+                    makeInfo.setAudioInfo(audioInfo);
+
+                    //打开制作歌词设置页面
+                    Intent intent = new Intent(LrcActivity.this, MakeLrcSettingActivity.class);
+                    intent.putExtra(MakeInfo.DATA_KEY, makeInfo);
+                    startActivity(intent);
+                    overridePendingTransition(0, 0);
+
+                } else {
+                    ToastUtil.showTextToast(mContext, getString(R.string.select_song_text));
+                }
+            }
+        });
 
         //搜索歌词
         ImageView lrcImgV = findViewById(R.id.search_lrc);

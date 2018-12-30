@@ -176,10 +176,10 @@ public class FileManagerActivity extends BaseActivity {
     /**
      * 返回上一级
      */
-    private void backParentFile() {
+    private boolean backParentFile() {
         if (mFilePathList.size() == 0) {
             loadFileData();
-            return;
+            return true;
         }
         String filePath = mFilePathList.get(mFilePathList.size() - 1);
         mFilePathList.remove(mFilePathList.size() - 1);
@@ -188,6 +188,7 @@ public class FileManagerActivity extends BaseActivity {
         } else {
             loadFileDirectoryData(filePath);
         }
+        return false;
     }
 
     /**
@@ -195,7 +196,7 @@ public class FileManagerActivity extends BaseActivity {
      *
      * @param filePath
      */
-    private void loadFileDirectoryData(String filePath) {
+    private synchronized void loadFileDirectoryData(String filePath) {
         Message msg = Message.obtain();
         msg.what = MESSAGE_WHAT_LOADFILEDIRECTORYDATA;
         msg.obj = filePath;
@@ -205,7 +206,7 @@ public class FileManagerActivity extends BaseActivity {
     /**
      * 加载文件数据
      */
-    private void loadFileData() {
+    private synchronized void loadFileData() {
         mWorkerHandler.sendEmptyMessage(MESSAGE_WHAT_LOADFILEDATA);
     }
 
@@ -312,7 +313,9 @@ public class FileManagerActivity extends BaseActivity {
 
     @Override
     public void onBackPressed() {
-        mSwipeBackLayout.closeView();
+        if (backParentFile()) {
+            mSwipeBackLayout.closeView();
+        }
     }
 
 }
