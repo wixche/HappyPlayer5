@@ -20,6 +20,16 @@
     </style>
 
     <style name="MakeLrcTheme" parent="Base.Theme.AppCompat.Light">
+        <!-- Customize your theme here. -->
+        <item name="colorPrimary">@color/colorPrimary</item>
+        <item name="colorPrimaryDark">@color/colorPrimaryDark</item>
+        <item name="colorAccent">@color/colorAccent</item>
+
+        <!--导航栏上的标题颜色-->
+        <item name="android:textColorPrimary">@android:color/black</item>
+        <!-- 去掉水波纹效果-->
+        <!-- <item name="android:selectableItemBackgroundBorderless">@null</item>-->
+
         <item name="android:windowNoTitle">true</item>
     </style>
 

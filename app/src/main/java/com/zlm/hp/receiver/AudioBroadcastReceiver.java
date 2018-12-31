@@ -216,6 +216,11 @@ public class AudioBroadcastReceiver {
      */
     public static final int ACTION_CODE_UPDATE_PLAYLIST = 35;
 
+    /**
+     * 歌词保存成功
+     */
+    public static final int ACTION_CODE_MAKE_SUCCESS = 36;
+
     private BroadcastReceiver mBroadcastReceiver;
     private IntentFilter mIntentFilter;
     private AudioReceiverListener mReceiverListener;
@@ -546,6 +551,17 @@ public class AudioBroadcastReceiver {
         Bundle bundle = new Bundle();
         bundle.putString(ACTION_DATA_KEY, hash);
         sendReceiver(context, ACTION_CODE_UPDATE_LIKE, ACTION_BUNDLEKEY, bundle);
+    }
+
+    /**
+     * 发送制作歌词成功广播
+     *
+     * @param context
+     */
+    public static void sendMakeLrcSuccessReceiver(Context context, String hash) {
+        Bundle bundle = new Bundle();
+        bundle.putString(ACTION_DATA_KEY, hash);
+        sendReceiver(context, ACTION_CODE_MAKE_SUCCESS, ACTION_BUNDLEKEY, bundle);
     }
 
 

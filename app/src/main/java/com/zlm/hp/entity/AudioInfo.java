@@ -165,6 +165,9 @@ public class AudioInfo implements Parcelable {
     }
 
     public String getTitle() {
+        if (getSingerName().equals("未知")) {
+            return getSongName();
+        }
         return getSingerName() + " - " + getSongName();
     }
 

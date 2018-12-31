@@ -138,6 +138,15 @@
     <string name="play_lrc_text">敲打节奏</string>
     <string name="pre_lrc_text">预览歌词</string>
     <string name="select_lrc_text">选择歌词</string>
+    <string name="check_lrc_text">请检测歌词是否有误</string>
+    <string name="lrc_null_text">请输入歌词!</string>
+    <string name="close_lrc_text">退出后本页面数据将丢弃!</string>
+    <string name="unfinish_lrc_text">歌词录制完成才可以预览!</string>
+    <string name="make_lrc_success">歌词保存成功!</string>
+    <string name="make_lrc_error">歌词保存失败!</string>
+    <string name="extra_lrc_1">翻译歌词</string>
+    <string name="extra_lrc_2">音译歌词</string>
+    <string name="def_lrc_null">请先制作歌词</string>
 
     //歌曲详情窗口
     <string name="singer_text">歌手</string>
@@ -157,6 +166,5 @@
     <string name="download_pause_text">点击暂停</string>
     <string name="download_wait_text">等待下载</string>
     <string name="download_goon_text">点击继续下载</string>
-
 
 </resources>

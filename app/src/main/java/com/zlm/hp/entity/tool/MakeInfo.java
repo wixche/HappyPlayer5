@@ -1,7 +1,9 @@
-package com.zlm.hp.entity;
+package com.zlm.hp.entity.tool;
 
 import android.os.Parcel;
 import android.os.Parcelable;
+
+import com.zlm.hp.entity.AudioInfo;
 
 /**
  * @Description: 制作歌词信息
@@ -12,8 +14,18 @@ public class MakeInfo implements Parcelable{
     /**
      *
      */
+
     public static final String DATA_KEY = "Data_Key";
     private AudioInfo audioInfo;
+    /**
+     * 默认歌词读取路径
+     */
+    private String lrcFilePath;
+    /**
+     * 保存歌词路径
+     */
+    private String saveLrcFilePath;
+
 
     public MakeInfo(){
 
@@ -21,11 +33,15 @@ public class MakeInfo implements Parcelable{
 
     protected MakeInfo(Parcel in) {
         audioInfo = in.readParcelable(AudioInfo.class.getClassLoader());
+        lrcFilePath = in.readString();
+        saveLrcFilePath = in.readString();
     }
 
     @Override
     public void writeToParcel(Parcel dest, int flags) {
         dest.writeParcelable(audioInfo, flags);
+        dest.writeString(lrcFilePath);
+        dest.writeString(saveLrcFilePath);
     }
 
     @Override
@@ -44,6 +60,22 @@ public class MakeInfo implements Parcelable{
             return new MakeInfo[size];
         }
     };
+
+    public String getSaveLrcFilePath() {
+        return saveLrcFilePath;
+    }
+
+    public void setSaveLrcFilePath(String saveLrcFilePath) {
+        this.saveLrcFilePath = saveLrcFilePath;
+    }
+
+    public String getLrcFilePath() {
+        return lrcFilePath;
+    }
+
+    public void setLrcFilePath(String lrcFilePath) {
+        this.lrcFilePath = lrcFilePath;
+    }
 
     public AudioInfo getAudioInfo() {
         return audioInfo;

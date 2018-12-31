@@ -424,12 +424,7 @@ public class MainActivity extends BaseActivity {
                             });
 
                             //加载歌词
-                            String keyWords = "";
-                            if (initAudioInfo.getSingerName().equals(getString(R.string.unknow))) {
-                                keyWords = initAudioInfo.getSongName();
-                            } else {
-                                keyWords = initAudioInfo.getTitle();
-                            }
+                            String keyWords = initAudioInfo.getTitle();
                             LyricsManager.newInstance(mContext).loadLyrics(keyWords, keyWords, initAudioInfo.getDuration() + "", initAudioInfo.getHash(), mConfigInfo.isWifi(), new AsyncHandlerTask(mUIHandler, mWorkerHandler), null);
 
                             if (mAdapter != null) {

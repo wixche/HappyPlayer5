@@ -2,6 +2,6 @@
 <resources>
     <string-array name="tool">
         <item>{\""toolName\"":\""歌词转换器\"",\""packageName\"":\""com.zlm.hp.ui.tool.LrcConverterActivity\""}</item>
-        <item>{\""toolName\"":\""歌词制作器\"",\""packageName\"":\""\""}</item>
+        <item>{\""toolName\"":\""歌词制作器\"",\""packageName\"":\""com.zlm.hp.ui.tool.LrcMakerActivity\""}</item>
     </string-array>
 </resources>

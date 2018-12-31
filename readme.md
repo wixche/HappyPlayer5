@@ -1,5 +1,5 @@
 # 简介 #
-乐乐音乐6.0主要是基于ijkplayer框架开发的Android音乐播放器，它支持多种音频格式和动感歌词。
+乐乐音乐6.0主要是基于ijkplayer框架开发的Android音乐播放器，它支持多种音频格式和动感歌词及制作动感歌词、翻译歌词和音译歌词。
 
 # 运行环境 #
 android5.0及以上
@@ -37,7 +37,15 @@ android5.0及以上
 
 [更多效果图，点击此次查看:https://pan.baidu.com/s/1YkZssna3TO9hKAOXwvxXiw 提取码: dgtc](https://pan.baidu.com/s/1YkZssna3TO9hKAOXwvxXiw)
 
-![歌词转换器](https://i.imgur.com/rcwZtqF.png)
+![制作音译歌词](https://i.imgur.com/s7MUO7T.png)
+
+![制作翻译歌词](https://i.imgur.com/eXpTpkd.png)
+
+![制作动感歌词](https://i.imgur.com/PKW9rc6.png)
+
+![歌词制作器](https://i.imgur.com/Ao93nFw.png)
+
+![歌词转换器](https://i.imgur.com/gmQAXnJ.png)
 
 ![新歌](https://i.imgur.com/4PzRnNz.png)
 
@@ -57,6 +65,9 @@ android5.0及以上
 - MV功能开发
 
 # 更新日志 #
+## 2018-01-01 ##
+- 添加制作动感歌词、翻译歌词和音译歌词功能
+
 ## 2018-12-31 ##
 - 添加制作歌词界面、修复全面屏情况下，输入法遮挡底部布局的问题
 

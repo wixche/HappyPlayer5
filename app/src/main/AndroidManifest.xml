@@ -74,8 +74,16 @@
         <activity android:name=".tool.FileManagerActivity" />
         <activity android:name=".MakeLrcSettingActivity" />
         <activity
-            android:name=".MakeLrcActivity"
-            android:theme="@style/MakeLrcTheme"></activity>
+            android:name=".tool.MakeLrcActivity"
+            android:theme="@style/MakeLrcTheme" />
+        <activity
+            android:name=".tool.MakeTranslateLrcActivity"
+            android:theme="@style/MakeLrcTheme" />
+        <activity
+            android:name=".tool.MakeTransliterationLrcActivity"
+            android:theme="@style/MakeLrcTheme" />
+        <activity android:name=".tool.LrcMakerActivity" />
+
     </application>
 
 </manifest>

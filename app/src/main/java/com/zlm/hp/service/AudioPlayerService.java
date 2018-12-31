@@ -401,12 +401,7 @@ public class AudioPlayerService extends Service {
 
             case AudioBroadcastReceiver.ACTION_CODE_INIT:
                 //初始化
-                String titleName = "";
-                if (audioInfo.getSingerName().equals(getString(R.string.unknow))) {
-                    titleName = audioInfo.getSongName();
-                } else {
-                    titleName = audioInfo.getTitle();
-                }
+                String titleName = audioInfo.getTitle();
                 mNotifyPlayBarRemoteViews.setTextViewText(R.id.titleName,
                         titleName);
 

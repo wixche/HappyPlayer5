@@ -1,10 +1,9 @@
 <?xml version="1.0" encoding="utf-8"?>
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
-    xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:orientation="vertical"
-    tools:context="com.zlm.hp.fragment.tool.EditLrcFragment">
+    android:background="#ffffff"
+    android:orientation="vertical">
 
     <RelativeLayout
         android:layout_width="match_parent"
@@ -52,34 +51,49 @@
 
     </RelativeLayout>
 
+    <View
+
+        android:layout_width="match_parent"
+        android:layout_height="2dp"
+        android:layout_marginTop="5dp"
+        android:background="#f3f3f3"></View>
 
     <RelativeLayout
-        android:layout_width="fill_parent"
-        android:layout_height="fill_parent"
-        android:orientation="vertical">
+        android:layout_width="match_parent"
+        android:layout_height="match_parent">
 
 
-        <EditText
-            android:id="@+id/lrctext_edittext"
+        <com.zlm.hp.widget.LinearLayoutRecyclerView
+            android:id="@+id/listview"
             android:layout_width="match_parent"
             android:layout_height="match_parent"
-            android:layout_above="@+id/goto_play"
-            android:layout_marginLeft="14dp"
-            android:layout_marginRight="14dp"
-            android:background="#e0e0e0"
-            android:gravity="left|top" />
+            android:layout_above="@+id/line" />
 
+        <View
+            android:id="@+id/line"
+            android:layout_width="match_parent"
+            android:layout_height="2dp"
+            android:layout_above="@+id/bottom"
+            android:layout_marginTop="5dp"
+            android:background="#f3f3f3"></View>
 
-        <Button
-            android:id="@+id/goto_play"
+        <LinearLayout
+            android:id="@+id/bottom"
             android:layout_width="match_parent"
             android:layout_height="60dp"
             android:layout_alignParentBottom="true"
-            android:layout_marginBottom="10dp"
-            android:layout_marginLeft="10dp"
-            android:layout_marginRight="10dp"
-            android:text="打节奏" />
+            android:orientation="horizontal">
+
+            <Button
+                android:id="@+id/preBtn"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:layout_weight="1"
+                android:text="预览" />
+
+        </LinearLayout>
+
+
     </RelativeLayout>
-
-
 </LinearLayout>
+

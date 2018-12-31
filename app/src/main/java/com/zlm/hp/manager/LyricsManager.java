@@ -124,6 +124,14 @@ public class LyricsManager {
     }
 
     /**
+     *
+     * @param hash
+     */
+    public void remove(String hash){
+        mLyricsReaderCache.remove(hash);
+    }
+
+    /**
      * 获取歌词读取器
      *
      * @param hash

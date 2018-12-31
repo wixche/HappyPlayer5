@@ -25,14 +25,17 @@ import com.zlm.hp.adapter.PopPlayListAdapter;
 import com.zlm.hp.async.AsyncHandlerTask;
 import com.zlm.hp.audio.utils.MediaUtil;
 import com.zlm.hp.constants.ConfigInfo;
+import com.zlm.hp.constants.ResourceConstants;
 import com.zlm.hp.db.util.AudioInfoDB;
 import com.zlm.hp.db.util.DownloadThreadInfoDB;
 import com.zlm.hp.entity.AudioInfo;
-import com.zlm.hp.entity.MakeInfo;
+import com.zlm.hp.entity.tool.MakeInfo;
 import com.zlm.hp.lyrics.LyricsReader;
 import com.zlm.hp.lyrics.model.LyricsInfo;
 import com.zlm.hp.lyrics.model.LyricsTag;
+import com.zlm.hp.lyrics.utils.FileUtils;
 import com.zlm.hp.lyrics.utils.LyricsIOUtils;
+import com.zlm.hp.lyrics.utils.LyricsUtils;
 import com.zlm.hp.lyrics.widget.AbstractLrcView;
 import com.zlm.hp.lyrics.widget.ManyLyricsView;
 import com.zlm.hp.manager.AudioPlayerManager;
@@ -42,6 +45,7 @@ import com.zlm.hp.manager.OnLineAudioManager;
 import com.zlm.hp.receiver.AudioBroadcastReceiver;
 import com.zlm.hp.util.ColorUtil;
 import com.zlm.hp.util.ImageUtil;
+import com.zlm.hp.util.ResourceUtil;
 import com.zlm.hp.util.ToastUtil;
 import com.zlm.hp.widget.ButtonRelativeLayout;
 import com.zlm.hp.widget.IconfontImageButtonTextView;
@@ -53,6 +57,7 @@ import com.zlm.libs.widget.CustomSeekBar;
 import com.zlm.libs.widget.MusicSeekBar;
 import com.zlm.libs.widget.RotateLayout;
 
+import java.io.File;
 import java.util.List;
 import java.util.Map;
 
@@ -1083,7 +1088,24 @@ public class LrcActivity extends BaseActivity {
 
                     //获取制作歌词所需的音频信息
                     MakeInfo makeInfo = new MakeInfo();
-                    makeInfo.setAudioInfo(audioInfo);
+                    AudioInfo temp = new AudioInfo();
+                    temp.setHash(audioInfo.getHash());
+                    if (temp.getType() == AudioInfo.TYPE_LOCAL) {
+                        temp.setFilePath(audioInfo.getFilePath());
+                    } else {
+                        String taskTempPath = ResourceUtil.getFilePath(mContext, ResourceConstants.PATH_CACHE_AUDIO, audioInfo.getHash() + ".temp");
+                        temp.setFilePath(taskTempPath);
+                    }
+                    makeInfo.setAudioInfo(temp);
+                    //默认歌词路径
+                    String fileName = audioInfo.getTitle();
+                    File lrcFile = LyricsUtils.getLrcFile(fileName, ResourceUtil.getFilePath(mContext, ResourceConstants.PATH_LYRICS, null));
+                    if (lrcFile != null && lrcFile.exists()) {
+                        makeInfo.setLrcFilePath(lrcFile.getPath());
+                        //保存歌词路径
+                        String saveLrcFilePath = lrcFile.getParent() + File.separator + FileUtils.removeExt(lrcFile.getName()) + ".hrc";
+                        makeInfo.setSaveLrcFilePath(saveLrcFilePath);
+                    }
 
                     //打开制作歌词设置页面
                     Intent intent = new Intent(LrcActivity.this, MakeLrcSettingActivity.class);
@@ -1862,12 +1884,7 @@ public class LrcActivity extends BaseActivity {
                     LyricsReader oldLyricsReader = mManyLineLyricsView.getLyricsReader();
                     if (oldLyricsReader == null || !oldLyricsReader.getHash().equals(initAudioInfo.getHash())) {
                         //加载歌词
-                        String keyWords = "";
-                        if (initAudioInfo.getSingerName().equals(getString(R.string.unknow))) {
-                            keyWords = initAudioInfo.getSongName();
-                        } else {
-                            keyWords = initAudioInfo.getTitle();
-                        }
+                        String keyWords = initAudioInfo.getTitle();
                         LyricsManager.newInstance(mContext).loadLyrics(keyWords, keyWords, initAudioInfo.getDuration() + "", initAudioInfo.getHash(), mConfigInfo.isWifi(), new AsyncHandlerTask(mUIHandler, mWorkerHandler), null);
                         //加载中
                         mManyLineLyricsView.initLrcData();
@@ -2085,6 +2102,23 @@ public class LrcActivity extends BaseActivity {
                     mLikeMenuBtn.setVisibility(View.GONE);
                 }
                 break;
+            case AudioBroadcastReceiver.ACTION_CODE_MAKE_SUCCESS:
+                //歌词制作成功
+                Bundle makeBundle = intent.getBundleExtra(AudioBroadcastReceiver.ACTION_BUNDLEKEY);
+                String lrchash = makeBundle.getString(AudioBroadcastReceiver.ACTION_DATA_KEY);
+                LyricsManager.newInstance(mContext).remove(lrchash);
+                if(mConfigInfo.getPlayHash().equals(lrchash)){
+
+                    AudioInfo lrcAudioInfo = AudioPlayerManager.newInstance(mContext).getCurSong(lrchash);
+                    //加载歌词
+                    String keyWords = lrcAudioInfo.getTitle();
+                    LyricsManager.newInstance(mContext).loadLyrics(keyWords, keyWords, lrcAudioInfo.getDuration() + "", lrcAudioInfo.getHash(), mConfigInfo.isWifi(), new AsyncHandlerTask(mUIHandler, mWorkerHandler), null);
+                    //加载中
+                    mManyLineLyricsView.initLrcData();
+                    mManyLineLyricsView.setLrcStatus(AbstractLrcView.LRCSTATUS_LOADING);
+                }
+
+                break;
         }
     }
 
@@ -2148,7 +2182,7 @@ public class LrcActivity extends BaseActivity {
 
     @Override
     public void finish() {
-        if(mExtraLrcTypeHandler != null){
+        if (mExtraLrcTypeHandler != null) {
             mExtraLrcTypeHandler.removeCallbacksAndMessages(null);
         }
         mSingerImageView.release();

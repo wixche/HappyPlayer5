@@ -395,9 +395,6 @@ public class LrcFragment extends BaseFragment {
 
                     //歌词文件名
                     String fileName = mAudioInfo.getTitle();
-                    if (mAudioInfo.getSingerName().equals(getString(R.string.unknow))) {
-                        fileName = mAudioInfo.getSongName();
-                    }
                     String lrcFilePath = ResourceUtil.getFilePath(mContext, ResourceConstants.PATH_LYRICS, fileName + ".krc");
                     mManyLineLyricsView.getLyricsReader().setLrcFilePath(lrcFilePath);
                     LyricsManager.newInstance(mContext).setLyricsReader(hash, mManyLineLyricsView.getLyricsReader());
@@ -448,9 +445,6 @@ public class LrcFragment extends BaseFragment {
                         String hash = mAudioInfo.getHash();
                         //歌词文件名
                         String fileName = mAudioInfo.getTitle();
-                        if (mAudioInfo.getSingerName().equals(getString(R.string.unknow))) {
-                            fileName = mAudioInfo.getSongName();
-                        }
                         String lrcFilePath = ResourceUtil.getFilePath(mContext, ResourceConstants.PATH_LYRICS, fileName + ".krc");
                         //
                         LyricsReader lyricsReader = new LyricsReader();

@@ -3,13 +3,21 @@ package com.zlm.hp.ui;
 import android.content.Intent;
 import android.os.Message;
 import android.os.Bundle;
+import android.text.TextUtils;
 import android.view.View;
 import android.widget.Button;
 import android.widget.ImageView;
 import android.widget.TextView;
 
-import com.zlm.hp.entity.MakeInfo;
+import com.zlm.hp.entity.tool.MakeInfo;
+import com.zlm.hp.lyrics.LyricsReader;
+import com.zlm.hp.ui.tool.MakeLrcActivity;
+import com.zlm.hp.ui.tool.MakeTranslateLrcActivity;
+import com.zlm.hp.ui.tool.MakeTransliterationLrcActivity;
+import com.zlm.hp.util.ToastUtil;
 import com.zlm.libs.widget.SwipeBackLayout;
+
+import java.io.File;
 
 /**
  * @Description: 制作歌词设置页面
@@ -43,6 +51,13 @@ public class MakeLrcSettingActivity extends BaseActivity {
      */
     private MakeInfo mMakeInfo;
 
+    private LyricsReader mLyricsReader;
+
+    /**
+     * 加载歌词
+     */
+    private final int MESSAGE_WHAT_LOADLRC = 0;
+
 
     @Override
     protected int setContentLayoutResID() {
@@ -64,7 +79,7 @@ public class MakeLrcSettingActivity extends BaseActivity {
         TextView titleView = findViewById(R.id.title);
         titleView.setText(getString(R.string.make_lrc_text));
 
-        //
+        //获取制作歌词数据
         mMakeInfo = getIntent().getParcelableExtra(MakeInfo.DATA_KEY);
 
         //返回
@@ -86,21 +101,8 @@ public class MakeLrcSettingActivity extends BaseActivity {
                         MakeLrcActivity.class);
                 lrcMakeIntent.putExtra(MakeInfo.DATA_KEY, mMakeInfo);
                 startActivity(lrcMakeIntent);
-                //去掉动画
-                overridePendingTransition(0, 0);
-
-                new Thread() {
-                    @Override
-                    public void run() {
-                        try {
-                            Thread.sleep(500);
-                        } catch (InterruptedException e) {
-                            e.printStackTrace();
-                        }
-                        finish();
-                    }
-                }.start();
-
+                overridePendingTransition(R.anim.in_from_bottom, 0);
+                finish();
             }
         });
 
@@ -109,7 +111,18 @@ public class MakeLrcSettingActivity extends BaseActivity {
         mMakeTranslateLrcBtn.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-
+                if (mLyricsReader == null || mLyricsReader.getLrcLineInfos() == null || mLyricsReader.getLrcLineInfos().size() == 0) {
+                    //没有默认歌词，不可制作
+                    ToastUtil.showTextToast(mContext, getString(R.string.def_lrc_null));
+                } else {
+                    //打开歌词制作界面
+                    Intent lrcMakeIntent = new Intent(MakeLrcSettingActivity.this,
+                            MakeTranslateLrcActivity.class);
+                    lrcMakeIntent.putExtra(MakeInfo.DATA_KEY, mMakeInfo);
+                    startActivity(lrcMakeIntent);
+                    overridePendingTransition(R.anim.in_from_bottom, 0);
+                    finish();
+                }
             }
         });
 
@@ -118,9 +131,21 @@ public class MakeLrcSettingActivity extends BaseActivity {
         mMakeTransliterationLrcBtn.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-
+                if (mLyricsReader == null || mLyricsReader.getLrcLineInfos() == null || mLyricsReader.getLrcLineInfos().size() == 0) {
+                    //没有默认歌词，不可制作
+                    ToastUtil.showTextToast(mContext, getString(R.string.def_lrc_null));
+                } else {
+                    //打开歌词制作界面
+                    Intent lrcMakeIntent = new Intent(MakeLrcSettingActivity.this,
+                            MakeTransliterationLrcActivity.class);
+                    lrcMakeIntent.putExtra(MakeInfo.DATA_KEY, mMakeInfo);
+                    startActivity(lrcMakeIntent);
+                    overridePendingTransition(R.anim.in_from_bottom, 0);
+                    finish();
+                }
             }
         });
+        mWorkerHandler.sendEmptyMessage(MESSAGE_WHAT_LOADLRC);
     }
 
     @Override
@@ -130,7 +155,20 @@ public class MakeLrcSettingActivity extends BaseActivity {
 
     @Override
     protected void handleWorkerMessage(Message msg) {
+        switch (msg.what) {
+            case MESSAGE_WHAT_LOADLRC:
 
+                String lrcFilePath = mMakeInfo.getLrcFilePath();
+                if (!TextUtils.isEmpty(lrcFilePath)) {
+                    File lrcFile = new File(lrcFilePath);
+                    if (lrcFile != null && lrcFile.exists()) {
+                        mLyricsReader = new LyricsReader();
+                        mLyricsReader.loadLrc(lrcFile);
+                    }
+
+                }
+                break;
+        }
     }
 
     @Override

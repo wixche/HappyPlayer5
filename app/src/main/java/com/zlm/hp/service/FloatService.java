@@ -785,12 +785,7 @@ public class FloatService extends Service {
                     LyricsReader oldLyricsReader = mFloatLyricsView.getLyricsReader();
                     if (oldLyricsReader == null || !oldLyricsReader.getHash().equals(initAudioInfo.getHash())) {
                         //加载歌词
-                        String keyWords = "";
-                        if (initAudioInfo.getSingerName().equals(getString(R.string.unknow))) {
-                            keyWords = initAudioInfo.getSongName();
-                        } else {
-                            keyWords = initAudioInfo.getTitle();
-                        }
+                        String keyWords = initAudioInfo.getTitle();
                         LyricsManager.newInstance(getApplicationContext()).loadLyrics(keyWords, keyWords, initAudioInfo.getDuration() + "", initAudioInfo.getHash(), mConfigInfo.isWifi(), new AsyncHandlerTask(mUIHandler, mWorkerHandler), null);
                         //加载中
                         mFloatLyricsView.initLrcData();
