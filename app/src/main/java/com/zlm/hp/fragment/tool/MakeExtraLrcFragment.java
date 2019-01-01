@@ -463,9 +463,9 @@ public class MakeExtraLrcFragment extends BaseFragment {
                         //翻译
                         String extraLineLyrics = extraLrcLineInfos.get(i).getLineLyrics();
                         if (StringUtils.isNotBlank(extraLineLyrics)) {
-                            makeExtraLrcLineInfo.setExtraLineLyrics("");
-                        } else {
                             makeExtraLrcLineInfo.setExtraLineLyrics(extraLineLyrics);
+                        } else {
+                            makeExtraLrcLineInfo.setExtraLineLyrics("");
                         }
                     }
                 }

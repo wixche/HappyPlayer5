@@ -188,6 +188,9 @@ public class LrcActivity extends BaseActivity {
     private IconfontImageButtonTextView mLikeMenuBtn;
     private IconfontImageButtonTextView mUnLikeMenuBtn;
 
+    //mv
+    private IconfontImageButtonTextView mMvMenuBtn;
+
     //下载
     private ImageView mDownloadImg;
     private ImageView mDownloadedImg;
@@ -738,6 +741,22 @@ public class LrcActivity extends BaseActivity {
                         initPopPlayListViews();
                     }
                     showPopPlayListView();
+                }
+            }
+        });
+
+        //mv
+        mMvMenuBtn = findViewById(R.id.mv_menu);
+        mMvMenuBtn.setConvert(false);
+        mMvMenuBtn.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                AudioInfo audioInfo = AudioPlayerManager.newInstance(mContext).getCurSong(mConfigInfo.getPlayHash());
+                if (audioInfo != null) {
+                    String mvHash = audioInfo.getMvHash();
+                    if (!TextUtils.isEmpty(mvHash)) {
+                        //不为空
+                    }
                 }
             }
         });
@@ -1843,6 +1862,9 @@ public class LrcActivity extends BaseActivity {
                 mUnLikeMenuBtn.setVisibility(View.VISIBLE);
                 mLikeMenuBtn.setVisibility(View.GONE);
 
+                //mv
+                mMvMenuBtn.setConvert(false);
+
                 reshDownloadView(null);
 
                 if (mAdapter != null)
@@ -1868,6 +1890,14 @@ public class LrcActivity extends BaseActivity {
                     } else {
                         mUnLikeMenuBtn.setVisibility(View.VISIBLE);
                         mLikeMenuBtn.setVisibility(View.GONE);
+                    }
+
+                    if (TextUtils.isEmpty(initAudioInfo.getMvHash())) {
+                        //mv
+                        mMvMenuBtn.setConvert(false);
+                    } else {
+                        //mv
+                        mMvMenuBtn.setConvert(true);
                     }
 
                     //
@@ -2107,7 +2137,7 @@ public class LrcActivity extends BaseActivity {
                 Bundle makeBundle = intent.getBundleExtra(AudioBroadcastReceiver.ACTION_BUNDLEKEY);
                 String lrchash = makeBundle.getString(AudioBroadcastReceiver.ACTION_DATA_KEY);
                 LyricsManager.newInstance(mContext).remove(lrchash);
-                if(mConfigInfo.getPlayHash().equals(lrchash)){
+                if (mConfigInfo.getPlayHash().equals(lrchash)) {
 
                     AudioInfo lrcAudioInfo = AudioPlayerManager.newInstance(mContext).getCurSong(lrchash);
                     //加载歌词
