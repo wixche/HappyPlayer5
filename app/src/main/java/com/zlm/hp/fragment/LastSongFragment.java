@@ -207,21 +207,24 @@ public class LastSongFragment extends BaseFragment {
      * @param httpReturnResult
      */
     private void handleLoadData(HttpReturnResult httpReturnResult) {
-        int pageSize = 0;
+
         if (!httpReturnResult.isSuccessful()) {
             ToastUtil.showTextToast(mContext, httpReturnResult.getErrorMsg());
         } else {
             mDatas.clear();
             Map<String, Object> returnResult = (Map<String, Object>) httpReturnResult.getResult();
             List<AudioInfo> lists = (List<AudioInfo>) returnResult.get("rows");
-            pageSize = lists.size();
+            int pageSize = lists.size();
             for (int i = 0; i < pageSize; i++) {
                 mDatas.add(lists.get(i));
             }
+
             ((AudioAdapter) (mAdapter.getInnerAdapter())).resetMenuOpenIndex();
+            mRecyclerView.refreshComplete(pageSize);
             mAdapter.notifyDataSetChanged();
         }
-        mRecyclerView.refreshComplete(pageSize);
+        mRecyclerView.setLoadMoreEnabled(false);
+
         showContentView();
     }
 

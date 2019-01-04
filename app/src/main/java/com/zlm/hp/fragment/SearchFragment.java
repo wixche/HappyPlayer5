@@ -329,7 +329,6 @@ public class SearchFragment extends BaseFragment {
      * @param httpReturnResult
      */
     private void handleLoadMoreData(HttpReturnResult httpReturnResult) {
-        int pageSize = 0;
         if (!httpReturnResult.isSuccessful()) {
             ToastUtil.showTextToast(mContext, httpReturnResult.getErrorMsg());
         } else {
@@ -337,7 +336,7 @@ public class SearchFragment extends BaseFragment {
 
             Map<String, Object> returnResult = (Map<String, Object>) httpReturnResult.getResult();
             List<AudioInfo> lists = (List<AudioInfo>) returnResult.get("rows");
-            pageSize = lists.size();
+            int pageSize = lists.size();
             if (lists == null || pageSize == 0) {
                 mRecyclerView.setNoMore(true);
             } else {
@@ -345,10 +344,10 @@ public class SearchFragment extends BaseFragment {
                     mDatas.add(lists.get(i));
                 }
                 ((AudioAdapter) (mAdapter.getInnerAdapter())).resetMenuOpenIndex();
+                mRecyclerView.refreshComplete(pageSize);
                 mAdapter.notifyDataSetChanged();
             }
         }
-        mRecyclerView.refreshComplete(pageSize);
     }
 
     /**

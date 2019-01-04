@@ -747,15 +747,15 @@ public class LrcActivity extends BaseActivity {
 
         //mv
         mMvMenuBtn = findViewById(R.id.mv_menu);
-        mMvMenuBtn.setConvert(false);
+        mMvMenuBtn.setConvert(true);
         mMvMenuBtn.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
                 AudioInfo audioInfo = AudioPlayerManager.newInstance(mContext).getCurSong(mConfigInfo.getPlayHash());
                 if (audioInfo != null) {
-                    String mvHash = audioInfo.getMvHash();
-                    if (!TextUtils.isEmpty(mvHash)) {
-                        //不为空
+                    //如果当前歌曲正在播放，则停止播放
+                    if (AudioPlayerManager.newInstance(mContext).getPlayStatus() == AudioPlayerManager.PLAYING) {
+                        AudioPlayerManager.newInstance(mContext).pause();
                     }
                 }
             }
@@ -1862,9 +1862,6 @@ public class LrcActivity extends BaseActivity {
                 mUnLikeMenuBtn.setVisibility(View.VISIBLE);
                 mLikeMenuBtn.setVisibility(View.GONE);
 
-                //mv
-                mMvMenuBtn.setConvert(false);
-
                 reshDownloadView(null);
 
                 if (mAdapter != null)
@@ -1890,14 +1887,6 @@ public class LrcActivity extends BaseActivity {
                     } else {
                         mUnLikeMenuBtn.setVisibility(View.VISIBLE);
                         mLikeMenuBtn.setVisibility(View.GONE);
-                    }
-
-                    if (TextUtils.isEmpty(initAudioInfo.getMvHash())) {
-                        //mv
-                        mMvMenuBtn.setConvert(false);
-                    } else {
-                        //mv
-                        mMvMenuBtn.setConvert(true);
                     }
 
                     //

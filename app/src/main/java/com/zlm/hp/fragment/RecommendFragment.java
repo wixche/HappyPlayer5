@@ -125,20 +125,21 @@ public class RecommendFragment extends BaseFragment {
      * @param httpReturnResult
      */
     private void handleLoadData(HttpReturnResult httpReturnResult) {
-        int pageSize = 0;
+
         if (!httpReturnResult.isSuccessful()) {
             ToastUtil.showTextToast(mContext, httpReturnResult.getErrorMsg());
         } else {
             mDatas.clear();
             Map<String, Object> returnResult = (Map<String, Object>) httpReturnResult.getResult();
             List<RankInfo> lists = (List<RankInfo>) returnResult.get("rows");
-            pageSize = lists.size();
+            int pageSize = lists.size();
             for (int i = 0; i < pageSize; i++) {
                 mDatas.add(lists.get(i));
             }
+            mRecyclerView.refreshComplete(pageSize);
             mAdapter.notifyDataSetChanged();
         }
-        mRecyclerView.refreshComplete(pageSize);
+        mRecyclerView.setLoadMoreEnabled(false);
         showContentView();
     }
 
