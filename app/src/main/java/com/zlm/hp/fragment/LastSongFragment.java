@@ -210,6 +210,9 @@ public class LastSongFragment extends BaseFragment {
 
         if (!httpReturnResult.isSuccessful()) {
             ToastUtil.showTextToast(mContext, httpReturnResult.getErrorMsg());
+
+            mRecyclerView.refreshComplete(0);
+            mAdapter.notifyDataSetChanged();
         } else {
             mDatas.clear();
             Map<String, Object> returnResult = (Map<String, Object>) httpReturnResult.getResult();
@@ -245,7 +248,7 @@ public class LastSongFragment extends BaseFragment {
     private void loadRefreshData() {
 
         try {
-            Thread.sleep(200);
+            Thread.sleep(100);
         } catch (InterruptedException e) {
             e.printStackTrace();
         }

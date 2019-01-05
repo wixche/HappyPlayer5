@@ -33,6 +33,8 @@ public class MVAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> {
     private Context mContext;
     private ArrayList<VideoInfo> mDatas;
 
+    private OnClickListener mOnClickListener;
+
     public MVAdapter(WeakRefHandler uiHandler, WeakRefHandler workerHandler, Context context, ArrayList<VideoInfo> datas) {
         this.mUIHandler = uiHandler;
         this.mWorkerHandler = workerHandler;
@@ -72,7 +74,9 @@ public class MVAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> {
         viewHolder.getListItemRelativeLayout().setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-
+                if (mOnClickListener != null) {
+                    mOnClickListener.openVideoView(videoInfo);
+                }
             }
         });
     }
@@ -80,6 +84,17 @@ public class MVAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> {
     @Override
     public int getItemCount() {
         return mDatas.size();
+    }
+
+    public void setOnClickListener(OnClickListener onClickListener) {
+        this.mOnClickListener = onClickListener;
+    }
+
+    /**
+     *
+     */
+    public interface OnClickListener {
+        void openVideoView(VideoInfo videoInfo);
     }
 
     class MvViewHolder extends RecyclerView.ViewHolder {

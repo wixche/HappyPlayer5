@@ -1,0 +1,42 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent">
+
+
+    <ImageView
+        android:id="@+id/backImg"
+        android:layout_width="@dimen/title_img_size"
+        android:layout_height="27dp"
+        android:layout_centerVertical="true"
+        android:layout_marginLeft="5dp"
+        android:background="@drawable/back_button"
+        android:clickable="true" />
+
+    <TextView
+        android:id="@+id/title"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:layout_toLeftOf="@+id/right_flag"
+        android:layout_toRightOf="@+id/backImg"
+        android:ellipsize="marquee"
+        android:gravity="center|center_horizontal"
+        android:singleLine="true"
+        android:text="标题"
+        android:textColor="#fff"
+        android:textSize="@dimen/title_size" />
+
+
+    <com.zlm.hp.widget.IconfontImageButtonTextView
+        android:id="@+id/right_flag"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_alignParentRight="true"
+        android:layout_centerVertical="true"
+        android:layout_marginRight="5dp"
+        android:text="@string/more_img"
+        android:textColor="#FFF"
+        android:textSize="@dimen/title_icon_size" />
+
+
+</RelativeLayout>

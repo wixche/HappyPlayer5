@@ -1,5 +1,6 @@
 package com.zlm.hp.ui;
 
+import android.content.Intent;
 import android.os.Bundle;
 import android.os.Message;
 import android.support.v7.widget.LinearLayoutManager;
@@ -8,6 +9,7 @@ import android.widget.ImageView;
 import android.widget.TextView;
 
 import com.github.jdsjlzx.interfaces.OnLoadMoreListener;
+import com.github.jdsjlzx.interfaces.OnNetWorkErrorListener;
 import com.github.jdsjlzx.interfaces.OnRefreshListener;
 import com.github.jdsjlzx.recyclerview.LRecyclerView;
 import com.github.jdsjlzx.recyclerview.LRecyclerViewAdapter;
@@ -130,6 +132,15 @@ public class SearchMVActivity extends BaseActivity {
         //
         mDatas = new ArrayList<VideoInfo>();
         mAdapter = new LRecyclerViewAdapter(new MVAdapter(mUIHandler, mWorkerHandler, mContext, mDatas));
+        ((MVAdapter) (mAdapter.getInnerAdapter())).setOnClickListener(new MVAdapter.OnClickListener() {
+            @Override
+            public void openVideoView(VideoInfo videoInfo) {
+                //打开视频界面
+                Intent intent = new Intent(SearchMVActivity.this, VideoActivity.class);
+                intent.putExtra(VideoInfo.DATA_KEY, videoInfo);
+                startActivity(intent);
+            }
+        });
         mRecyclerView.setAdapter(mAdapter);
 
         mRecyclerView.setOnRefreshListener(new OnRefreshListener() {
@@ -174,13 +185,20 @@ public class SearchMVActivity extends BaseActivity {
     private void handleLoadMoreData(HttpReturnResult httpReturnResult) {
         if (!httpReturnResult.isSuccessful()) {
             ToastUtil.showTextToast(mContext, httpReturnResult.getErrorMsg());
+            mRecyclerView.setOnNetWorkErrorListener(new OnNetWorkErrorListener() {
+                @Override
+                public void reload() {
+                    mWorkerHandler.sendEmptyMessage(LOADMOREDATA);
+                }
+            });
         } else {
             mPage++;
 
             Map<String, Object> returnResult = (Map<String, Object>) httpReturnResult.getResult();
             List<VideoInfo> lists = (List<VideoInfo>) returnResult.get("rows");
+            int total = (int) returnResult.get("total");
             int pageSize = lists.size();
-            if (lists == null || pageSize == 0) {
+            if (total <= mAdapter.getItemCount() || total == 0) {
                 mRecyclerView.setNoMore(true);
             } else {
                 for (int i = 0; i < pageSize; i++) {
@@ -200,6 +218,8 @@ public class SearchMVActivity extends BaseActivity {
     private void handleLoadData(HttpReturnResult httpReturnResult) {
         if (!httpReturnResult.isSuccessful()) {
             ToastUtil.showTextToast(mContext, httpReturnResult.getErrorMsg());
+            mRecyclerView.refreshComplete(0);
+            mAdapter.notifyDataSetChanged();
         } else {
             mDatas.clear();
             Map<String, Object> returnResult = (Map<String, Object>) httpReturnResult.getResult();
@@ -236,7 +256,7 @@ public class SearchMVActivity extends BaseActivity {
      */
     private void loadMoreData() {
         try {
-            Thread.sleep(200);
+            Thread.sleep(100);
         } catch (InterruptedException e) {
             e.printStackTrace();
         }
@@ -263,7 +283,7 @@ public class SearchMVActivity extends BaseActivity {
     private void loadRefreshData() {
 
         try {
-            Thread.sleep(200);
+            Thread.sleep(100);
         } catch (InterruptedException e) {
             e.printStackTrace();
         }

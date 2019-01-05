@@ -83,7 +83,12 @@
             android:name=".tool.MakeTransliterationLrcActivity"
             android:theme="@style/MakeLrcTheme" />
         <activity android:name=".tool.LrcMakerActivity" />
-        <activity android:name=".SearchMVActivity"></activity>
+        <activity
+            android:name=".SearchMVActivity"
+            android:configChanges="screenSize|keyboardHidden|orientation" />
+        <activity
+            android:name=".VideoActivity"
+            android:screenOrientation="landscape"></activity>
     </application>
 
 </manifest>

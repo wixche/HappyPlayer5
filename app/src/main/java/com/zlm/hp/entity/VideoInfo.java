@@ -16,6 +16,13 @@ import org.greenrobot.greendao.annotation.Generated;
         generateGettersSetters = false
 )
 public class VideoInfo implements Parcelable {
+
+    /**
+     *
+     */
+
+    public static final String DATA_KEY = "Data_Key";
+
     /**
      *
      */

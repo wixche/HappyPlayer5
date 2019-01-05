@@ -17,6 +17,7 @@ import android.widget.LinearLayout;
 import android.widget.TextView;
 
 import com.github.jdsjlzx.interfaces.OnLoadMoreListener;
+import com.github.jdsjlzx.interfaces.OnNetWorkErrorListener;
 import com.github.jdsjlzx.interfaces.OnRefreshListener;
 import com.github.jdsjlzx.recyclerview.LRecyclerView;
 import com.github.jdsjlzx.recyclerview.LRecyclerViewAdapter;
@@ -331,13 +332,21 @@ public class SearchFragment extends BaseFragment {
     private void handleLoadMoreData(HttpReturnResult httpReturnResult) {
         if (!httpReturnResult.isSuccessful()) {
             ToastUtil.showTextToast(mContext, httpReturnResult.getErrorMsg());
+
+            mRecyclerView.setOnNetWorkErrorListener(new OnNetWorkErrorListener() {
+                @Override
+                public void reload() {
+                    mWorkerHandler.sendEmptyMessage(LOADMOREDATA);
+                }
+            });
         } else {
             mPage++;
 
             Map<String, Object> returnResult = (Map<String, Object>) httpReturnResult.getResult();
             List<AudioInfo> lists = (List<AudioInfo>) returnResult.get("rows");
+            int total = (int) returnResult.get("total");
             int pageSize = lists.size();
-            if (lists == null || pageSize == 0) {
+            if (total <= mAdapter.getItemCount() || total == 0) {
                 mRecyclerView.setNoMore(true);
             } else {
                 for (int i = 0; i < pageSize; i++) {
@@ -358,6 +367,9 @@ public class SearchFragment extends BaseFragment {
     private void handleLoadData(HttpReturnResult httpReturnResult) {
         if (!httpReturnResult.isSuccessful()) {
             ToastUtil.showTextToast(mContext, httpReturnResult.getErrorMsg());
+
+            mRecyclerView.refreshComplete(0);
+            mAdapter.notifyDataSetChanged();
         } else {
             mDatas.clear();
             Map<String, Object> returnResult = (Map<String, Object>) httpReturnResult.getResult();
@@ -397,7 +409,7 @@ public class SearchFragment extends BaseFragment {
      */
     private void loadMoreData() {
         try {
-            Thread.sleep(200);
+            Thread.sleep(100);
         } catch (InterruptedException e) {
             e.printStackTrace();
         }
@@ -439,7 +451,7 @@ public class SearchFragment extends BaseFragment {
     private void loadRefreshData() {
 
         try {
-            Thread.sleep(200);
+            Thread.sleep(100);
         } catch (InterruptedException e) {
             e.printStackTrace();
         }
