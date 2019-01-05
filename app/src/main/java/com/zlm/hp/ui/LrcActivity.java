@@ -757,6 +757,12 @@ public class LrcActivity extends BaseActivity {
                     if (AudioPlayerManager.newInstance(mContext).getPlayStatus() == AudioPlayerManager.PLAYING) {
                         AudioPlayerManager.newInstance(mContext).pause();
                     }
+
+                    //打开mv搜索界面
+                    Intent intent = new Intent(LrcActivity.this, SearchMVActivity.class);
+                    intent.putExtra(SearchMVActivity.DATA_KEY, audioInfo);
+                    startActivity(intent);
+                    overridePendingTransition(0, 0);
                 }
             }
         });

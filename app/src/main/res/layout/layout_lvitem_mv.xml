@@ -1,0 +1,93 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="#fff"
+    android:orientation="vertical">
+
+    <com.zlm.hp.widget.ListItemRelativeLayout
+        android:id="@+id/itemBG"
+        android:layout_width="match_parent"
+        android:layout_height="@dimen/songitem_height"
+        android:clickable="true">
+
+        <ImageView
+            android:id="@+id/item_icon"
+            android:layout_width="@dimen/base_img_height"
+            android:layout_height="@dimen/base_img_height"
+            android:layout_alignParentLeft="true"
+            android:layout_centerVertical="true"
+            android:layout_marginLeft="10dp"
+            android:layout_marginRight="10dp"
+            android:background="@mipmap/bpz" />
+
+
+        <LinearLayout
+            android:id="@+id/content"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:layout_marginBottom="10dp"
+            android:layout_marginLeft="10dp"
+            android:layout_marginRight="10dp"
+            android:layout_marginTop="10dp"
+            android:layout_toLeftOf="@+id/item_arrow"
+            android:layout_toRightOf="@+id/item_icon"
+            android:orientation="vertical">
+
+
+            <TextView
+                android:id="@+id/songName"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_gravity="center_vertical"
+                android:layout_weight="1"
+                android:ellipsize="marquee"
+                android:singleLine="true"
+                android:text="歌曲名称"
+                android:textColor="#000"
+                android:textSize="15dp" />
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:orientation="horizontal">
+
+                <TextView
+                    android:id="@+id/singerName"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_gravity="center_vertical"
+                    android:ellipsize="marquee"
+                    android:singleLine="true"
+                    android:text="歌手名称"
+                    android:textColor="@color/def_bar_title_color"
+                    android:textSize="12dp" />
+
+
+            </LinearLayout>
+
+
+        </LinearLayout>
+
+
+        <ImageView
+            android:id="@+id/item_arrow"
+            android:layout_width="8dp"
+            android:layout_height="15dp"
+            android:layout_alignParentRight="true"
+            android:layout_centerVertical="true"
+            android:layout_marginLeft="10dp"
+            android:layout_marginRight="15dp"
+            android:background="@mipmap/c06" />
+
+        <com.zlm.hp.widget.DividerView
+            android:layout_width="match_parent"
+            android:layout_height="1.5dip"
+            android:layout_alignParentBottom="true"
+            android:layout_toRightOf="@+id/item_icon" />
+
+
+    </com.zlm.hp.widget.ListItemRelativeLayout>
+
+</LinearLayout>
