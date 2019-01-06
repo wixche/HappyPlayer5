@@ -54,6 +54,7 @@ import com.zlm.hp.fragment.SongFragment;
 import com.zlm.hp.fragment.SpecialFragment;
 import com.zlm.hp.manager.ActivityManager;
 import com.zlm.hp.manager.AudioPlayerManager;
+import com.zlm.hp.manager.DownloadAudioManager;
 import com.zlm.hp.manager.LyricsManager;
 import com.zlm.hp.manager.OnLineAudioManager;
 import com.zlm.hp.receiver.AppSystemReceiver;
@@ -1412,6 +1413,7 @@ public class MainActivity extends BaseActivity {
      */
     private void releaseData() {
         ImageUtil.release();
+        DownloadAudioManager.newInstance(mContext).release();
         AudioPlayerManager.newInstance(mContext).release();
         ToastUtil.release();
     }

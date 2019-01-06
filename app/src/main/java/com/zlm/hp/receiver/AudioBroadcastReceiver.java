@@ -221,6 +221,26 @@ public class AudioBroadcastReceiver {
      */
     public static final int ACTION_CODE_MAKE_SUCCESS = 36;
 
+    /**
+     * 视频下载中
+     */
+    public static final int ACTION_CODE_VIDEO_DOWNLOADING = 37;
+
+    /**
+     * 视频下载完成
+     */
+    public static final int ACTION_CODE_VIDEO_DOWNLOADED = 38;
+
+    /**
+     * 视频停止播放
+     */
+    public static final int ACTION_CODE_VIDEO_STOP = 39;
+
+    /**
+     * 播放网络视频
+     */
+    public static final int ACTION_CODE_PLAYNETVIDEO = 40;
+
     private BroadcastReceiver mBroadcastReceiver;
     private IntentFilter mIntentFilter;
     private AudioReceiverListener mReceiverListener;
@@ -562,6 +582,57 @@ public class AudioBroadcastReceiver {
         Bundle bundle = new Bundle();
         bundle.putString(ACTION_DATA_KEY, hash);
         sendReceiver(context, ACTION_CODE_MAKE_SUCCESS, ACTION_BUNDLEKEY, bundle);
+    }
+
+    /**
+     * 在线视频下载中
+     *
+     * @param context
+     * @param task
+     */
+    public static void sendDownloadingOnlineVideoReceiver(Context context, DownloadTask task) {
+        Bundle bundle = new Bundle();
+        bundle.putParcelable(ACTION_DATA_KEY, task);
+        sendReceiver(context, ACTION_CODE_VIDEO_DOWNLOADING, ACTION_BUNDLEKEY, bundle);
+
+    }
+
+    /**
+     * 在线视频下载完成
+     *
+     * @param context
+     * @param task
+     */
+    public static void sendDownloadedOnlineVideoReceiver(Context context, DownloadTask task) {
+        Bundle bundle = new Bundle();
+        bundle.putParcelable(ACTION_DATA_KEY, task);
+        sendReceiver(context, ACTION_CODE_VIDEO_DOWNLOADED, ACTION_BUNDLEKEY, bundle);
+
+    }
+
+    /**
+     * 在线视频停止
+     *
+     * @param context
+     * @param task
+     */
+    public static void sendOnlineVideoStopReceiver(Context context, DownloadTask task) {
+        Bundle bundle = new Bundle();
+        bundle.putParcelable(ACTION_DATA_KEY, task);
+        sendReceiver(context, ACTION_CODE_VIDEO_STOP, ACTION_BUNDLEKEY, bundle);
+
+    }
+
+    /**
+     * 播放网络视频
+     *
+     * @param task
+     */
+    public static void sendPlayNetVideoReceiver(Context context, DownloadTask task) {
+        Bundle bundle = new Bundle();
+        bundle.putParcelable(ACTION_DATA_KEY, task);
+        sendReceiver(context, ACTION_CODE_PLAYNETVIDEO, ACTION_BUNDLEKEY, bundle);
+
     }
 
 

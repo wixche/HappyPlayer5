@@ -35,6 +35,7 @@ public class VideoInfoDao extends AbstractDao<VideoInfo, Void> {
         public final static Property SingerName = new Property(8, String.class, "singerName", false, "SINGER_NAME");
         public final static Property ImageUrl = new Property(9, String.class, "imageUrl", false, "IMAGE_URL");
         public final static Property DownloadUrl = new Property(10, String.class, "downloadUrl", false, "DOWNLOAD_URL");
+        public final static Property Status = new Property(11, int.class, "status", false, "STATUS");
     }
 
 
@@ -60,7 +61,8 @@ public class VideoInfoDao extends AbstractDao<VideoInfo, Void> {
                 "\"MV_NAME\" TEXT," + // 7: mvName
                 "\"SINGER_NAME\" TEXT," + // 8: singerName
                 "\"IMAGE_URL\" TEXT," + // 9: imageUrl
-                "\"DOWNLOAD_URL\" TEXT);"); // 10: downloadUrl
+                "\"DOWNLOAD_URL\" TEXT," + // 10: downloadUrl
+                "\"STATUS\" INTEGER NOT NULL );"); // 11: status
     }
 
     /** Drops the underlying database table. */
@@ -119,6 +121,7 @@ public class VideoInfoDao extends AbstractDao<VideoInfo, Void> {
         if (downloadUrl != null) {
             stmt.bindString(11, downloadUrl);
         }
+        stmt.bindLong(12, entity.getStatus());
     }
 
     @Override
@@ -171,6 +174,7 @@ public class VideoInfoDao extends AbstractDao<VideoInfo, Void> {
         if (downloadUrl != null) {
             stmt.bindString(11, downloadUrl);
         }
+        stmt.bindLong(12, entity.getStatus());
     }
 
     @Override
@@ -198,6 +202,7 @@ public class VideoInfoDao extends AbstractDao<VideoInfo, Void> {
         entity.setSingerName(cursor.isNull(offset + 8) ? null : cursor.getString(offset + 8));
         entity.setImageUrl(cursor.isNull(offset + 9) ? null : cursor.getString(offset + 9));
         entity.setDownloadUrl(cursor.isNull(offset + 10) ? null : cursor.getString(offset + 10));
+        entity.setStatus(cursor.getInt(offset + 11));
      }
     
     @Override

@@ -5,6 +5,7 @@ import android.os.Parcelable;
 
 import org.greenrobot.greendao.annotation.Entity;
 import org.greenrobot.greendao.annotation.Generated;
+import org.greenrobot.greendao.annotation.Transient;
 
 /**
  * @Description: 视频信息
@@ -22,6 +23,12 @@ public class VideoInfo implements Parcelable {
      */
 
     public static final String DATA_KEY = "Data_Key";
+
+    /**
+     * 状态
+     */
+    public static final int STATUS_FINISH = 0;
+    public static final int STATUS_INIT = 1;
 
     /**
      *
@@ -67,8 +74,14 @@ public class VideoInfo implements Parcelable {
      */
     private String downloadUrl;
 
+    /**
+     * 状态
+     */
+    private int status = STATUS_INIT;
+
     public VideoInfo() {
     }
+
 
     protected VideoInfo(Parcel in) {
         hash = in.readString();
@@ -82,6 +95,28 @@ public class VideoInfo implements Parcelable {
         singerName = in.readString();
         imageUrl = in.readString();
         downloadUrl = in.readString();
+        status = in.readInt();
+    }
+
+    @Override
+    public void writeToParcel(Parcel dest, int flags) {
+        dest.writeString(hash);
+        dest.writeString(fileExt);
+        dest.writeLong(fileSize);
+        dest.writeString(fileSizeText);
+        dest.writeString(filePath);
+        dest.writeLong(duration);
+        dest.writeString(durationText);
+        dest.writeString(mvName);
+        dest.writeString(singerName);
+        dest.writeString(imageUrl);
+        dest.writeString(downloadUrl);
+        dest.writeInt(status);
+    }
+
+    @Override
+    public int describeContents() {
+        return 0;
     }
 
     public static final Creator<VideoInfo> CREATOR = new Creator<VideoInfo>() {
@@ -184,23 +219,18 @@ public class VideoInfo implements Parcelable {
         this.downloadUrl = downloadUrl;
     }
 
-    @Override
-    public int describeContents() {
-        return 0;
+    public int getStatus() {
+        return status;
     }
 
-    @Override
-    public void writeToParcel(Parcel dest, int flags) {
-        dest.writeString(hash);
-        dest.writeString(fileExt);
-        dest.writeLong(fileSize);
-        dest.writeString(fileSizeText);
-        dest.writeString(filePath);
-        dest.writeLong(duration);
-        dest.writeString(durationText);
-        dest.writeString(mvName);
-        dest.writeString(singerName);
-        dest.writeString(imageUrl);
-        dest.writeString(downloadUrl);
+    public void setStatus(int status) {
+        this.status = status;
+    }
+
+    public String getTitle() {
+        if (getSingerName().equals("未知")) {
+            return getMvName();
+        }
+        return getSingerName() + " - " + getMvName();
     }
 }

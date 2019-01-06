@@ -31,6 +31,10 @@ import com.zlm.hp.util.ColorUtil;
 
 public abstract class BaseActivity extends AppCompatActivity {
 
+    /**
+     * 是否全屏
+     */
+    private boolean mIsFullScreen = false;
 
     /**
      * 子线程用于执行耗时任务
@@ -107,7 +111,8 @@ public abstract class BaseActivity extends AppCompatActivity {
      * @param view
      */
     private void initStatusBar(View view) {
-        AppBarUtil.initBar(this.getWindow());
+        if (!mIsFullScreen)
+            AppBarUtil.initBar(this.getWindow());
         boolean isAddStatusBar = AppBarUtil.isAddStatusBar();
         //添加状态栏
         addStatusBar(view, isAddStatusBar);
@@ -211,6 +216,10 @@ public abstract class BaseActivity extends AppCompatActivity {
      */
     public void setStatusBarViewBG(int statusBarViewBG) {
         this.mStatusBarViewBG = statusBarViewBG;
+    }
+
+    public void setFullScreen(boolean isFullScreen) {
+        this.mIsFullScreen = isFullScreen;
     }
 
     /**

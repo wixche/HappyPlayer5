@@ -48,14 +48,18 @@
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
-        <activity android:name=".MainActivity" />
+        <activity
+            android:name=".MainActivity"
+            android:configChanges="screenSize|keyboardHidden|orientation" />
         <activity android:name=".SettingActivity" />
         <activity android:name=".AboutActivity" />
         <activity android:name=".HelpActivity" />
 
         <service android:name="com.zlm.hp.service.AudioPlayerService" />
 
-        <activity android:name=".LrcActivity" />
+        <activity
+            android:name=".LrcActivity"
+            android:configChanges="screenSize|keyboardHidden|orientation" />
         <activity android:name=".SearchSingerActivity" />
         <activity android:name=".SearchLrcActivity" />
         <activity android:name=".TimerPowerOffActivity" />
@@ -64,6 +68,7 @@
 
         <activity
             android:name=".LockActivity"
+            android:configChanges="screenSize|keyboardHidden|orientation"
             android:excludeFromRecents="true"
             android:launchMode="singleInstance"
             android:screenOrientation="portrait"
