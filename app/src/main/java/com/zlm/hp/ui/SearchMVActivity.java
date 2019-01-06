@@ -159,7 +159,7 @@ public class SearchMVActivity extends BaseActivity {
         });
 
         //加载数据
-        mWorkerHandler.sendEmptyMessage(LOADREFRESHDATA);
+        mRecyclerView.forceToRefresh();
     }
 
     @Override

@@ -13,6 +13,7 @@ import android.view.SurfaceView;
 import android.view.View;
 import android.view.WindowManager;
 import android.widget.ImageView;
+import android.widget.RelativeLayout;
 import android.widget.TextView;
 
 import com.zlm.down.entity.DownloadTask;
@@ -86,6 +87,11 @@ public class VideoActivity extends BaseActivity {
      * 视频完成
      */
     private final int MESSAGE_WHAT_FINISH = 4;
+
+    /**
+     * 操作面板
+     */
+    private RelativeLayout mOpRL;
 
     /**
      * 播放进度
@@ -165,9 +171,24 @@ public class VideoActivity extends BaseActivity {
             }
         });
 
-        //
+        //视频view
         mSurfaceView = findViewById(R.id.video_surface);
-
+        mSurfaceView.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                mOpRL.setVisibility(View.VISIBLE);
+            }
+        });
+        //操作面板
+        mOpRL = findViewById(R.id.op_bg);
+        mOpRL.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                if(mOpRL.getVisibility() == View.VISIBLE){
+                    mOpRL.setVisibility(View.INVISIBLE);
+                }
+            }
+        });
         //
         mAudioBroadcastReceiver = new AudioBroadcastReceiver();
         mAudioBroadcastReceiver.setReceiverListener(new AudioBroadcastReceiver.AudioReceiverListener() {
