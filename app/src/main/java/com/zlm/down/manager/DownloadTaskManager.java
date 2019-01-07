@@ -51,6 +51,9 @@ public class DownloadTaskManager {
 
         @Override
         public void taskDownloading(DownloadTask task, int downloadedSize) {
+            if (task.getTaskFileSize() <= downloadedSize) {
+                return;
+            }
             if (mIDownloadTaskEvent != null) {
                 task.setStatus(DownloadTask.STATUS_DOWNLOADING);
                 mIDownloadTaskEvent.taskDownloading(task, downloadedSize);
@@ -61,6 +64,10 @@ public class DownloadTaskManager {
         public void taskPause(DownloadTask task, int downloadedSize) {
 
             removeTask(task);
+
+            if (task.getTaskFileSize() <= downloadedSize) {
+                return;
+            }
 
             if (mIDownloadTaskEvent != null) {
                 task.setStatus(DownloadTask.STATUS_PAUSE);
@@ -83,6 +90,11 @@ public class DownloadTaskManager {
         public void taskFinish(DownloadTask task, int downloadedSize) {
 
             removeTask(task);
+
+            if (task.getTaskFileSize() > downloadedSize) {
+                return;
+            }
+
             if (mIDownloadTaskEvent != null) {
                 task.setStatus(DownloadTask.STATUS_FINISH);
                 mIDownloadTaskEvent

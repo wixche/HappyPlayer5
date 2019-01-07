@@ -76,18 +76,14 @@ public class DownloadAudioManager {
 
             @Override
             public void taskDownloading(DownloadTask task, int downloadedSize) {
-                if (task.getTaskFileSize() <= downloadedSize) {
-                    return;
-                }
+
                 ZLog.d(new CodeLineUtil().getCodeLineInfo(), "task taskDownloading ->" + task.getTaskName() + " " + downloadedSize);
                 AudioBroadcastReceiver.sendDownloadingSongReceiver(mContext, task);
             }
 
             @Override
             public void taskPause(DownloadTask task, int downloadedSize) {
-                if (task.getTaskFileSize() <= downloadedSize) {
-                    return;
-                }
+
                 ZLog.d(new CodeLineUtil().getCodeLineInfo(), "task taskPause ->" + task.getTaskName() + " " + downloadedSize);
                 AudioBroadcastReceiver.sendDownloadPauseReceiver(mContext, task);
             }
@@ -104,9 +100,7 @@ public class DownloadAudioManager {
 
             @Override
             public void taskFinish(DownloadTask task, int downloadedSize) {
-                if (task.getTaskFileSize() > downloadedSize) {
-                    return;
-                }
+
                 //添加本地歌曲
                 if (AudioInfoDB.isDownloadAudioExists(mContext, task.getTaskId())) {
                     AudioInfoDB.addDownloadedAudio(mContext, task.getTaskId(), true);
