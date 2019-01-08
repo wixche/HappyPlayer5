@@ -13,6 +13,7 @@ import android.view.SurfaceView;
 import android.view.View;
 import android.view.WindowManager;
 import android.widget.ImageView;
+import android.widget.LinearLayout;
 import android.widget.RelativeLayout;
 import android.widget.TextView;
 
@@ -90,6 +91,20 @@ public class VideoActivity extends BaseActivity {
     private RelativeLayout mOpRL;
 
     /**
+     * 标题栏
+     */
+    private RelativeLayout mHeaderView;
+    /**
+     * 底部栏
+     */
+    private LinearLayout mFooterView;
+
+    /**
+     *
+     */
+    private boolean isVisibility = false;
+
+    /**
      * 播放进度
      */
     private TextView mSongProgressTv;
@@ -126,14 +141,31 @@ public class VideoActivity extends BaseActivity {
         setFullScreen(true);
 
         getWindow().setFlags(WindowManager.LayoutParams.FLAG_FULLSCREEN, WindowManager.LayoutParams.FLAG_FULLSCREEN);
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
-            getWindow().setNavigationBarColor(Color.BLACK);
-        }
-
         setStatusBarViewBG(Color.TRANSPARENT);
+
+        setFullScreenActivity();
         super.preInitStatusBar();
     }
 
+    /**
+     * 设置全屏
+     */
+    private void setFullScreenActivity() {
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
+            getWindow().getDecorView().setSystemUiVisibility(View.SYSTEM_UI_FLAG_LOW_PROFILE
+                    | View.SYSTEM_UI_FLAG_FULLSCREEN
+                    | View.SYSTEM_UI_FLAG_LAYOUT_STABLE
+                    | View.SYSTEM_UI_FLAG_IMMERSIVE_STICKY
+                    | View.SYSTEM_UI_FLAG_LAYOUT_HIDE_NAVIGATION
+                    | View.SYSTEM_UI_FLAG_HIDE_NAVIGATION);
+        }
+    }
+
+    @Override
+    protected void onResume() {
+        super.onResume();
+        setFullScreenActivity();
+    }
 
     @Override
     protected int setContentLayoutResID() {
@@ -166,25 +198,26 @@ public class VideoActivity extends BaseActivity {
 
             }
         });
-
         //视频view
         mSurfaceView = findViewById(R.id.video_surface);
-        mSurfaceView.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                mOpRL.setVisibility(View.VISIBLE);
-            }
-        });
         //操作面板
         mOpRL = findViewById(R.id.op_bg);
         mOpRL.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                if(mOpRL.getVisibility() == View.VISIBLE){
-                    mOpRL.setVisibility(View.INVISIBLE);
+                if (isVisibility) {
+                    isVisibility = false;
+                    mHeaderView.setVisibility(View.INVISIBLE);
+                    mFooterView.setVisibility(View.INVISIBLE);
+                } else {
+                    isVisibility = true;
+                    mHeaderView.setVisibility(View.VISIBLE);
+                    mFooterView.setVisibility(View.VISIBLE);
                 }
             }
         });
+        mHeaderView = findViewById(R.id.video_title);
+        mFooterView = findViewById(R.id.video_footer);
         //
         mAudioBroadcastReceiver = new AudioBroadcastReceiver();
         mAudioBroadcastReceiver.setReceiverListener(new AudioBroadcastReceiver.AudioReceiverListener() {
@@ -210,7 +243,7 @@ public class VideoActivity extends BaseActivity {
         mMusicSeekBar.setOnMusicListener(new MusicSeekBar.OnMusicListener() {
             @Override
             public String getTimeText() {
-                return MediaUtil.formatTime(mMusicSeekBar.getProgress());
+                return null;
             }
 
             @Override
