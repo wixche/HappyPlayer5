@@ -170,6 +170,9 @@ public static java.lang.String TABLENAME;
 -dontwarn com.github.jdsjlzx.**
 -keep class com.github.jdsjlzx.progressindicator.indicators.** { *; }
 
+#implementation 'com.github.zhangliangming:Subtitle:v1.0'
+-keep class com.zlm.subtitlelibrary.** { *; }
+
 #6混淆项目代码
 -keep class com.zlm.**
 -keepclassmembers class com.zlm.** {

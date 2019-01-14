@@ -15,6 +15,7 @@ android5.0及以上
 
 # 项目中抽出来的开源控件 #
 
+- [Subtitle（字幕库）](https://github.com/zhangliangming/Subtitle)
 - [SwipeBackLayout（右滑动关闭界面）](https://github.com/zhangliangming/SwipeBackLayout.git)
 - [RotateLayout（旋转界面）](https://github.com/zhangliangming/RotateLayout.git)
 - [SeekBar（进度条）](https://github.com/zhangliangming/SeekBar.git)
@@ -65,6 +66,9 @@ android5.0及以上
 - MV功能开发
 
 # 更新日志 #
+
+## 2019-01-15 ##
+- 引入Subtitle库
 
 ## 2018-01-06 ##
 - 添加简单MV界面
