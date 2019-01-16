@@ -98,8 +98,8 @@ public class AudioPlayerService extends Service {
             if (focusChange == AudioManager.AUDIOFOCUS_GAIN) {
             } else {
                 //已经失去音频焦点
-                if (AudioPlayerManager.newInstance(mContext).getPlayStatus() == AudioPlayerManager.PLAYING) {
-                    AudioPlayerManager.newInstance(mContext).pause();
+                if (AudioPlayerManager.getInstance(mContext).getPlayStatus() == AudioPlayerManager.PLAYING) {
+                    AudioPlayerManager.getInstance(mContext).pause();
                 }
             }
         }
@@ -118,20 +118,20 @@ public class AudioPlayerService extends Service {
                 switch (code) {
                     case AudioBroadcastReceiver.ACTION_CODE_NOTIFY_PLAY:
                         if (getCurAudioInfo() != null) {
-                            AudioPlayerManager.newInstance(mContext).play(getCurAudioInfo().getPlayProgress());
+                            AudioPlayerManager.getInstance(mContext).play(getCurAudioInfo().getPlayProgress());
                         }
 
                         break;
                     case AudioBroadcastReceiver.ACTION_CODE_NOTIFY_PAUSE:
                         if (getCurAudioInfo() != null) {
-                            AudioPlayerManager.newInstance(mContext).pause();
+                            AudioPlayerManager.getInstance(mContext).pause();
                         }
                         break;
                     case AudioBroadcastReceiver.ACTION_CODE_NOTIFY_NEXT:
-                        AudioPlayerManager.newInstance(mContext).next();
+                        AudioPlayerManager.getInstance(mContext).next();
                         break;
                     case AudioBroadcastReceiver.ACTION_CODE_NOTIFY_PRE:
-                        AudioPlayerManager.newInstance(mContext).pre();
+                        AudioPlayerManager.getInstance(mContext).pre();
                         break;
                     case AudioBroadcastReceiver.ACTION_CODE_NOTIFY_UNLOCK:
                         ConfigInfo configInfo = ConfigInfo.obtain();
@@ -264,7 +264,7 @@ public class AudioPlayerService extends Service {
     private void loadNotificationData() {
         //加载数据
         ConfigInfo configInfo = ConfigInfo.obtain();
-        AudioInfo audioInfo = AudioPlayerManager.newInstance(mContext).getCurSong(configInfo.getPlayHash());
+        AudioInfo audioInfo = AudioPlayerManager.getInstance(mContext).getCurSong(configInfo.getPlayHash());
         if (audioInfo != null) {
             doNotification(audioInfo, AudioBroadcastReceiver.ACTION_CODE_INIT, true);
         } else {
@@ -641,7 +641,7 @@ public class AudioPlayerService extends Service {
                     } else {
                         releasePlayer();
                         //播放完成，执行下一首操作
-                        AudioPlayerManager.newInstance(mContext).next();
+                        AudioPlayerManager.getInstance(mContext).next();
                     }
 
 
@@ -697,7 +697,7 @@ public class AudioPlayerService extends Service {
 //                    Thread.sleep(1000);
 //
 //                    //播放完成，执行下一首操作
-//                    AudioPlayerManager.newInstance(mContext).next();
+//                    AudioPlayerManager.getInstance(mContext).next();
 //                } catch (InterruptedException e) {
 //                    e.printStackTrace();
 //                }
@@ -734,7 +734,7 @@ public class AudioPlayerService extends Service {
      */
     private AudioInfo getCurAudioInfo() {
         ConfigInfo configInfo = ConfigInfo.obtain();
-        return AudioPlayerManager.newInstance(mContext).getCurSong(configInfo.getPlayHash());
+        return AudioPlayerManager.getInstance(mContext).getCurSong(configInfo.getPlayHash());
     }
 
     /**

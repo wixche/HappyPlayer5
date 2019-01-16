@@ -236,7 +236,7 @@ public class FloatService extends Service {
         //创建桌面布局
         createDesktopLayout();
 
-        AudioInfo curAudioInfo = AudioPlayerManager.newInstance(getApplicationContext()).getCurSong(mConfigInfo.getPlayHash());
+        AudioInfo curAudioInfo = AudioPlayerManager.getInstance(getApplicationContext()).getCurSong(mConfigInfo.getPlayHash());
         Intent intent = new Intent();
         if (curAudioInfo != null) {
 
@@ -245,7 +245,7 @@ public class FloatService extends Service {
             intent.putExtra(AudioBroadcastReceiver.ACTION_BUNDLEKEY, bundle);
             handleAudioBroadcastReceiver(intent, AudioBroadcastReceiver.ACTION_CODE_INIT);
 
-            int playStatus = AudioPlayerManager.newInstance(getApplicationContext()).getPlayStatus();
+            int playStatus = AudioPlayerManager.getInstance(getApplicationContext()).getPlayStatus();
             if (playStatus == AudioPlayerManager.PLAYING) {
                 handleAudioBroadcastReceiver(intent, AudioBroadcastReceiver.ACTION_CODE_PLAY);
             }
@@ -463,7 +463,7 @@ public class FloatService extends Service {
                 mUIHandler.removeCallbacks(mRunnable);
 
 
-                AudioPlayerManager.newInstance(getApplicationContext()).pre();
+                AudioPlayerManager.getInstance(getApplicationContext()).pre();
 
                 mUIHandler.postDelayed(mRunnable, mDelayMs);
             }
@@ -476,9 +476,9 @@ public class FloatService extends Service {
             public void onClick(View v) {
                 mUIHandler.removeCallbacks(mRunnable);
 
-                AudioInfo audioInfo = AudioPlayerManager.newInstance(getApplicationContext()).getCurSong(mConfigInfo.getPlayHash());
+                AudioInfo audioInfo = AudioPlayerManager.getInstance(getApplicationContext()).getCurSong(mConfigInfo.getPlayHash());
                 if (audioInfo != null) {
-                    AudioPlayerManager.newInstance(getApplicationContext()).play(audioInfo.getPlayProgress());
+                    AudioPlayerManager.getInstance(getApplicationContext()).play(audioInfo.getPlayProgress());
                 }
 
                 mUIHandler.postDelayed(mRunnable, mDelayMs);
@@ -492,7 +492,7 @@ public class FloatService extends Service {
             public void onClick(View v) {
                 mUIHandler.removeCallbacks(mRunnable);
 
-                AudioPlayerManager.newInstance(getApplicationContext()).pause();
+                AudioPlayerManager.getInstance(getApplicationContext()).pause();
 
                 mUIHandler.postDelayed(mRunnable, mDelayMs);
             }
@@ -506,7 +506,7 @@ public class FloatService extends Service {
             public void onClick(View v) {
                 mUIHandler.removeCallbacks(mRunnable);
 
-                AudioPlayerManager.newInstance(getApplicationContext()).next();
+                AudioPlayerManager.getInstance(getApplicationContext()).next();
 
                 mUIHandler.postDelayed(mRunnable, mDelayMs);
             }
@@ -786,7 +786,7 @@ public class FloatService extends Service {
                     if (oldLyricsReader == null || !oldLyricsReader.getHash().equals(initAudioInfo.getHash())) {
                         //加载歌词
                         String keyWords = initAudioInfo.getTitle();
-                        LyricsManager.newInstance(getApplicationContext()).loadLyrics(keyWords, keyWords, initAudioInfo.getDuration() + "", initAudioInfo.getHash(), mConfigInfo.isWifi(), new AsyncHandlerTask(mUIHandler, mWorkerHandler), null);
+                        LyricsManager.getInstance(getApplicationContext()).loadLyrics(keyWords, keyWords, initAudioInfo.getDuration() + "", initAudioInfo.getHash(), mConfigInfo.isWifi(), new AsyncHandlerTask(mUIHandler, mWorkerHandler), null);
                         //加载中
                         mFloatLyricsView.initLrcData();
                         mFloatLyricsView.setLrcStatus(AbstractLrcView.LRCSTATUS_LOADING);
@@ -835,10 +835,10 @@ public class FloatService extends Service {
                 //歌词加载完成
                 Bundle lrcloadedBundle = intent.getBundleExtra(AudioBroadcastReceiver.ACTION_BUNDLEKEY);
                 String lrcHash = lrcloadedBundle.getString(AudioBroadcastReceiver.ACTION_DATA_KEY);
-                AudioInfo curAudioInfo = AudioPlayerManager.newInstance(getApplicationContext()).getCurSong(mConfigInfo.getPlayHash());
+                AudioInfo curAudioInfo = AudioPlayerManager.getInstance(getApplicationContext()).getCurSong(mConfigInfo.getPlayHash());
                 if (curAudioInfo != null && lrcHash.equals(curAudioInfo.getHash())) {
                     LyricsReader oldLyricsReader = mFloatLyricsView.getLyricsReader();
-                    LyricsReader newLyricsReader = LyricsManager.newInstance(getApplicationContext()).getLyricsReader(lrcHash);
+                    LyricsReader newLyricsReader = LyricsManager.getInstance(getApplicationContext()).getLyricsReader(lrcHash);
                     if (oldLyricsReader != null && newLyricsReader != null && oldLyricsReader.getHash().equals(newLyricsReader.getHash())) {
 
                     } else {

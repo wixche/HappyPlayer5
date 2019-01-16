@@ -71,7 +71,7 @@ public class AudioPlayerManager {
      * @param context
      * @return
      */
-    public synchronized static AudioPlayerManager newInstance(Context context) {
+    public synchronized static AudioPlayerManager getInstance(Context context) {
         if (_AudioPlayerManager == null) {
             _AudioPlayerManager = new AudioPlayerManager(context);
         }

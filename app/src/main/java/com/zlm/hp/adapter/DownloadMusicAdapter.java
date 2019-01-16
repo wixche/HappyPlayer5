@@ -142,7 +142,7 @@ public class DownloadMusicAdapter extends RecyclerView.Adapter<RecyclerView.View
         viewHolder.getDlTipTv().setText(downloadSizeText + "/" + fileSizeText);
 
         //获取下载任务
-        DownloadTask downloadTask = DownloadAudioManager.newInstance(mContext).getDownloadTask(audioInfo.getHash());
+        DownloadTask downloadTask = DownloadAudioManager.getInstance(mContext).getDownloadTask(audioInfo.getHash());
         if (downloadTask == null) {
             //点击下载
             viewHolder.getDownloadingImg().setVisibility(View.VISIBLE);
@@ -173,22 +173,22 @@ public class DownloadMusicAdapter extends RecyclerView.Adapter<RecyclerView.View
             @Override
             public void onClick(View view) {
                 //获取下载任务
-                DownloadTask downloadTask = DownloadAudioManager.newInstance(mContext).getDownloadTask(audioInfo.getHash());
+                DownloadTask downloadTask = DownloadAudioManager.getInstance(mContext).getDownloadTask(audioInfo.getHash());
                 if (downloadTask == null) {
                     //点击下载
-                    DownloadAudioManager.newInstance(mContext).addTask(audioInfo);
+                    DownloadAudioManager.getInstance(mContext).addTask(audioInfo);
 
                 } else {
                     if (downloadTask.getStatus() == DownloadTask.STATUS_WAIT) {
                         //等待下载
-                        DownloadAudioManager.newInstance(mContext).cancelTask(downloadTask.getTaskId());
+                        DownloadAudioManager.getInstance(mContext).cancelTask(downloadTask.getTaskId());
 
                     } else if (downloadTask.getStatus() == DownloadTask.STATUS_DOWNLOADING) {
                         //点击暂停
-                        DownloadAudioManager.newInstance(mContext).pauseTask(downloadTask.getTaskId());
+                        DownloadAudioManager.getInstance(mContext).pauseTask(downloadTask.getTaskId());
                     } else {
                         //点击下载
-                        DownloadAudioManager.newInstance(mContext).addTask(audioInfo);
+                        DownloadAudioManager.getInstance(mContext).addTask(audioInfo);
                     }
                 }
             }
@@ -199,13 +199,13 @@ public class DownloadMusicAdapter extends RecyclerView.Adapter<RecyclerView.View
             @Override
             public void onClick(View view) {
                 //获取下载任务
-                DownloadTask downloadTask = DownloadAudioManager.newInstance(mContext).getDownloadTask(audioInfo.getHash());
+                DownloadTask downloadTask = DownloadAudioManager.getInstance(mContext).getDownloadTask(audioInfo.getHash());
                 if (downloadTask == null) {
                     //删除
                     DownloadTaskDB.delete(mContext, audioInfo.getHash(), DownloadAudioManager.mThreadNum);
                 } else {
                     //取消任务（任务正在下载）
-                    DownloadAudioManager.newInstance(mContext).cancelTask(downloadTask.getTaskId());
+                    DownloadAudioManager.getInstance(mContext).cancelTask(downloadTask.getTaskId());
                 }
             }
         });
@@ -329,13 +329,13 @@ public class DownloadMusicAdapter extends RecyclerView.Adapter<RecyclerView.View
             public void onClick(View v) {
                 int oldIndex = getPlayIndexPosition(mConfigInfo.getPlayHash());
                 if (oldIndex == position) {
-                    AudioPlayerManager.newInstance(mContext).playOrPause();
+                    AudioPlayerManager.getInstance(mContext).playOrPause();
                     return;
                 }
 
                 mOldPlayHash = audioInfo.getHash();
                 //如果是本地歌曲列表，点击列表时，需要替换当前的播放列表为本地歌曲列表
-                AudioPlayerManager.newInstance(mContext).playSong(AudioInfoDB.getDownloadedAudios(mContext), audioInfo);
+                AudioPlayerManager.getInstance(mContext).playSong(AudioInfoDB.getDownloadedAudios(mContext), audioInfo);
 
                 if (oldIndex != -1) {
                     notifyItemChanged(oldIndex);

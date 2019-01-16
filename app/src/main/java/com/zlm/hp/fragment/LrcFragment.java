@@ -197,7 +197,7 @@ public class LrcFragment extends BaseFragment {
                 @Override
                 public void run() {
                     if (mAudioInfo != null) {
-                        AudioInfo audioInfo = AudioPlayerManager.newInstance(mContext).getCurSong(mConfigInfo.getPlayHash());
+                        AudioInfo audioInfo = AudioPlayerManager.getInstance(mContext).getCurSong(mConfigInfo.getPlayHash());
                         if (audioInfo == null) {
                             refreshView((int) mAudioInfo.getDuration());
                         } else if (mAudioInfo.getHash().equals(audioInfo.getHash())) {
@@ -397,7 +397,7 @@ public class LrcFragment extends BaseFragment {
                     String fileName = mAudioInfo.getTitle();
                     String lrcFilePath = ResourceUtil.getFilePath(mContext, ResourceConstants.PATH_LYRICS, fileName + ".krc");
                     mManyLineLyricsView.getLyricsReader().setLrcFilePath(lrcFilePath);
-                    LyricsManager.newInstance(mContext).setLyricsReader(hash, mManyLineLyricsView.getLyricsReader());
+                    LyricsManager.getInstance(mContext).setLyricsReader(hash, mManyLineLyricsView.getLyricsReader());
 
                     //发送使用歌词广播
                     AudioBroadcastReceiver.sendLrcReLoadedReceiver(mContext, hash);

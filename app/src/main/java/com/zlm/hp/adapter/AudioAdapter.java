@@ -208,16 +208,16 @@ public class AudioAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> 
 
                 int oldIndex = getAudioIndex(mConfigInfo.getPlayHash());
                 if (oldIndex == position) {
-                    AudioPlayerManager.newInstance(mContext).playOrPause();
+                    AudioPlayerManager.getInstance(mContext).playOrPause();
                     return;
                 }
 
                 mOldPlayHash = audioInfo.getHash();
                 if (mSongType == SongFragment.SONG_TYPE_LOCAL) {
                     //如果是本地歌曲列表，点击列表时，需要替换当前的播放列表为本地歌曲列表
-                    AudioPlayerManager.newInstance(mContext).playSong(AudioInfoDB.getLocalAudios(mContext), audioInfo);
+                    AudioPlayerManager.getInstance(mContext).playSong(AudioInfoDB.getLocalAudios(mContext), audioInfo);
                 } else {
-                    AudioPlayerManager.newInstance(mContext).playSongAndAdd(audioInfo);
+                    AudioPlayerManager.getInstance(mContext).playSongAndAdd(audioInfo);
                 }
 
                 if (oldIndex != -1) {
@@ -324,7 +324,7 @@ public class AudioAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> 
 
                     //播放器如果正在播放
                     if (flag)
-                        AudioPlayerManager.newInstance(mContext).stop();
+                        AudioPlayerManager.getInstance(mContext).stop();
                     //移除数据
                     if (curHashIndex != -1) {
                         audioInfos.remove(curHashIndex);
@@ -357,12 +357,12 @@ public class AudioAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> 
         viewHolder.getDownloadImg().setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                boolean flag = DownloadAudioManager.newInstance(mContext).isDownloadAudioExists(audioInfo.getHash());
+                boolean flag = DownloadAudioManager.getInstance(mContext).isDownloadAudioExists(audioInfo.getHash());
                 if (flag) {
                     ToastUtil.showTextToast(mContext, mContext.getResources().getString(R.string.undownload_tip_text));
                 } else {
                     ToastUtil.showTextToast(mContext, mContext.getResources().getString(R.string.download_tip_text));
-                    DownloadAudioManager.newInstance(mContext).addTask(audioInfo);
+                    DownloadAudioManager.getInstance(mContext).addTask(audioInfo);
                 }
             }
         });

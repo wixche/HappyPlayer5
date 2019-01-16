@@ -367,7 +367,7 @@ public class LrcActivity extends BaseActivity {
     @Override
     protected void handleUIMessage(Message msg) {
 
-        AudioInfo audioInfo = AudioPlayerManager.newInstance(mContext).getCurSong(mConfigInfo.getPlayHash());
+        AudioInfo audioInfo = AudioPlayerManager.getInstance(mContext).getCurSong(mConfigInfo.getPlayHash());
 
         switch (msg.what) {
             case LOAD_DATA:
@@ -380,7 +380,7 @@ public class LrcActivity extends BaseActivity {
                     intent.putExtra(AudioBroadcastReceiver.ACTION_BUNDLEKEY, bundle);
                     handleAudioBroadcastReceiver(intent, AudioBroadcastReceiver.ACTION_CODE_INIT);
 
-                    int playStatus = AudioPlayerManager.newInstance(mContext).getPlayStatus();
+                    int playStatus = AudioPlayerManager.getInstance(mContext).getPlayStatus();
                     if (playStatus == AudioPlayerManager.PLAYING) {
                         handleAudioBroadcastReceiver(intent, AudioBroadcastReceiver.ACTION_CODE_PLAY);
                     }
@@ -453,10 +453,10 @@ public class LrcActivity extends BaseActivity {
                     return;
                 }
                 //
-                AudioInfo audioInfo = AudioPlayerManager.newInstance(mContext).getCurSong(mConfigInfo.getPlayHash());
+                AudioInfo audioInfo = AudioPlayerManager.getInstance(mContext).getCurSong(mConfigInfo.getPlayHash());
                 if (audioInfo != null && progress <= audioInfo.getDuration()) {
                     audioInfo.setPlayProgress(progress);
-                    AudioPlayerManager.newInstance(mContext).seekto(audioInfo);
+                    AudioPlayerManager.getInstance(mContext).seekto(audioInfo);
                 }
             }
         });
@@ -610,7 +610,7 @@ public class LrcActivity extends BaseActivity {
 
             @Override
             public void onProgressChanged(MusicSeekBar musicSeekBar) {
-                int playStatus = AudioPlayerManager.newInstance(mContext).getPlayStatus();
+                int playStatus = AudioPlayerManager.getInstance(mContext).getPlayStatus();
                 if (playStatus != AudioPlayerManager.PLAYING) {
                     mSongProgressTv.setText(MediaUtil.formatTime((mMusicSeekBar.getProgress())));
                 }
@@ -624,10 +624,10 @@ public class LrcActivity extends BaseActivity {
             @Override
             public void onTrackingTouchFinish(MusicSeekBar musicSeekBar) {
                 int progress = mMusicSeekBar.getProgress();
-                AudioInfo audioInfo = AudioPlayerManager.newInstance(mContext).getCurSong(mConfigInfo.getPlayHash());
+                AudioInfo audioInfo = AudioPlayerManager.getInstance(mContext).getCurSong(mConfigInfo.getPlayHash());
                 if (audioInfo != null && progress <= audioInfo.getDuration()) {
                     audioInfo.setPlayProgress(progress);
-                    AudioPlayerManager.newInstance(mContext).seekto(audioInfo);
+                    AudioPlayerManager.getInstance(mContext).seekto(audioInfo);
                 }
             }
         });
@@ -643,7 +643,7 @@ public class LrcActivity extends BaseActivity {
         mPlayBtn.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                AudioPlayerManager.newInstance(mContext).play(mMusicSeekBar.getProgress());
+                AudioPlayerManager.getInstance(mContext).play(mMusicSeekBar.getProgress());
             }
         });
         //暂停
@@ -651,7 +651,7 @@ public class LrcActivity extends BaseActivity {
         mPauseBtn.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                AudioPlayerManager.newInstance(mContext).pause();
+                AudioPlayerManager.getInstance(mContext).pause();
             }
         });
 
@@ -660,7 +660,7 @@ public class LrcActivity extends BaseActivity {
         mNextBtn.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                AudioPlayerManager.newInstance(mContext).next();
+                AudioPlayerManager.getInstance(mContext).next();
             }
         });
 
@@ -669,7 +669,7 @@ public class LrcActivity extends BaseActivity {
         mPreBtn.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                AudioPlayerManager.newInstance(mContext).pre();
+                AudioPlayerManager.getInstance(mContext).pre();
             }
         });
 
@@ -751,11 +751,11 @@ public class LrcActivity extends BaseActivity {
         mMvMenuBtn.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                AudioInfo audioInfo = AudioPlayerManager.newInstance(mContext).getCurSong(mConfigInfo.getPlayHash());
+                AudioInfo audioInfo = AudioPlayerManager.getInstance(mContext).getCurSong(mConfigInfo.getPlayHash());
                 if (audioInfo != null) {
                     //如果当前歌曲正在播放，则停止播放
-                    if (AudioPlayerManager.newInstance(mContext).getPlayStatus() == AudioPlayerManager.PLAYING) {
-                        AudioPlayerManager.newInstance(mContext).pause();
+                    if (AudioPlayerManager.getInstance(mContext).getPlayStatus() == AudioPlayerManager.PLAYING) {
+                        AudioPlayerManager.getInstance(mContext).pause();
                     }
 
                     //打开mv搜索界面
@@ -773,7 +773,7 @@ public class LrcActivity extends BaseActivity {
         mLikeMenuBtn.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                AudioInfo audioInfo = AudioPlayerManager.newInstance(mContext).getCurSong(mConfigInfo.getPlayHash());
+                AudioInfo audioInfo = AudioPlayerManager.getInstance(mContext).getCurSong(mConfigInfo.getPlayHash());
                 if (audioInfo != null) {
                     if (AudioInfoDB.isLikeAudioExists(mContext, audioInfo.getHash())) {
                         boolean result = AudioInfoDB.deleteLikeAudio(mContext, audioInfo.getHash(), true);
@@ -793,7 +793,7 @@ public class LrcActivity extends BaseActivity {
         mUnLikeMenuBtn.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                AudioInfo audioInfo = AudioPlayerManager.newInstance(mContext).getCurSong(mConfigInfo.getPlayHash());
+                AudioInfo audioInfo = AudioPlayerManager.getInstance(mContext).getCurSong(mConfigInfo.getPlayHash());
                 if (audioInfo != null) {
                     if (!AudioInfoDB.isLikeAudioExists(mContext, audioInfo.getHash())) {
                         boolean result = AudioInfoDB.addLikeAudio(mContext, audioInfo, true);
@@ -812,14 +812,14 @@ public class LrcActivity extends BaseActivity {
         mDownloadImg.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                AudioInfo audioInfo = AudioPlayerManager.newInstance(mContext).getCurSong(mConfigInfo.getPlayHash());
+                AudioInfo audioInfo = AudioPlayerManager.getInstance(mContext).getCurSong(mConfigInfo.getPlayHash());
                 if (audioInfo != null) {
-                    boolean flag = DownloadAudioManager.newInstance(mContext).isDownloadAudioExists(audioInfo.getHash());
+                    boolean flag = DownloadAudioManager.getInstance(mContext).isDownloadAudioExists(audioInfo.getHash());
                     if (flag) {
                         ToastUtil.showTextToast(mContext, mContext.getResources().getString(R.string.undownload_tip_text));
                     } else {
                         ToastUtil.showTextToast(mContext, mContext.getResources().getString(R.string.download_tip_text));
-                        DownloadAudioManager.newInstance(mContext).addTask(audioInfo);
+                        DownloadAudioManager.getInstance(mContext).addTask(audioInfo);
                     }
                 }
             }
@@ -976,7 +976,7 @@ public class LrcActivity extends BaseActivity {
         mPlayListRListView.setAdapter(mAdapter);
 
         //定位
-        int position = AudioPlayerManager.newInstance(mContext).getCurSongIndex(mConfigInfo.getAudioInfos(), mConfigInfo.getPlayHash());
+        int position = AudioPlayerManager.getInstance(mContext).getCurSongIndex(mConfigInfo.getAudioInfos(), mConfigInfo.getPlayHash());
         if (position != -1) {
             ((LinearLayoutManager) mPlayListRListView.getLayoutManager()).scrollToPositionWithOffset(position, 0);
         }
@@ -1101,14 +1101,14 @@ public class LrcActivity extends BaseActivity {
         makeLrcImg.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                AudioInfo audioInfo = AudioPlayerManager.newInstance(mContext).getCurSong(mConfigInfo.getPlayHash());
+                AudioInfo audioInfo = AudioPlayerManager.getInstance(mContext).getCurSong(mConfigInfo.getPlayHash());
                 if (audioInfo != null) {
 
                     hideMoreMenuView();
 
                     //如果当前歌曲正在播放，则停止播放
-                    if (AudioPlayerManager.newInstance(mContext).getPlayStatus() == AudioPlayerManager.PLAYING) {
-                        AudioPlayerManager.newInstance(mContext).pause();
+                    if (AudioPlayerManager.getInstance(mContext).getPlayStatus() == AudioPlayerManager.PLAYING) {
+                        AudioPlayerManager.getInstance(mContext).pause();
                     }
 
                     //获取制作歌词所需的音频信息
@@ -1149,13 +1149,13 @@ public class LrcActivity extends BaseActivity {
         lrcImgV.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                final AudioInfo audioInfo = AudioPlayerManager.newInstance(mContext).getCurSong(mConfigInfo.getPlayHash());
+                final AudioInfo audioInfo = AudioPlayerManager.getInstance(mContext).getCurSong(mConfigInfo.getPlayHash());
                 if (audioInfo != null) {
 
                     hideMoreMenuView();
 
                     //
-                    if (AudioPlayerManager.newInstance(mContext).getPlayStatus() == AudioPlayerManager.PLAYING) {
+                    if (AudioPlayerManager.getInstance(mContext).getPlayStatus() == AudioPlayerManager.PLAYING) {
                         Intent intent = new Intent(LrcActivity.this, SearchLrcActivity.class);
                         intent.putExtra(SearchLrcActivity.AUDIO_DATA_KEY, audioInfo);
                         startActivity(intent);
@@ -1176,7 +1176,7 @@ public class LrcActivity extends BaseActivity {
         singerImgV.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                final AudioInfo audioInfo = AudioPlayerManager.newInstance(mContext).getCurSong(mConfigInfo.getPlayHash());
+                final AudioInfo audioInfo = AudioPlayerManager.getInstance(mContext).getCurSong(mConfigInfo.getPlayHash());
                 if (audioInfo != null) {
 
                     hideMoreMenuView();
@@ -1223,7 +1223,7 @@ public class LrcActivity extends BaseActivity {
         songinfoImgV.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                final AudioInfo audioInfo = AudioPlayerManager.newInstance(mContext).getCurSong(mConfigInfo.getPlayHash());
+                final AudioInfo audioInfo = AudioPlayerManager.getInstance(mContext).getCurSong(mConfigInfo.getPlayHash());
                 if (audioInfo != null) {
 
                     hideMoreMenuView();
@@ -1910,7 +1910,7 @@ public class LrcActivity extends BaseActivity {
                     if (oldLyricsReader == null || !oldLyricsReader.getHash().equals(initAudioInfo.getHash())) {
                         //加载歌词
                         String keyWords = initAudioInfo.getTitle();
-                        LyricsManager.newInstance(mContext).loadLyrics(keyWords, keyWords, initAudioInfo.getDuration() + "", initAudioInfo.getHash(), mConfigInfo.isWifi(), new AsyncHandlerTask(mUIHandler, mWorkerHandler), null);
+                        LyricsManager.getInstance(mContext).loadLyrics(keyWords, keyWords, initAudioInfo.getDuration() + "", initAudioInfo.getHash(), mConfigInfo.isWifi(), new AsyncHandlerTask(mUIHandler, mWorkerHandler), null);
                         //加载中
                         mManyLineLyricsView.initLrcData();
                         mManyLineLyricsView.setLrcStatus(AbstractLrcView.LRCSTATUS_LOADING);
@@ -1926,7 +1926,7 @@ public class LrcActivity extends BaseActivity {
 
                         if (mIsShowPopPlayList) {
                             //定位
-                            int position = AudioPlayerManager.newInstance(mContext).getCurSongIndex(mConfigInfo.getAudioInfos(), mConfigInfo.getPlayHash());
+                            int position = AudioPlayerManager.getInstance(mContext).getCurSongIndex(mConfigInfo.getAudioInfos(), mConfigInfo.getPlayHash());
                             if (position != -1) {
                                 ((LinearLayoutManager) mPlayListRListView.getLayoutManager()).scrollToPositionWithOffset(position, 0);
                             }
@@ -2008,7 +2008,7 @@ public class LrcActivity extends BaseActivity {
                     if (mIsShowPopPlayList && mAdapter != null)
                         mAdapter.reshViewHolder(downloadedHash);
                     if (code == AudioBroadcastReceiver.ACTION_CODE_DOWNLOAD_FINISH) {
-                        AudioInfo downloadedAudioInfo = AudioPlayerManager.newInstance(mContext).getCurSong(downloadedHash);
+                        AudioInfo downloadedAudioInfo = AudioPlayerManager.getInstance(mContext).getCurSong(downloadedHash);
                         if (downloadedHash.equals(downloadedAudioInfo.getHash())) {
                             reshDownloadView(downloadedAudioInfo);
                         }
@@ -2035,7 +2035,7 @@ public class LrcActivity extends BaseActivity {
                 Bundle downloadOnlineSongBundle = intent.getBundleExtra(AudioBroadcastReceiver.ACTION_BUNDLEKEY);
                 DownloadTask downloadingTask = downloadOnlineSongBundle.getParcelable(AudioBroadcastReceiver.ACTION_DATA_KEY);
                 String hash = mConfigInfo.getPlayHash();
-                AudioInfo audioInfo = AudioPlayerManager.newInstance(mContext).getCurSong(hash);
+                AudioInfo audioInfo = AudioPlayerManager.getInstance(mContext).getCurSong(hash);
                 if (audioInfo != null && downloadingTask != null && !TextUtils.isEmpty(hash) && hash.equals(downloadingTask.getTaskId())) {
                     int downloadedSize = DownloadThreadInfoDB.getDownloadedSize(mContext, downloadingTask.getTaskId(), OnLineAudioManager.mThreadNum);
                     double pre = downloadedSize * 1.0 / audioInfo.getFileSize();
@@ -2049,10 +2049,10 @@ public class LrcActivity extends BaseActivity {
                 //歌词加载完成
                 Bundle lrcloadedBundle = intent.getBundleExtra(AudioBroadcastReceiver.ACTION_BUNDLEKEY);
                 String lrcHash = lrcloadedBundle.getString(AudioBroadcastReceiver.ACTION_DATA_KEY);
-                AudioInfo curAudioInfo = AudioPlayerManager.newInstance(mContext).getCurSong(mConfigInfo.getPlayHash());
+                AudioInfo curAudioInfo = AudioPlayerManager.getInstance(mContext).getCurSong(mConfigInfo.getPlayHash());
                 if (curAudioInfo != null && lrcHash.equals(curAudioInfo.getHash())) {
                     LyricsReader oldLyricsReader = mManyLineLyricsView.getLyricsReader();
-                    LyricsReader newLyricsReader = LyricsManager.newInstance(mContext).getLyricsReader(lrcHash);
+                    LyricsReader newLyricsReader = LyricsManager.getInstance(mContext).getLyricsReader(lrcHash);
                     if (oldLyricsReader != null && newLyricsReader != null && oldLyricsReader.getHash().equals(newLyricsReader.getHash())) {
 
                     } else {
@@ -2069,7 +2069,7 @@ public class LrcActivity extends BaseActivity {
 
             case AudioBroadcastReceiver.ACTION_CODE_LRCRELOADING:
                 //歌词重新加载中
-                AudioInfo curAudioInfoTemp1 = AudioPlayerManager.newInstance(mContext).getCurSong(mConfigInfo.getPlayHash());
+                AudioInfo curAudioInfoTemp1 = AudioPlayerManager.getInstance(mContext).getCurSong(mConfigInfo.getPlayHash());
                 LyricsReader oldLyricsReader = mManyLineLyricsView.getLyricsReader();
                 if (oldLyricsReader == null || oldLyricsReader.getHash().equals(curAudioInfoTemp1.getHash())) {
                     //加载中
@@ -2082,9 +2082,9 @@ public class LrcActivity extends BaseActivity {
                 //歌词重新加载
                 Bundle lrcreloadedBundle = intent.getBundleExtra(AudioBroadcastReceiver.ACTION_BUNDLEKEY);
                 String reloadlrcHash = lrcreloadedBundle.getString(AudioBroadcastReceiver.ACTION_DATA_KEY);
-                AudioInfo curAudioInfoTemp = AudioPlayerManager.newInstance(mContext).getCurSong(mConfigInfo.getPlayHash());
+                AudioInfo curAudioInfoTemp = AudioPlayerManager.getInstance(mContext).getCurSong(mConfigInfo.getPlayHash());
                 if (curAudioInfoTemp != null && reloadlrcHash.equals(curAudioInfoTemp.getHash())) {
-                    LyricsReader newLyricsReader = LyricsManager.newInstance(mContext).getLyricsReader(reloadlrcHash);
+                    LyricsReader newLyricsReader = LyricsManager.getInstance(mContext).getLyricsReader(reloadlrcHash);
                     if (newLyricsReader != null) {
                         mManyLineLyricsView.setLyricsReader(newLyricsReader);
                     }
@@ -2100,7 +2100,7 @@ public class LrcActivity extends BaseActivity {
             case AudioBroadcastReceiver.ACTION_CODE_RELOADSINGERIMG:
                 Bundle singerReloadBundle = intent.getBundleExtra(AudioBroadcastReceiver.ACTION_BUNDLEKEY);
                 String singerHash = singerReloadBundle.getString(AudioBroadcastReceiver.ACTION_DATA_KEY);
-                AudioInfo curSingerAudioInfo = AudioPlayerManager.newInstance(mContext).getCurSong(mConfigInfo.getPlayHash());
+                AudioInfo curSingerAudioInfo = AudioPlayerManager.getInstance(mContext).getCurSong(mConfigInfo.getPlayHash());
                 if (curSingerAudioInfo != null && curSingerAudioInfo.getHash().equals(singerHash)) {
                     mUIHandler.sendEmptyMessage(MESSAGE_CODE_SINGER_RELOAD);
                 }
@@ -2117,7 +2117,7 @@ public class LrcActivity extends BaseActivity {
                 String curHash = mConfigInfo.getPlayHash();
                 if (!curHash.equals(likeHash)) return;
 
-                AudioInfo curAudioInfoTemp2 = AudioPlayerManager.newInstance(mContext).getCurSong(curHash);
+                AudioInfo curAudioInfoTemp2 = AudioPlayerManager.getInstance(mContext).getCurSong(curHash);
                 if (curAudioInfoTemp2 == null) return;
                 if (AudioInfoDB.isLikeAudioExists(mContext, curAudioInfoTemp2.getHash())) {
                     mUnLikeMenuBtn.setVisibility(View.GONE);
@@ -2131,13 +2131,13 @@ public class LrcActivity extends BaseActivity {
                 //歌词制作成功
                 Bundle makeBundle = intent.getBundleExtra(AudioBroadcastReceiver.ACTION_BUNDLEKEY);
                 String lrchash = makeBundle.getString(AudioBroadcastReceiver.ACTION_DATA_KEY);
-                LyricsManager.newInstance(mContext).remove(lrchash);
+                LyricsManager.getInstance(mContext).remove(lrchash);
                 if (mConfigInfo.getPlayHash().equals(lrchash)) {
 
-                    AudioInfo lrcAudioInfo = AudioPlayerManager.newInstance(mContext).getCurSong(lrchash);
+                    AudioInfo lrcAudioInfo = AudioPlayerManager.getInstance(mContext).getCurSong(lrchash);
                     //加载歌词
                     String keyWords = lrcAudioInfo.getTitle();
-                    LyricsManager.newInstance(mContext).loadLyrics(keyWords, keyWords, lrcAudioInfo.getDuration() + "", lrcAudioInfo.getHash(), mConfigInfo.isWifi(), new AsyncHandlerTask(mUIHandler, mWorkerHandler), null);
+                    LyricsManager.getInstance(mContext).loadLyrics(keyWords, keyWords, lrcAudioInfo.getDuration() + "", lrcAudioInfo.getHash(), mConfigInfo.isWifi(), new AsyncHandlerTask(mUIHandler, mWorkerHandler), null);
                     //加载中
                     mManyLineLyricsView.initLrcData();
                     mManyLineLyricsView.setLrcStatus(AbstractLrcView.LRCSTATUS_LOADING);

@@ -426,13 +426,13 @@ public class MainActivity extends BaseActivity {
 
                             //加载歌词
                             String keyWords = initAudioInfo.getTitle();
-                            LyricsManager.newInstance(mContext).loadLyrics(keyWords, keyWords, initAudioInfo.getDuration() + "", initAudioInfo.getHash(), mConfigInfo.isWifi(), new AsyncHandlerTask(mUIHandler, mWorkerHandler), null);
+                            LyricsManager.getInstance(mContext).loadLyrics(keyWords, keyWords, initAudioInfo.getDuration() + "", initAudioInfo.getHash(), mConfigInfo.isWifi(), new AsyncHandlerTask(mUIHandler, mWorkerHandler), null);
 
                             if (mAdapter != null) {
 
                                 if (mIsShowPopPlayList) {
                                     //定位
-                                    int position = AudioPlayerManager.newInstance(mContext).getCurSongIndex(mConfigInfo.getAudioInfos(), mConfigInfo.getPlayHash());
+                                    int position = AudioPlayerManager.getInstance(mContext).getCurSongIndex(mConfigInfo.getAudioInfos(), mConfigInfo.getPlayHash());
                                     if (position != -1) {
                                         ((LinearLayoutManager) mPlayListRListView.getLayoutManager()).scrollToPositionWithOffset(position, 0);
                                     }
@@ -514,7 +514,7 @@ public class MainActivity extends BaseActivity {
                         Bundle downloadOnlineSongBundle = intent.getBundleExtra(AudioBroadcastReceiver.ACTION_BUNDLEKEY);
                         DownloadTask downloadingTask = downloadOnlineSongBundle.getParcelable(AudioBroadcastReceiver.ACTION_DATA_KEY);
                         String hash = mConfigInfo.getPlayHash();
-                        AudioInfo audioInfo = AudioPlayerManager.newInstance(mContext).getCurSong(hash);
+                        AudioInfo audioInfo = AudioPlayerManager.getInstance(mContext).getCurSong(hash);
                         if (audioInfo != null && downloadingTask != null && !TextUtils.isEmpty(hash) && hash.equals(downloadingTask.getTaskId())) {
                             int downloadedSize = DownloadThreadInfoDB.getDownloadedSize(mContext, downloadingTask.getTaskId(), OnLineAudioManager.mThreadNum);
                             double pre = downloadedSize * 1.0 / audioInfo.getFileSize();
@@ -732,7 +732,7 @@ public class MainActivity extends BaseActivity {
             case LOAD_CONFIG_DATA:
 
                 mConfigInfo = ConfigInfo.obtain();
-                AudioPlayerManager.newInstance(mContext).init();
+                AudioPlayerManager.getInstance(mContext).init();
 
                 mUIHandler.sendEmptyMessage(LOAD_CONFIG_DATA);
                 break;
@@ -1121,7 +1121,7 @@ public class MainActivity extends BaseActivity {
         mPlayImageView.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                AudioPlayerManager.newInstance(mContext).play(mMusicSeekBar.getProgress());
+                AudioPlayerManager.getInstance(mContext).play(mMusicSeekBar.getProgress());
             }
         });
         //暂停
@@ -1129,7 +1129,7 @@ public class MainActivity extends BaseActivity {
         mPauseImageView.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                AudioPlayerManager.newInstance(mContext).pause();
+                AudioPlayerManager.getInstance(mContext).pause();
             }
         });
         //下一首
@@ -1137,7 +1137,7 @@ public class MainActivity extends BaseActivity {
         mNextImageView.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                AudioPlayerManager.newInstance(mContext).next();
+                AudioPlayerManager.getInstance(mContext).next();
             }
         });
 
@@ -1167,10 +1167,10 @@ public class MainActivity extends BaseActivity {
             @Override
             public void onTrackingTouchFinish(MusicSeekBar musicSeekBar) {
                 int progress = mMusicSeekBar.getProgress();
-                AudioInfo audioInfo = AudioPlayerManager.newInstance(mContext).getCurSong(mConfigInfo.getPlayHash());
+                AudioInfo audioInfo = AudioPlayerManager.getInstance(mContext).getCurSong(mConfigInfo.getPlayHash());
                 if (audioInfo != null && progress <= audioInfo.getDuration()) {
                     audioInfo.setPlayProgress(progress);
-                    AudioPlayerManager.newInstance(mContext).seekto(audioInfo);
+                    AudioPlayerManager.getInstance(mContext).seekto(audioInfo);
                 }
             }
         });
@@ -1292,7 +1292,7 @@ public class MainActivity extends BaseActivity {
         mPlayListRListView.setAdapter(mAdapter);
 
         //定位
-        int position = AudioPlayerManager.newInstance(mContext).getCurSongIndex(mConfigInfo.getAudioInfos(), mConfigInfo.getPlayHash());
+        int position = AudioPlayerManager.getInstance(mContext).getCurSongIndex(mConfigInfo.getAudioInfos(), mConfigInfo.getPlayHash());
         if (position != -1) {
             ((LinearLayoutManager) mPlayListRListView.getLayoutManager()).scrollToPositionWithOffset(position, 0);
         }
@@ -1413,8 +1413,8 @@ public class MainActivity extends BaseActivity {
      */
     private void releaseData() {
         ImageUtil.release();
-        DownloadAudioManager.newInstance(mContext).release();
-        AudioPlayerManager.newInstance(mContext).release();
+        DownloadAudioManager.getInstance(mContext).release();
+        AudioPlayerManager.getInstance(mContext).release();
         ToastUtil.release();
     }
 

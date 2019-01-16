@@ -136,12 +136,12 @@ public class PhoneV4Receiver extends BroadcastReceiver {
      */
     private void seekToMusic(int seekProgress) {
         ConfigInfo configInfo = ConfigInfo.obtain();
-        AudioInfo audioInfo = AudioPlayerManager.newInstance(mContext).getCurSong(configInfo.getPlayHash());
+        AudioInfo audioInfo = AudioPlayerManager.getInstance(mContext).getCurSong(configInfo.getPlayHash());
         if (audioInfo != null) {
             seekProgress += audioInfo.getPlayProgress();
             if (seekProgress <= audioInfo.getDuration()) {
                 audioInfo.setPlayProgress(seekProgress);
-                AudioPlayerManager.newInstance(mContext).seekto(audioInfo);
+                AudioPlayerManager.getInstance(mContext).seekto(audioInfo);
             }
         }
     }
@@ -151,21 +151,21 @@ public class PhoneV4Receiver extends BroadcastReceiver {
      * 播放上一首
      */
     private void playPrevious() {
-        AudioPlayerManager.newInstance(mContext).pre();
+        AudioPlayerManager.getInstance(mContext).pre();
     }
 
     /**
      * 播放下一首
      */
     private void playNext() {
-        AudioPlayerManager.newInstance(mContext).next();
+        AudioPlayerManager.getInstance(mContext).next();
     }
 
     /**
      * 播放或者暂存
      */
     private void playOrPause() {
-        AudioPlayerManager.newInstance(mContext).playOrPause();
+        AudioPlayerManager.getInstance(mContext).playOrPause();
     }
 
     @Override

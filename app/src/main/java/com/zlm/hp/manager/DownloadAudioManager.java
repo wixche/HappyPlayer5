@@ -191,7 +191,7 @@ public class DownloadAudioManager {
         });
     }
 
-    public static DownloadAudioManager newInstance(Context context) {
+    public static DownloadAudioManager getInstance(Context context) {
         if (_DownloadAudioManager == null) {
             _DownloadAudioManager = new DownloadAudioManager(context);
         }

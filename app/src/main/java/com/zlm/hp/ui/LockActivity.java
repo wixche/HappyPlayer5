@@ -313,7 +313,7 @@ public class LockActivity extends BaseActivity {
             @Override
             public void onClick(View v) {
 
-                AudioPlayerManager.newInstance(mContext).pre();
+                AudioPlayerManager.getInstance(mContext).pre();
 
             }
         });
@@ -323,7 +323,7 @@ public class LockActivity extends BaseActivity {
             @Override
             public void onClick(View v) {
 
-                AudioPlayerManager.newInstance(mContext).next();
+                AudioPlayerManager.getInstance(mContext).next();
 
             }
         });
@@ -333,7 +333,7 @@ public class LockActivity extends BaseActivity {
             @Override
             public void onClick(View v) {
 
-                AudioPlayerManager.newInstance(mContext).playOrPause();
+                AudioPlayerManager.getInstance(mContext).playOrPause();
             }
         });
 
@@ -562,7 +562,7 @@ public class LockActivity extends BaseActivity {
                 break;
             case MESSAGE_WHAT_LOAD_DATA:
 
-                AudioInfo audioInfo = AudioPlayerManager.newInstance(mContext).getCurSong(mConfigInfo.getPlayHash());
+                AudioInfo audioInfo = AudioPlayerManager.getInstance(mContext).getCurSong(mConfigInfo.getPlayHash());
                 Intent intent = new Intent();
                 if (audioInfo != null) {
 
@@ -571,7 +571,7 @@ public class LockActivity extends BaseActivity {
                     intent.putExtra(AudioBroadcastReceiver.ACTION_BUNDLEKEY, bundle);
                     handleAudioBroadcastReceiver(intent, AudioBroadcastReceiver.ACTION_CODE_INIT);
 
-                    int playStatus = AudioPlayerManager.newInstance(mContext).getPlayStatus();
+                    int playStatus = AudioPlayerManager.getInstance(mContext).getPlayStatus();
                     if (playStatus == AudioPlayerManager.PLAYING) {
                         handleAudioBroadcastReceiver(intent, AudioBroadcastReceiver.ACTION_CODE_PLAY);
                     }
@@ -640,7 +640,7 @@ public class LockActivity extends BaseActivity {
                     if (oldLyricsReader == null || !oldLyricsReader.getHash().equals(initAudioInfo.getHash())) {
                         //加载歌词
                         String keyWords = initAudioInfo.getTitle();
-                        LyricsManager.newInstance(mContext).loadLyrics(keyWords, keyWords, initAudioInfo.getDuration() + "", initAudioInfo.getHash(), mConfigInfo.isWifi(), new AsyncHandlerTask(mUIHandler, mWorkerHandler), null);
+                        LyricsManager.getInstance(mContext).loadLyrics(keyWords, keyWords, initAudioInfo.getDuration() + "", initAudioInfo.getHash(), mConfigInfo.isWifi(), new AsyncHandlerTask(mUIHandler, mWorkerHandler), null);
                         //加载中
                         mManyLineLyricsView.initLrcData();
                         mManyLineLyricsView.setLrcStatus(AbstractLrcView.LRCSTATUS_LOADING);
@@ -703,10 +703,10 @@ public class LockActivity extends BaseActivity {
                 //歌词加载完成
                 Bundle lrcloadedBundle = intent.getBundleExtra(AudioBroadcastReceiver.ACTION_BUNDLEKEY);
                 String lrcHash = lrcloadedBundle.getString(AudioBroadcastReceiver.ACTION_DATA_KEY);
-                AudioInfo curAudioInfo = AudioPlayerManager.newInstance(mContext).getCurSong(mConfigInfo.getPlayHash());
+                AudioInfo curAudioInfo = AudioPlayerManager.getInstance(mContext).getCurSong(mConfigInfo.getPlayHash());
                 if (curAudioInfo != null && lrcHash.equals(curAudioInfo.getHash())) {
                     LyricsReader oldLyricsReader = mManyLineLyricsView.getLyricsReader();
-                    LyricsReader newLyricsReader = LyricsManager.newInstance(mContext).getLyricsReader(lrcHash);
+                    LyricsReader newLyricsReader = LyricsManager.getInstance(mContext).getLyricsReader(lrcHash);
                     if (oldLyricsReader != null && newLyricsReader != null && oldLyricsReader.getHash().equals(newLyricsReader.getHash())) {
 
                     } else {

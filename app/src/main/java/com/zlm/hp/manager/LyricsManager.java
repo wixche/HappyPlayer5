@@ -35,7 +35,7 @@ public class LyricsManager {
         this.mContext = context;
     }
 
-    public synchronized static LyricsManager newInstance(Context context) {
+    public synchronized static LyricsManager getInstance(Context context) {
         if (_LyricsManager == null) {
             _LyricsManager = new LyricsManager(context);
         }

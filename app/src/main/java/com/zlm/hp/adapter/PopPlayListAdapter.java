@@ -114,12 +114,12 @@ public class PopPlayListAdapter extends RecyclerView.Adapter<RecyclerView.ViewHo
         viewHolder.getDownloadImg().setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                boolean flag = DownloadAudioManager.newInstance(mContext).isDownloadAudioExists(audioInfo.getHash());
+                boolean flag = DownloadAudioManager.getInstance(mContext).isDownloadAudioExists(audioInfo.getHash());
                 if (flag) {
                     ToastUtil.showTextToast(mContext, mContext.getResources().getString(R.string.undownload_tip_text));
                 } else {
                     ToastUtil.showTextToast(mContext, mContext.getResources().getString(R.string.download_tip_text));
-                    DownloadAudioManager.newInstance(mContext).addTask(audioInfo);
+                    DownloadAudioManager.getInstance(mContext).addTask(audioInfo);
                 }
             }
         });
@@ -200,7 +200,7 @@ public class PopPlayListAdapter extends RecyclerView.Adapter<RecyclerView.ViewHo
 
                 //播放器如果正在播放
                 if (flag)
-                    AudioPlayerManager.newInstance(mContext).stop();
+                    AudioPlayerManager.getInstance(mContext).stop();
 
                 //移除数据
                 if (curHashIndex != -1) {
@@ -241,11 +241,11 @@ public class PopPlayListAdapter extends RecyclerView.Adapter<RecyclerView.ViewHo
             public void onClick(View view) {
                 int oldIndex = getAudioIndex(mConfigInfo.getPlayHash());
                 if (oldIndex == position) {
-                    AudioPlayerManager.newInstance(mContext).playOrPause();
+                    AudioPlayerManager.getInstance(mContext).playOrPause();
                     return;
                 }
 
-                AudioPlayerManager.newInstance(mContext).playSong(audioInfo);
+                AudioPlayerManager.getInstance(mContext).playSong(audioInfo);
 
                 if (oldIndex != -1) {
                     notifyItemChanged(oldIndex);
