@@ -126,6 +126,6 @@ dependencies {
     /**
      * 字幕
      */
-    implementation 'com.github.zhangliangming:Subtitle:v1.2'
+    implementation 'com.github.zhangliangming:Subtitle:v1.3'
 
 }
