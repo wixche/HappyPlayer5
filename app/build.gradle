@@ -77,7 +77,7 @@ dependencies {
     /**
      * 进度条
      */
-    implementation 'com.github.zhangliangming:SeekBar:v3.7'
+    implementation 'com.github.zhangliangming:SeekBar:v3.8'
     /**
      * 歌词
      */
