@@ -762,6 +762,7 @@ public class LockActivity extends BaseActivity {
     @Override
     public void finish() {
         AniUtil.stopAnimation(mAniLoading);
+        LyricsManager.getInstance(mContext).release();
         mManyLineLyricsView.release();
         mSingerImageView.release();
 

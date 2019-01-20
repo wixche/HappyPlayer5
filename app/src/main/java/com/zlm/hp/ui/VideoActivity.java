@@ -11,7 +11,10 @@ import android.text.TextUtils;
 import android.view.SurfaceHolder;
 import android.view.SurfaceView;
 import android.view.View;
+import android.view.ViewTreeObserver;
 import android.view.WindowManager;
+import android.view.animation.Animation;
+import android.view.animation.TranslateAnimation;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.RelativeLayout;
@@ -28,6 +31,7 @@ import com.zlm.hp.util.ColorUtil;
 import com.zlm.hp.util.ResourceUtil;
 import com.zlm.hp.util.ToastUtil;
 import com.zlm.hp.widget.IconfontImageButtonTextView;
+import com.zlm.hp.widget.IconfontTextView;
 import com.zlm.libs.widget.MusicSeekBar;
 
 import tv.danmaku.ijk.media.player.IMediaPlayer;
@@ -136,6 +140,13 @@ public class VideoActivity extends BaseActivity {
         }
     };
 
+    /**
+     * pop
+     */
+    private RelativeLayout mPopRelativeLayout;
+    private LinearLayout mPopMenuLinearLayout;
+    private boolean mIsShowPopMenu = false;
+
     @Override
     protected void preInitStatusBar() {
         setFullScreen(true);
@@ -195,7 +206,14 @@ public class VideoActivity extends BaseActivity {
         menu.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-
+                if (mIsShowPopMenu) {
+                    hidePopMenuView();
+                } else {
+                    if (mPopRelativeLayout == null) {
+                        initPopMenuView();
+                    }
+                    showPopMenuView();
+                }
             }
         });
         //视频view
@@ -311,6 +329,112 @@ public class VideoActivity extends BaseActivity {
     }
 
     /**
+     * 初始化pop menu
+     */
+    private void initPopMenuView() {
+        //全屏视图
+        mPopRelativeLayout = findViewById(R.id.video_pop);
+        mPopRelativeLayout.setVisibility(View.INVISIBLE);
+        mPopRelativeLayout.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                hidePopMenuView();
+            }
+        });
+        //窗口
+        mPopMenuLinearLayout = findViewById(R.id.video_pop_menu);
+
+        //关闭窗口
+        IconfontTextView closeBtn = findViewById(R.id.closebtn);
+        closeBtn.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                hidePopMenuView();
+            }
+        });
+    }
+
+    /**
+     *
+     */
+    private void showPopMenuView() {
+        /**
+         * 如果该界面还没初始化，则监听
+         */
+        if (mPopMenuLinearLayout.getHeight() == 0) {
+            mPopMenuLinearLayout.getViewTreeObserver().addOnGlobalLayoutListener(new ViewTreeObserver.OnGlobalLayoutListener() {
+                @Override
+                public void onGlobalLayout() {
+                    mPopMenuLinearLayout.getViewTreeObserver().removeOnGlobalLayoutListener(this);
+                    showPopMenuViewAnimation();
+                }
+            });
+
+        } else {
+            showPopMenuViewAnimation();
+        }
+    }
+
+    /**
+     * 隐藏pop menu
+     */
+    private void hidePopMenuView() {
+        TranslateAnimation translateAnimation = new TranslateAnimation(0, 0, 0, mPopMenuLinearLayout.getHeight());
+        translateAnimation.setDuration(250);//设置动画持续时间
+        translateAnimation.setFillAfter(true);
+        translateAnimation.setAnimationListener(new Animation.AnimationListener() {
+            @Override
+            public void onAnimationStart(Animation animation) {
+
+            }
+
+            @Override
+            public void onAnimationEnd(Animation animation) {
+                mIsShowPopMenu = false;
+                mPopRelativeLayout.setVisibility(View.GONE);
+            }
+
+            @Override
+            public void onAnimationRepeat(Animation animation) {
+
+            }
+        });
+        mPopMenuLinearLayout.clearAnimation();
+        mPopMenuLinearLayout.startAnimation(translateAnimation);
+    }
+
+
+    /**
+     *
+     */
+    private void showPopMenuViewAnimation() {
+        mPopRelativeLayout.setVisibility(View.VISIBLE);
+        TranslateAnimation translateAnimation = new TranslateAnimation(0, 0, mPopMenuLinearLayout.getHeight(), 0);
+        translateAnimation.setDuration(250);//设置动画持续时间
+        translateAnimation.setFillAfter(true);
+        translateAnimation.setAnimationListener(new Animation.AnimationListener() {
+            @Override
+            public void onAnimationStart(Animation animation) {
+                mIsShowPopMenu = true;
+
+            }
+
+            @Override
+            public void onAnimationEnd(Animation animation) {
+
+            }
+
+            @Override
+            public void onAnimationRepeat(Animation animation) {
+
+            }
+        });
+
+        mPopMenuLinearLayout.clearAnimation();
+        mPopMenuLinearLayout.startAnimation(translateAnimation);
+    }
+
+    /**
      * 播放视频
      */
     private void playVideo() {
@@ -396,6 +520,12 @@ public class VideoActivity extends BaseActivity {
             public void surfaceDestroyed(SurfaceHolder holder) {
                 if (mMediaPlayer != null && mMediaPlayer.isPlaying()) {
                     mUIHandler.sendEmptyMessage(MESSAGE_WHAT_PAUSE);
+                }
+
+                if (!isVisibility) {
+                    isVisibility = true;
+                    mHeaderView.setVisibility(View.VISIBLE);
+                    mFooterView.setVisibility(View.VISIBLE);
                 }
             }
         });
@@ -563,5 +693,14 @@ public class VideoActivity extends BaseActivity {
         System.gc();
 
 
+    }
+
+    @Override
+    public void onBackPressed() {
+        if (mIsShowPopMenu) {
+            hidePopMenuView();
+            return;
+        }
+        super.onBackPressed();
     }
 }

@@ -2,7 +2,7 @@ apply plugin: 'com.android.application'
 apply plugin: 'org.greenrobot.greendao'
 
 android {
-    buildToolsVersion '28.0.2'
+
     compileSdkVersion 28
     defaultConfig {
         applicationId "com.zlm.hp"
@@ -33,6 +33,10 @@ android {
         preDexLibraries = false
     }
 
+    lintOptions {
+        abortOnError false
+    }
+
     productFlavors {
     }
 
@@ -43,6 +47,7 @@ android {
         targetGenDir 'src/main/java'
     }
 
+    buildToolsVersion '28.0.0'
 }
 
 dependencies {
@@ -51,7 +56,7 @@ dependencies {
     androidTestImplementation('com.android.support.test.espresso:espresso-core:2.2.2', {
         exclude group: 'com.android.support', module: 'support-annotations'
     })
-    implementation 'com.android.support:appcompat-v7:28+'
+    implementation 'com.android.support:appcompat-v7:28.0.0'
     implementation 'com.android.support:support-v4:28.0.0'
     implementation 'com.android.support:recyclerview-v7:28.0.0'
     testImplementation 'junit:junit:4.12'
@@ -122,10 +127,8 @@ dependencies {
      * 第三方上拉加载更多，下拉刷新
      */
     implementation 'com.github.zhangliangming:LRecyclerView:v1.0'
-
     /**
      * 字幕
      */
     implementation 'com.github.zhangliangming:Subtitle:v1.3'
-
 }

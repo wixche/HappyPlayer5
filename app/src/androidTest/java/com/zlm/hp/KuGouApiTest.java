@@ -105,7 +105,7 @@ public class KuGouApiTest {
     public void KuGouApiRankSongList() {
         Context appContext = InstrumentationRegistry.getTargetContext();
         APIHttpClient apiHttpClient = HttpUtil.getHttpClient();
-        apiHttpClient.rankSongList(appContext, "6666", 1, 10, true);
+        apiHttpClient.rankSongList(appContext, "6666", "",1, 10, true);
     }
 
     /**

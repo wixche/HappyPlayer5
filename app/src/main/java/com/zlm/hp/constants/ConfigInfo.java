@@ -186,6 +186,15 @@ public class ConfigInfo implements Parcelable {
      */
     private TimerInfo timerInfo;
 
+    /**
+     * 是否显示字幕
+     */
+    private boolean isShowSubtitle;
+
+    /**
+     * 字幕字体大小
+     */
+    private int subtitleFontSize = MIN_LRC_FONT_SIZE;
 
     protected ConfigInfo(Parcel in) {
         if (in != null) {
@@ -202,6 +211,9 @@ public class ConfigInfo implements Parcelable {
             desktopLrcY = in.readInt();
             playHash = in.readString();
             playModel = in.readInt();
+
+            isShowSubtitle = in.readByte() != 0;
+            subtitleFontSize = in.readInt();/**/
 //            audioInfos = in.createTypedArrayList(AudioInfo.CREATOR);
         }
     }
@@ -221,6 +233,9 @@ public class ConfigInfo implements Parcelable {
         dest.writeInt(desktopLrcY);
         dest.writeString(playHash);
         dest.writeInt(playModel);
+
+        dest.writeByte((byte) (isShowSubtitle ? 1 : 0));
+        dest.writeInt(subtitleFontSize);
 //        dest.writeTypedList(audioInfos);
     }
 
@@ -411,6 +426,24 @@ public class ConfigInfo implements Parcelable {
 
     public ConfigInfo setPlayHash(String playHash) {
         this.playHash = playHash;
+        return this;
+    }
+
+    public boolean isShowSubtitle() {
+        return isShowSubtitle;
+    }
+
+    public ConfigInfo setShowSubtitle(boolean showSubtitle) {
+        isShowSubtitle = showSubtitle;
+        return this;
+    }
+
+    public int getSubtitleFontSize() {
+        return subtitleFontSize;
+    }
+
+    public ConfigInfo setSubtitleFontSize(int subtitleFontSize) {
+        this.subtitleFontSize = subtitleFontSize;
         return this;
     }
 

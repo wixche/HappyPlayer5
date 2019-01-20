@@ -2210,6 +2210,7 @@ public class LrcActivity extends BaseActivity {
         if (mExtraLrcTypeHandler != null) {
             mExtraLrcTypeHandler.removeCallbacksAndMessages(null);
         }
+        LyricsManager.getInstance(mContext).release();
         mSingerImageView.release();
         mManyLineLyricsView.release();
         destroyReceiver();

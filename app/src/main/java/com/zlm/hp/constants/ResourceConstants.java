@@ -78,4 +78,9 @@ public class ResourceConstants {
     public final static String PATH_CACHE_AUDIO = PATH_TEMP + File.separator
             + "cache" + File.separator + "audio";
 
+    /**
+     * 字幕目录
+     */
+    public final static String PATH_SUBTITLE = PATH_TEMP + File.separator + "subtitle";
+
 }

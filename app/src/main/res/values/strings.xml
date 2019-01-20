@@ -167,4 +167,7 @@
     <string name="download_wait_text">等待下载</string>
     <string name="download_goon_text">点击继续下载</string>
 
+    //字幕
+    <string name="subtitle_switch_text">字幕开关</string>
+
 </resources>

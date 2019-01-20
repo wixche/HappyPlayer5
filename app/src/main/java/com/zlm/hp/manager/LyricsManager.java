@@ -124,11 +124,18 @@ public class LyricsManager {
     }
 
     /**
-     *
      * @param hash
      */
-    public void remove(String hash){
+    public void remove(String hash) {
         mLyricsReaderCache.remove(hash);
+    }
+
+    /**
+     *
+     */
+    public void release() {
+        if (mLyricsReaderCache != null)
+            mLyricsReaderCache.clear();
     }
 
     /**
