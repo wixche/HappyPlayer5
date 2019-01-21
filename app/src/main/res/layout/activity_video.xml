@@ -17,6 +17,14 @@
             android:layout_width="match_parent"
             android:layout_height="match_parent" />
 
+        <com.zlm.subtitlelibrary.widget.SubtitleView
+            android:id="@+id/subtitle"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_alignParentBottom="true"
+            android:layout_marginBottom="25dp"
+            android:gravity="center_horizontal" />
+
         <RelativeLayout
             android:id="@+id/op_bg"
             android:layout_width="match_parent"

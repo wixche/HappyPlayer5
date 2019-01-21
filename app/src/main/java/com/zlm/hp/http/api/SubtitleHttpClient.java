@@ -62,21 +62,23 @@ public class SubtitleHttpClient {
 
                     Map<String, Object> returnResult = new HashMap<String, Object>();
                     JSONObject subJsonNode = jsonNode.getJSONObject("sub");
-                    if (subJsonNode.has("subs") && subJsonNode.get("subs") instanceof JSONArray) {
-                        JSONArray subsJsonNode = subJsonNode.getJSONArray("subs");
+                    if (subJsonNode.has("subs")) {
                         List<SubtitleInfo> lists = new ArrayList<SubtitleInfo>();
-                        for (int i = 0; i < subsJsonNode.length(); i++) {
-                            JSONObject dataDataNode = subsJsonNode.getJSONObject(i);
+                        if (subJsonNode.get("subs") instanceof JSONArray) {
+                            JSONArray subsJsonNode = subJsonNode.getJSONArray("subs");
+                            for (int i = 0; i < subsJsonNode.length(); i++) {
+                                JSONObject dataDataNode = subsJsonNode.getJSONObject(i);
 
-                            String id = dataDataNode.optString("id", "");
-                            if (TextUtils.isEmpty(id)) {
-                                continue;
-                            }
+                                String id = dataDataNode.optString("id", "");
+                                if (TextUtils.isEmpty(id)) {
+                                    continue;
+                                }
 
-                            //
-                            List<SubtitleInfo> subtitleInfos = getSubtitleInfos(id);
-                            if (subtitleInfos != null && subtitleInfos.size() > 0) {
-                                lists.addAll(subtitleInfos);
+                                //
+                                List<SubtitleInfo> subtitleInfos = getSubtitleInfos(id);
+                                if (subtitleInfos != null && subtitleInfos.size() > 0) {
+                                    lists.addAll(subtitleInfos);
+                                }
                             }
                         }
                         returnResult.put("rows", lists);
@@ -126,10 +128,10 @@ public class SubtitleHttpClient {
                                 if (dataDataNode.get("filelist") instanceof JSONArray) {
 
                                     JSONArray filelistJsonArray = dataDataNode.getJSONArray("filelist");
-                                    for(int j = 0; j < filelistJsonArray.length(); j++){
+                                    for (int j = 0; j < filelistJsonArray.length(); j++) {
                                         JSONObject filelistJSONObject = filelistJsonArray.getJSONObject(j);
-                                        SubtitleInfo subtitleInfo =  getSubtitleInfo(filelistJSONObject);
-                                        if(subtitleInfo != null){
+                                        SubtitleInfo subtitleInfo = getSubtitleInfo(id, filelistJSONObject);
+                                        if (subtitleInfo != null) {
                                             subtitleInfos.add(subtitleInfo);
                                         }
                                     }
@@ -137,8 +139,8 @@ public class SubtitleHttpClient {
                                 } else if (dataDataNode.get("filelist") instanceof JSONObject) {
 
                                     JSONObject filelistJSONObject = dataDataNode.getJSONObject("filelist");
-                                    SubtitleInfo subtitleInfo =  getSubtitleInfo(filelistJSONObject);
-                                    if(subtitleInfo != null){
+                                    SubtitleInfo subtitleInfo = getSubtitleInfo(id, filelistJSONObject);
+                                    if (subtitleInfo != null) {
                                         subtitleInfos.add(subtitleInfo);
                                     }
 
@@ -156,15 +158,17 @@ public class SubtitleHttpClient {
 
     /**
      * 获取字幕信息
+     *
      * @param filelistJSONObject
      * @return
      */
-    private SubtitleInfo getSubtitleInfo(JSONObject filelistJSONObject) {
-        if(filelistJSONObject != null){
+    private SubtitleInfo getSubtitleInfo(String id, JSONObject filelistJSONObject) {
+        if (filelistJSONObject != null) {
 
             SubtitleInfo subtitleInfo = new SubtitleInfo();
-            subtitleInfo.setDownloadUrl(filelistJSONObject.optString("url",""));
-            subtitleInfo.setFileName(filelistJSONObject.optString("f",""));
+            subtitleInfo.setId(id);
+            subtitleInfo.setDownloadUrl(filelistJSONObject.optString("url", ""));
+            subtitleInfo.setFileName(filelistJSONObject.optString("f", ""));
 
             return subtitleInfo;
         }

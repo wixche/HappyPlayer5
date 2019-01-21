@@ -27,16 +27,16 @@ public class AndroidBug5497WorkaroundUtils {
     private FrameLayout.LayoutParams frameLayoutParams;
 
     private AndroidBug5497WorkaroundUtils(final Activity activity) {
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
-            FrameLayout content = (FrameLayout) activity.findViewById(android.R.id.content);
-            mChildOfContent = content.getChildAt(0);
-            mChildOfContent.getViewTreeObserver().addOnGlobalLayoutListener(new ViewTreeObserver.OnGlobalLayoutListener() {
-                public void onGlobalLayout() {
-                    possiblyResizeChildOfContent(activity);
-                }
-            });
-            frameLayoutParams = (FrameLayout.LayoutParams) mChildOfContent.getLayoutParams();
-        }
+
+        FrameLayout content = (FrameLayout) activity.findViewById(android.R.id.content);
+        mChildOfContent = content.getChildAt(0);
+        mChildOfContent.getViewTreeObserver().addOnGlobalLayoutListener(new ViewTreeObserver.OnGlobalLayoutListener() {
+            public void onGlobalLayout() {
+                possiblyResizeChildOfContent(activity);
+            }
+        });
+        frameLayoutParams = (FrameLayout.LayoutParams) mChildOfContent.getLayoutParams();
+
 
     }
 

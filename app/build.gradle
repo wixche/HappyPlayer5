@@ -42,7 +42,7 @@ android {
 
     //greendao设置相关参数
     greendao {
-        schemaVersion 2
+        schemaVersion 3
         daoPackage 'com.zlm.hp.db.dao'
         targetGenDir 'src/main/java'
     }

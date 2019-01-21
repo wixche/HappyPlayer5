@@ -38,11 +38,14 @@ public class SubtitleInfo implements Parcelable {
      */
     private String downloadUrl;
 
+    private String id = "";
+
     protected SubtitleInfo(Parcel in) {
         videoHash = in.readString();
         fileName = in.readString();
         filePath = in.readString();
         downloadUrl = in.readString();
+        id = in.readString();
     }
 
     public SubtitleInfo() {
@@ -54,6 +57,7 @@ public class SubtitleInfo implements Parcelable {
         dest.writeString(fileName);
         dest.writeString(filePath);
         dest.writeString(downloadUrl);
+        dest.writeString(id);
     }
 
     @Override
@@ -103,5 +107,13 @@ public class SubtitleInfo implements Parcelable {
 
     public void setDownloadUrl(String downloadUrl) {
         this.downloadUrl = downloadUrl;
+    }
+
+    public String getId() {
+        return id;
+    }
+
+    public void setId(String id) {
+        this.id = id;
     }
 }

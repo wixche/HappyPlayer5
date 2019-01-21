@@ -1,5 +1,6 @@
 package com.zlm.hp.ui;
 
+import android.app.Activity;
 import android.content.Context;
 import android.content.Intent;
 import android.graphics.Color;
@@ -7,6 +8,8 @@ import android.media.AudioManager;
 import android.os.Build;
 import android.os.Bundle;
 import android.os.Message;
+import android.support.v7.widget.LinearLayoutManager;
+import android.support.v7.widget.RecyclerView;
 import android.text.TextUtils;
 import android.view.SurfaceHolder;
 import android.view.SurfaceView;
@@ -19,20 +22,35 @@ import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.RelativeLayout;
 import android.widget.TextView;
+import android.widget.Toast;
 
+import com.suke.widget.SwitchButton;
 import com.zlm.down.entity.DownloadTask;
+import com.zlm.hp.adapter.SubtitleAdapter;
 import com.zlm.hp.audio.utils.MediaUtil;
+import com.zlm.hp.constants.ConfigInfo;
 import com.zlm.hp.constants.ResourceConstants;
 import com.zlm.hp.db.util.DownloadThreadInfoDB;
+import com.zlm.hp.entity.SubtitleInfo;
 import com.zlm.hp.entity.VideoInfo;
+import com.zlm.hp.http.HttpReturnResult;
+import com.zlm.hp.http.api.SubtitleHttpClient;
+import com.zlm.hp.lyrics.utils.FileUtils;
 import com.zlm.hp.manager.OnLineVideoManager;
 import com.zlm.hp.receiver.AudioBroadcastReceiver;
+import com.zlm.hp.ui.tool.FileManagerActivity;
 import com.zlm.hp.util.ColorUtil;
 import com.zlm.hp.util.ResourceUtil;
 import com.zlm.hp.util.ToastUtil;
 import com.zlm.hp.widget.IconfontImageButtonTextView;
 import com.zlm.hp.widget.IconfontTextView;
+import com.zlm.libs.widget.CustomSeekBar;
 import com.zlm.libs.widget.MusicSeekBar;
+import com.zlm.subtitlelibrary.widget.SubtitleView;
+
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Map;
 
 import tv.danmaku.ijk.media.player.IMediaPlayer;
 import tv.danmaku.ijk.media.player.IjkMediaPlayer;
@@ -88,6 +106,16 @@ public class VideoActivity extends BaseActivity {
      * 视频完成
      */
     private final int MESSAGE_WHAT_FINISH = 4;
+
+    /**
+     * 搜索字幕
+     */
+    private final int MESSAGE_WHAT_SEARCH_SUBTITLE = 5;
+
+    /**
+     * 选择源文件请求码
+     */
+    private final int SELECTORIGFILE = 0;
 
     /**
      * 操作面板
@@ -146,6 +174,19 @@ public class VideoActivity extends BaseActivity {
     private RelativeLayout mPopRelativeLayout;
     private LinearLayout mPopMenuLinearLayout;
     private boolean mIsShowPopMenu = false;
+
+    /**
+     * 字幕
+     */
+    private SubtitleView mSubtitleView;
+    /**
+     * 字幕
+     */
+    private RecyclerView mRecyclerView;
+    private SubtitleAdapter mAdapter;
+    private ArrayList<SubtitleInfo> mDatas = new ArrayList<SubtitleInfo>();
+    //
+    private ConfigInfo mConfigInfo;
 
     @Override
     protected void preInitStatusBar() {
@@ -323,6 +364,14 @@ public class VideoActivity extends BaseActivity {
             }
         });
 
+        mSubtitleView = findViewById(R.id.subtitle);
+        mConfigInfo = ConfigInfo.obtain();
+        mSubtitleView.setTextSize(mConfigInfo.getSubtitleFontSize());
+
+        mRecyclerView = findViewById(R.id.recyclerView);
+        mRecyclerView.setLayoutManager(new LinearLayoutManager(mContext));
+        mAdapter = new SubtitleAdapter(mContext, mDatas);
+        mRecyclerView.setAdapter(mAdapter);
 
         //播放视频
         playVideo();
@@ -352,6 +401,69 @@ public class VideoActivity extends BaseActivity {
                 hidePopMenuView();
             }
         });
+
+        //字幕开关
+        SwitchButton switchButton = findViewById(R.id.subtitle_switch);
+        switchButton.setOnCheckedChangeListener(new SwitchButton.OnCheckedChangeListener() {
+            @Override
+            public void onCheckedChanged(SwitchButton view, boolean isChecked) {
+                if (isChecked) {
+                    mConfigInfo.setShowSubtitle(isChecked).save();
+                    searchSubtitle();
+                }
+            }
+        });
+        switchButton.setChecked(mConfigInfo.isShowSubtitle());
+
+        //进度条
+        CustomSeekBar customSeekBar = findViewById(R.id.fontSizeSeekbar);
+        customSeekBar.setMax(ConfigInfo.MAX_LRC_FONT_SIZE - ConfigInfo.MIN_LRC_FONT_SIZE);
+        customSeekBar.setProgress((mConfigInfo.getSubtitleFontSize() - ConfigInfo.MIN_LRC_FONT_SIZE));
+        customSeekBar.setOnChangeListener(new CustomSeekBar.OnChangeListener() {
+            @Override
+            public void onProgressChanged(CustomSeekBar seekBar) {
+
+                int fontSize = seekBar.getProgress() + ConfigInfo.MIN_LRC_FONT_SIZE;
+                mSubtitleView.setTextSize(fontSize);
+                mConfigInfo.setSubtitleFontSize(fontSize).save();
+
+            }
+
+            @Override
+            public void onTrackingTouchStart(CustomSeekBar seekBar) {
+
+            }
+
+            @Override
+            public void onTrackingTouchFinish(CustomSeekBar seekBar) {
+
+            }
+        });
+
+        //选择本地字幕
+        TextView selectFile = findViewById(R.id.select_file_text);
+        selectFile.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                Intent selectFileIntent = new Intent(VideoActivity.this, FileManagerActivity.class);
+                selectFileIntent.putExtra(FileManagerActivity.FILEFILTER_KEY, "srt,ass");
+                startActivityForResult(selectFileIntent, SELECTORIGFILE);
+                //去掉动画
+                overridePendingTransition(0, 0);
+            }
+        });
+
+        //搜索字幕
+        if (mConfigInfo.isShowSubtitle()) {
+            searchSubtitle();
+        }
+    }
+
+    /**
+     * 搜索字幕
+     */
+    private void searchSubtitle() {
+        mWorkerHandler.sendEmptyMessage(MESSAGE_WHAT_SEARCH_SUBTITLE);
     }
 
     /**
@@ -649,7 +761,35 @@ public class VideoActivity extends BaseActivity {
                 mMusicSeekBar.setMax(0);
 
                 break;
+            case MESSAGE_WHAT_SEARCH_SUBTITLE:
+
+                handleSubtitleData((HttpReturnResult) msg.obj);
+
+                break;
         }
+    }
+
+    /**
+     * 处理字幕数据
+     *
+     * @param httpReturnResult
+     */
+    private void handleSubtitleData(HttpReturnResult httpReturnResult) {
+        if (!httpReturnResult.isSuccessful()) {
+            ToastUtil.showTextToast(mContext, httpReturnResult.getErrorMsg());
+
+        } else {
+
+            Map<String, Object> returnResult = (Map<String, Object>) httpReturnResult.getResult();
+            List<SubtitleInfo> lists = (List<SubtitleInfo>) returnResult.get("rows");
+            if (lists != null && lists.size() > 0) {
+                mDatas.addAll(lists);
+                mAdapter.notifyDataSetChanged();
+            } else {
+                ToastUtil.showTextToast(mContext, HttpReturnResult.ERROR_MSG_NULLDATA);
+            }
+        }
+
     }
 
     @Override
@@ -658,6 +798,50 @@ public class VideoActivity extends BaseActivity {
             case MESSAGE_WHAT_DOWNLOAD_VIDEO:
                 mOnLineVideoManager.addDownloadTask(mVideoInfo);
                 break;
+            case MESSAGE_WHAT_SEARCH_SUBTITLE:
+                //搜索字幕
+                doSearchSubtitle();
+                break;
+        }
+    }
+
+    /**
+     * 搜索
+     */
+    private void doSearchSubtitle() {
+        String keyword = mVideoInfo.getMvName();
+        SubtitleHttpClient subtitleHttpClient = new SubtitleHttpClient();
+        HttpReturnResult httpReturnResult = subtitleHttpClient.searchSubtitle(mContext, keyword, 1, 50, mConfigInfo.isWifi());
+
+        Message msg = Message.obtain();
+        msg.what = MESSAGE_WHAT_SEARCH_SUBTITLE;
+        msg.obj = httpReturnResult;
+        mUIHandler.sendMessage(msg);
+    }
+
+    /**
+     * 追加字幕
+     *
+     * @param filePath
+     */
+    private void appentSubtitle(String filePath) {
+        String id = filePath.hashCode() + "";
+    }
+
+    @Override
+    protected void onActivityResult(int requestCode, int resultCode, Intent data) {
+        if (requestCode == SELECTORIGFILE) {
+            if (resultCode == Activity.RESULT_OK) {
+                String filePath = data.getStringExtra("selectFilePath");
+                if (!TextUtils.isEmpty(filePath)) {
+                    String ext = FileUtils.getFileExt(filePath);
+                    if (!ext.equals("srt") && !ext.equals("ass")) {
+                        Toast.makeText(getApplicationContext(), "请选择支持的字幕文件！", Toast.LENGTH_SHORT).show();
+                        return;
+                    }
+                    appentSubtitle(filePath);
+                }
+            }
         }
     }
 
