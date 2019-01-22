@@ -9,8 +9,11 @@ import com.zlm.hp.entity.SubtitleInfo;
 import com.zlm.hp.http.HttpClient;
 import com.zlm.hp.util.ResourceUtil;
 import com.zlm.subtitlelibrary.SubtitleReader;
+import com.zlm.subtitlelibrary.formats.SubtitleFileReader;
+import com.zlm.subtitlelibrary.util.SubtitleUtil;
 
 import java.io.File;
+import java.io.UnsupportedEncodingException;
 import java.lang.ref.SoftReference;
 import java.util.HashMap;
 import java.util.Map;
@@ -40,9 +43,10 @@ public class SubtitleManager {
 
     /**
      * 加载字幕
+     *
      * @param videoHash
-     * @param keyword 关键字
-     * @param subtitleInfo 字幕内容
+     * @param keyword              关键字
+     * @param subtitleInfo         字幕内容
      * @param asyncHandlerTask
      * @param loadSubtitleCallBack
      */
@@ -51,27 +55,36 @@ public class SubtitleManager {
             @Override
             protected SubtitleReader doInBackground() {
                 String key = subtitleInfo.getDownloadUrl().hashCode() + "";
-                if (mSubtitleReaderCache.get(key).get() == null) {
+                if (getSubtitleReader(key) == null) {
                     HttpClient.Result result = new HttpClient().get(subtitleInfo.getDownloadUrl());
                     if (result.isSuccessful()) {
-
-                        String dataResult = result.getDataString();
                         File saveFile = new File(ResourceUtil.getFilePath(mContext, ResourceConstants.PATH_SUBTITLE + File.separator + keyword, subtitleInfo.getFileName()));
-                        SubtitleReader subtitleReader = new SubtitleReader();
-                        subtitleReader.readText(dataResult, saveFile);
-                        if (subtitleReader.getSubtitleInfo() != null) {
-                            if (subtitleReader.getSubtitleInfo().getSubtitleLineInfos() != null) {
-                                if (subtitleReader.getSubtitleInfo().getSubtitleLineInfos().size() > 0) {
-                                    mSubtitleReaderCache.put(key, new SoftReference<SubtitleReader>(subtitleReader));
+                        SubtitleFileReader subtitleFileReader = SubtitleUtil.getSubtitleFileReader(saveFile);
+                        if (subtitleFileReader != null) {
+                            String dataResult = null;
+                            try {
+                                dataResult = new String(result.getData(),"GBK");
+                                dataResult = dataResult.replaceAll("\\\r", "");
+                                SubtitleReader subtitleReader = new SubtitleReader();
+                                subtitleReader.readText(dataResult, saveFile);
+                                if (subtitleReader.getSubtitleInfo() != null) {
+                                    if (subtitleReader.getSubtitleInfo().getSubtitleLineInfos() != null) {
+                                        if (subtitleReader.getSubtitleInfo().getSubtitleLineInfos().size() > 0) {
+                                            mSubtitleReaderCache.put(key, new SoftReference<SubtitleReader>(subtitleReader));
 
-                                    if (SubtitleInfoDB.isSubtitleExists(mContext, videoHash)) {
-                                        SubtitleInfoDB.updateSubtitleInfo(mContext, videoHash, subtitleInfo.getFileName(), subtitleInfo.getFilePath(), subtitleInfo.getDownloadUrl());
-                                    } else {
-                                        subtitleInfo.setFilePath(saveFile.getPath());
-                                        subtitleInfo.setVideoHash(videoHash);
-                                        SubtitleInfoDB.addSubtitleInfo(mContext, subtitleInfo);
+                                            if (SubtitleInfoDB.isSubtitleExists(mContext, videoHash)) {
+                                                SubtitleInfoDB.updateSubtitleInfo(mContext, videoHash, subtitleInfo.getFileName(), subtitleInfo.getFilePath(), subtitleInfo.getDownloadUrl());
+                                            } else {
+                                                subtitleInfo.setFilePath(saveFile.getPath());
+                                                subtitleInfo.setVideoHash(videoHash);
+                                                SubtitleInfoDB.addSubtitleInfo(mContext, subtitleInfo);
+                                            }
+                                            return subtitleReader;
+                                        }
                                     }
                                 }
+                            } catch (UnsupportedEncodingException e) {
+                                e.printStackTrace();
                             }
                         }
                     }
@@ -94,6 +107,37 @@ public class SubtitleManager {
                 }
             }
         });
+    }
+
+    /**
+     *
+     * @param key
+     * @param subtitleReader
+     */
+    public void addSubtitleReader(String key,SubtitleReader subtitleReader){
+        mSubtitleReaderCache.put(key, new SoftReference<SubtitleReader>(subtitleReader));
+    }
+
+    /**
+     * 获取读取器
+     *
+     * @param key
+     * @return
+     */
+    public SubtitleReader getSubtitleReader(String key) {
+        SoftReference<SubtitleReader> subtitleReaderSoftReference = mSubtitleReaderCache.get(key);
+        if (subtitleReaderSoftReference != null) {
+            return subtitleReaderSoftReference.get();
+        }
+        return null;
+    }
+
+    /**
+     *
+     */
+    public void release() {
+        if (mSubtitleReaderCache != null)
+            mSubtitleReaderCache.clear();
     }
 
     public interface LoadSubtitleCallBack {

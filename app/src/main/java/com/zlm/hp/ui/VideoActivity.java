@@ -27,6 +27,7 @@ import android.widget.Toast;
 import com.suke.widget.SwitchButton;
 import com.zlm.down.entity.DownloadTask;
 import com.zlm.hp.adapter.SubtitleAdapter;
+import com.zlm.hp.async.AsyncHandlerTask;
 import com.zlm.hp.audio.utils.MediaUtil;
 import com.zlm.hp.constants.ConfigInfo;
 import com.zlm.hp.constants.ResourceConstants;
@@ -37,6 +38,7 @@ import com.zlm.hp.http.HttpReturnResult;
 import com.zlm.hp.http.api.SubtitleHttpClient;
 import com.zlm.hp.lyrics.utils.FileUtils;
 import com.zlm.hp.manager.OnLineVideoManager;
+import com.zlm.hp.manager.SubtitleManager;
 import com.zlm.hp.receiver.AudioBroadcastReceiver;
 import com.zlm.hp.ui.tool.FileManagerActivity;
 import com.zlm.hp.util.ColorUtil;
@@ -46,8 +48,13 @@ import com.zlm.hp.widget.IconfontImageButtonTextView;
 import com.zlm.hp.widget.IconfontTextView;
 import com.zlm.libs.widget.CustomSeekBar;
 import com.zlm.libs.widget.MusicSeekBar;
+import com.zlm.subtitlelibrary.SubtitleReader;
+import com.zlm.subtitlelibrary.entity.SubtitleLineInfo;
+import com.zlm.subtitlelibrary.formats.SubtitleFileReader;
+import com.zlm.subtitlelibrary.util.SubtitleUtil;
 import com.zlm.subtitlelibrary.widget.SubtitleView;
 
+import java.io.File;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
@@ -111,6 +118,11 @@ public class VideoActivity extends BaseActivity {
      * 搜索字幕
      */
     private final int MESSAGE_WHAT_SEARCH_SUBTITLE = 5;
+
+    /**
+     * 字幕更新
+     */
+    private final int MESSAGE_WHAT_SUBTITLE_UPDATE = 6;
 
     /**
      * 选择源文件请求码
@@ -187,6 +199,16 @@ public class VideoActivity extends BaseActivity {
     private ArrayList<SubtitleInfo> mDatas = new ArrayList<SubtitleInfo>();
     //
     private ConfigInfo mConfigInfo;
+
+    /**
+     * 字幕读取器
+     */
+    private SubtitleReader mSubtitleReader;
+
+    /**
+     * 字幕快进
+     */
+    private TextView mSubtitleProgressTextView;
 
     @Override
     protected void preInitStatusBar() {
@@ -371,6 +393,12 @@ public class VideoActivity extends BaseActivity {
         mRecyclerView = findViewById(R.id.recyclerView);
         mRecyclerView.setLayoutManager(new LinearLayoutManager(mContext));
         mAdapter = new SubtitleAdapter(mContext, mDatas);
+        mAdapter.setItemEvent(new SubtitleAdapter.ItemEvent() {
+            @Override
+            public void subtitleClick(SubtitleInfo subtitleInfo) {
+                loadSubtitle(subtitleInfo);
+            }
+        });
         mRecyclerView.setAdapter(mAdapter);
 
         //播放视频
@@ -417,13 +445,13 @@ public class VideoActivity extends BaseActivity {
 
         //进度条
         CustomSeekBar customSeekBar = findViewById(R.id.fontSizeSeekbar);
-        customSeekBar.setMax(ConfigInfo.MAX_LRC_FONT_SIZE - ConfigInfo.MIN_LRC_FONT_SIZE);
-        customSeekBar.setProgress((mConfigInfo.getSubtitleFontSize() - ConfigInfo.MIN_LRC_FONT_SIZE));
+        customSeekBar.setMax((ConfigInfo.MAX_LRC_FONT_SIZE - ConfigInfo.MIN_LRC_FONT_SIZE) / 2);
+        customSeekBar.setProgress((mConfigInfo.getSubtitleFontSize() - ConfigInfo.MIN_LRC_FONT_SIZE / 2));
         customSeekBar.setOnChangeListener(new CustomSeekBar.OnChangeListener() {
             @Override
             public void onProgressChanged(CustomSeekBar seekBar) {
 
-                int fontSize = seekBar.getProgress() + ConfigInfo.MIN_LRC_FONT_SIZE;
+                int fontSize = seekBar.getProgress() + ConfigInfo.MIN_LRC_FONT_SIZE / 2;
                 mSubtitleView.setTextSize(fontSize);
                 mConfigInfo.setSubtitleFontSize(fontSize).save();
 
@@ -441,15 +469,53 @@ public class VideoActivity extends BaseActivity {
         });
 
         //选择本地字幕
-        TextView selectFile = findViewById(R.id.select_file_text);
+        RelativeLayout selectFile = findViewById(R.id.select_file_text);
         selectFile.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
+                if (!mConfigInfo.isShowSubtitle()) {
+                    ToastUtil.showTextToast(mContext, "请先开启字幕开关");
+                    return;
+                }
                 Intent selectFileIntent = new Intent(VideoActivity.this, FileManagerActivity.class);
                 selectFileIntent.putExtra(FileManagerActivity.FILEFILTER_KEY, "srt,ass");
                 startActivityForResult(selectFileIntent, SELECTORIGFILE);
                 //去掉动画
                 overridePendingTransition(0, 0);
+            }
+        });
+
+        TextView jian = findViewById(R.id.jian_progress);
+        jian.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                if (mConfigInfo.isShowSubtitle()) {
+                    if (mSubtitleReader != null) {
+                        mSubtitleReader.setOffset(mSubtitleReader.getOffset() - 500);
+                        ;
+                        mSubtitleProgressTextView.setText((float) mSubtitleReader.getOffset() / 1000 + "s");
+                    } else {
+                        mSubtitleProgressTextView.setText("0s");
+                    }
+                }
+            }
+        });
+
+        mSubtitleProgressTextView = findViewById(R.id.progress);
+
+        TextView jia = findViewById(R.id.jia_progress);
+        jia.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                if (mConfigInfo.isShowSubtitle()) {
+                    if (mSubtitleReader != null) {
+                        mSubtitleReader.setOffset(mSubtitleReader.getOffset() + 500);
+                        ;
+                        mSubtitleProgressTextView.setText((float) mSubtitleReader.getOffset() / 1000 + "s");
+                    } else {
+                        mSubtitleProgressTextView.setText("0s");
+                    }
+                }
             }
         });
 
@@ -700,6 +766,8 @@ public class VideoActivity extends BaseActivity {
     protected void handleUIMessage(Message msg) {
         switch (msg.what) {
             case MESSAGE_WHAT_PLAY:
+                //更新字幕
+                mUIHandler.sendEmptyMessage(MESSAGE_WHAT_SUBTITLE_UPDATE);
 
                 //
                 mSongProgressTv.setText(MediaUtil.formatTime(0));
@@ -726,6 +794,9 @@ public class VideoActivity extends BaseActivity {
                     int playProgress = (int) mMediaPlayer.getCurrentPosition();
                     mMusicSeekBar.setProgress(playProgress);
                     mSongProgressTv.setText(MediaUtil.formatTime(playProgress));
+
+                    //更新字幕
+                    mUIHandler.sendEmptyMessage(MESSAGE_WHAT_SUBTITLE_UPDATE);
                 }
 
                 break;
@@ -749,6 +820,9 @@ public class VideoActivity extends BaseActivity {
                 break;
             case MESSAGE_WHAT_FINISH:
 
+                //更新字幕
+                mUIHandler.sendEmptyMessage(MESSAGE_WHAT_SUBTITLE_UPDATE);
+
                 mOnLineVideoManager.setPlayStatus(OnLineVideoManager.STOP);
                 mWorkerHandler.removeCallbacks(mPlayRunnable);
 
@@ -762,9 +836,40 @@ public class VideoActivity extends BaseActivity {
 
                 break;
             case MESSAGE_WHAT_SEARCH_SUBTITLE:
-
+                //加载字幕列表
                 handleSubtitleData((HttpReturnResult) msg.obj);
 
+                break;
+            case MESSAGE_WHAT_SUBTITLE_UPDATE:
+
+                if (mSubtitleReader != null) {
+                    mSubtitleProgressTextView.setText((float) mSubtitleReader.getOffset() / 1000 + "s");
+
+                }
+
+                //加载字幕
+                if (mConfigInfo.isShowSubtitle()) {
+                    if (mMediaPlayer != null && mMediaPlayer.isPlaying()) {
+                        if (mSubtitleReader != null && mSubtitleReader.getSubtitleInfo() != null) {
+                            List<SubtitleLineInfo> subtitleLineInfos = mSubtitleReader.getSubtitleInfo().getSubtitleLineInfos();
+                            if (subtitleLineInfos != null && subtitleLineInfos.size() > 0) {
+                                int lineNumber = SubtitleUtil.getLineNumber(subtitleLineInfos, mMediaPlayer.getCurrentPosition(), mSubtitleReader.getPlayOffset());
+                                if (lineNumber != -1) {
+                                    SubtitleLineInfo subtitleLineInfo = subtitleLineInfos.get(lineNumber);
+                                    String html = subtitleLineInfo.getSubtitleHtml();
+                                    if (!TextUtils.isEmpty(html)) {
+                                        mSubtitleView.setText(html);
+                                    } else {
+                                        mSubtitleView.setText(subtitleLineInfo.getSubtitleText());
+                                        mSubtitleView.setTextColor(Color.WHITE);
+                                    }
+                                    return;
+                                }
+                            }
+                        }
+                    }
+                }
+                mSubtitleView.setText("");
                 break;
         }
     }
@@ -824,8 +929,66 @@ public class VideoActivity extends BaseActivity {
      *
      * @param filePath
      */
-    private void appentSubtitle(String filePath) {
-        String id = filePath.hashCode() + "";
+    private void appentSubtitle(final String filePath) {
+        mWorkerHandler.post(new Runnable() {
+            @Override
+            public void run() {
+                SubtitleFileReader subtitleFileReader = SubtitleUtil.getSubtitleFileReader(filePath);
+                if (subtitleFileReader != null) {
+                    SubtitleReader subtitleReader = new SubtitleReader();
+                    File file = new File(filePath);
+                    subtitleReader.setSubtitleInfo(subtitleFileReader.readFile(file));
+                    SubtitleInfo subtitleInfo = new SubtitleInfo();
+
+                    subtitleInfo.setId(filePath.hashCode() + "");
+                    subtitleInfo.setVideoHash(mVideoInfo.getHash());
+                    subtitleInfo.setFilePath(filePath);
+                    subtitleInfo.setFileName(file.getName());
+                    subtitleInfo.setDownloadUrl(filePath);
+
+                    mDatas.add(subtitleInfo);
+                    mUIHandler.post(new Runnable() {
+                        @Override
+                        public void run() {
+                            mAdapter.notifyDataSetChanged();
+                        }
+                    });
+
+                    //
+                    String key = subtitleInfo.getDownloadUrl().hashCode() + "";
+                    SubtitleManager.getInstance(mContext).addSubtitleReader(key, subtitleReader);
+
+                }
+            }
+        });
+
+    }
+
+    /**
+     * 加载字幕
+     *
+     * @param subtitleInfo
+     */
+    private void loadSubtitle(final SubtitleInfo subtitleInfo) {
+        mWorkerHandler.post(new Runnable() {
+            @Override
+            public void run() {
+                String videoHash = mVideoInfo.getHash();
+                String keyword = mVideoInfo.getMvName();
+                SubtitleManager.getInstance(mContext).loadSubtitle(videoHash, keyword, subtitleInfo, new AsyncHandlerTask(mUIHandler, mWorkerHandler), new SubtitleManager.LoadSubtitleCallBack() {
+                    @Override
+                    public void callback(SubtitleReader subtitleReader) {
+                        if (subtitleReader != null) {
+                            mSubtitleReader = subtitleReader;
+
+
+                            mUIHandler.sendEmptyMessage(MESSAGE_WHAT_SUBTITLE_UPDATE);
+
+                        }
+                    }
+                });
+            }
+        });
     }
 
     @Override
@@ -849,6 +1012,9 @@ public class VideoActivity extends BaseActivity {
     public void finish() {
 
         releasePlayer();
+
+        //
+        SubtitleManager.getInstance(mContext).release();
 
         if (mOnLineVideoManager != null) {
             mOnLineVideoManager.release();

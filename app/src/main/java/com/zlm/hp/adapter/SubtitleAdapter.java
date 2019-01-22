@@ -28,6 +28,7 @@ public class SubtitleAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolde
 
 
     private String mSelectId;
+    private int mSelectIndex = -1;
 
     public SubtitleAdapter(Context context, ArrayList<SubtitleInfo> datas) {
         this.mContext = context;
@@ -56,10 +57,32 @@ public class SubtitleAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolde
      * @param viewHolder
      * @param position
      */
-    private void reshFileViewHolder(final FileViewHolder viewHolder, int position) {
-        SubtitleInfo subtitleInfo = mDatas.get(position);
+    private void reshFileViewHolder(final FileViewHolder viewHolder, final int position) {
+        final SubtitleInfo subtitleInfo = mDatas.get(position);
         viewHolder.getFimeNamTextView().setTextColor(Color.WHITE);
         viewHolder.getFimeNamTextView().setText(subtitleInfo.getFileName());
+        final String key = subtitleInfo.getDownloadUrl().hashCode() + "";
+        if (key.equals(mSelectId)) {
+            viewHolder.getFileRadioButton().setChecked(true);
+        } else {
+            viewHolder.getFileRadioButton().setChecked(false);
+        }
+        viewHolder.getListItemRelativeLayout().setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                mSelectId = key;
+                if (mSelectIndex != -1) {
+                    notifyItemChanged(mSelectIndex);
+                }
+                mSelectIndex = position;
+                notifyItemChanged(mSelectIndex);
+
+                if (mItemEvent != null) {
+                    mItemEvent.subtitleClick(subtitleInfo);
+                }
+            }
+        });
+
     }
 
     @Override

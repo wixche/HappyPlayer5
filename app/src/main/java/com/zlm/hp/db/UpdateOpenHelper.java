@@ -4,6 +4,7 @@ import android.content.Context;
 import android.database.sqlite.SQLiteDatabase;
 
 import com.zlm.hp.db.dao.DaoMaster;
+import com.zlm.hp.db.dao.SubtitleInfoDao;
 
 import org.greenrobot.greendao.database.Database;
 
@@ -27,7 +28,7 @@ public class UpdateOpenHelper extends DaoMaster.OpenHelper {
     public void onUpgrade(Database db, int oldVersion, int newVersion) {
         if (oldVersion < newVersion) {
             //操作数据库的更新 有几个表升级都可以传入到下面
-            //MigrationHelper.getInstance().migrate(db, AudioInfoDao.class);
+            SubtitleInfoDao.createTable(db, true);
         }
     }
 }

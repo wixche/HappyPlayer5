@@ -109,14 +109,20 @@
             android:layout_width="match_parent"
             android:layout_height="@dimen/title_height">
 
-            <TextView
+            <RelativeLayout
                 android:id="@+id/select_file_text"
                 android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_centerVertical="true"
-                android:layout_margin="10dp"
-                android:text="选择字幕"
-                android:textColor="#fff" />
+                android:layout_height="@dimen/title_height">
+
+                <TextView
+
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_centerVertical="true"
+                    android:layout_margin="10dp"
+                    android:text="选择字幕"
+                    android:textColor="#fff" />
+            </RelativeLayout>
 
             <View
                 android:id="@+id/line"
