@@ -596,17 +596,19 @@ public class AudioPlayerService extends Service {
         if (AudioInfoDB.isRecentAudioExists(mContext, audioInfo.getHash())) {
             AudioInfoDB.updateRecentAudio(mContext, audioInfo.getHash(), DateUtil.parseDateToString(new Date()));
         } else {
-            AudioInfoDB.addRecentAudio(mContext, audioInfo,true);
+            AudioInfoDB.addRecentAudio(mContext, audioInfo, true);
         }
 
         try {
             String fileName = audioInfo.getTitle();
-            String filePath = ResourceUtil.getFilePath(mContext, ResourceConstants.PATH_AUDIO, fileName + "." + audioInfo.getFileExt());
-            File audioFile = new File(filePath);
-            if (!audioFile.exists()) {
-                filePath = ResourceUtil.getFilePath(mContext, ResourceConstants.PATH_CACHE_AUDIO, audioInfo.getHash() + ".temp");
+            String filePath = audioInfo.getFilePath();
+            if (audioInfo.getType() != AudioInfo.TYPE_LOCAL) {
+                filePath = ResourceUtil.getFilePath(mContext, ResourceConstants.PATH_AUDIO, fileName + "." + audioInfo.getFileExt());
+                File audioFile = new File(filePath);
+                if (!audioFile.exists()) {
+                    filePath = ResourceUtil.getFilePath(mContext, ResourceConstants.PATH_CACHE_AUDIO, audioInfo.getHash() + ".temp");
+                }
             }
-
             if (mMediaPlayer != null) {
                 releasePlayer();
             }
