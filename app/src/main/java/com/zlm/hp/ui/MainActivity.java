@@ -690,38 +690,40 @@ public class MainActivity extends BaseActivity {
         mLocklrcSwitchButton.setOnCheckedChangeListener(new SwitchButton.OnCheckedChangeListener() {
             @Override
             public void onCheckedChanged(SwitchButton view, boolean isChecked) {
-                boolean askLockPermission = PreferencesUtil.getBoolean(mContext, Constants.ASK_LOCK_PERMISSION, true);
-                if (askLockPermission) {
-                    //弹出窗口显示
+                if (isChecked) {
+                    boolean askLockPermission = PreferencesUtil.getBoolean(mContext, Constants.ASK_LOCK_PERMISSION, true);
+                    if (askLockPermission) {
+                        //弹出窗口显示
 
-                    String tipMsg = getString(R.string.locklrc_tip);
-                    DialogUIUtils.showMdAlert(MainActivity.this, getString(R.string.tip_title), tipMsg, new DialogUIListener() {
-                        @Override
-                        public void onPositive() {
+                        String tipMsg = getString(R.string.locklrc_tip);
+                        DialogUIUtils.showMdAlert(MainActivity.this, getString(R.string.tip_title), tipMsg, new DialogUIListener() {
+                            @Override
+                            public void onPositive() {
 
-                            PreferencesUtil.putBoolean(mContext, Constants.ASK_LOCK_PERMISSION, false);
+                                PreferencesUtil.putBoolean(mContext, Constants.ASK_LOCK_PERMISSION, false);
 
-                            //跳转权限设置页面
-                            IntentUtil.gotoPermissionSetting(MainActivity.this);
-                            mLocklrcSwitchButton.setChecked(false);
-                        }
+                                //跳转权限设置页面
+                                IntentUtil.gotoPermissionSetting(MainActivity.this);
+                                mLocklrcSwitchButton.setChecked(false);
+                            }
 
-                        @Override
-                        public void onNegative() {
-                            mLocklrcSwitchButton.setChecked(false);
-                        }
+                            @Override
+                            public void onNegative() {
+                                mLocklrcSwitchButton.setChecked(false);
+                            }
 
-                        @Override
-                        public void onCancle() {
-                            mLocklrcSwitchButton.setChecked(false);
-                        }
-                    }).setCancelable(true, false).show();
+                            @Override
+                            public void onCancle() {
+                                mLocklrcSwitchButton.setChecked(false);
+                            }
+                        }).setCancelable(true, false).show();
 
-                    return;
+                        return;
+                    }
+
+                    if (mConfigInfo.isShowLockScreenLrc() != isChecked)
+                        mConfigInfo.setShowLockScreenLrc(isChecked).save();
                 }
-
-                if (mConfigInfo.isShowLockScreenLrc() != isChecked)
-                    mConfigInfo.setShowLockScreenLrc(isChecked).save();
             }
         });
     }
@@ -795,9 +797,9 @@ public class MainActivity extends BaseActivity {
 
             @Override
             public void onHideFragment(Fragment fragment) {
-                if(fragment != null && fragment instanceof SearchFragment){
+                if (fragment != null && fragment instanceof SearchFragment) {
                     //强制关闭输入法
-                    hideInput(mContext,mSlidingMenuLayout);
+                    hideInput(mContext, mSlidingMenuLayout);
                 }
             }
         });

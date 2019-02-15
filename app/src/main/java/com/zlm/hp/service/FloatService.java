@@ -8,6 +8,7 @@ import android.graphics.Color;
 import android.graphics.Paint;
 import android.graphics.PixelFormat;
 import android.graphics.Typeface;
+import android.os.Build;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.HandlerThread;
@@ -276,7 +277,12 @@ public class FloatService extends Service {
         // 窗体的布局样式
         mLayout = new WindowManager.LayoutParams();
         // 设置窗体显示类型——TYPE_SYSTEM_ALERT(系统提示)
-        mLayout.type = WindowManager.LayoutParams.TYPE_SYSTEM_ALERT;
+        //mLayout.type = WindowManager.LayoutParams.TYPE_SYSTEM_ALERT;
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {//6.0+
+            mLayout.type = WindowManager.LayoutParams.TYPE_APPLICATION_OVERLAY;
+        } else {
+            mLayout.type = WindowManager.LayoutParams.TYPE_SYSTEM_ALERT;
+        }
         // 设置显示的模式
         mLayout.format = PixelFormat.RGBA_8888;
         // 设置对齐的方法
