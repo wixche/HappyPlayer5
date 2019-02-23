@@ -62,11 +62,6 @@ android5.0及以上
 
 [更多版本客户端，点击此次查看:https://pan.baidu.com/s/1YkZssna3TO9hKAOXwvxXiw 提取码: dgtc](https://pan.baidu.com/s/1YkZssna3TO9hKAOXwvxXiw)
 
-# 后期将会修复、优化和新开发的功能 #
-- 制作歌词，该模块还没优化
-- 歌词转换器，添加视频字幕相互转换，方便后期应用于MV；添加批量转换
-- MV功能开发
-
 # 更新日志 #
 
 ## 2019-01-24 ##
