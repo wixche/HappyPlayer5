@@ -196,6 +196,10 @@ public class ConfigInfo implements Parcelable {
      */
     private int subtitleFontSize = MIN_LRC_FONT_SIZE;
 
+    public ConfigInfo(){
+
+    }
+
     protected ConfigInfo(Parcel in) {
         if (in != null) {
             isWifi = in.readByte() != 0;
@@ -280,7 +284,11 @@ public class ConfigInfo implements Parcelable {
             }
         }
         //
-        _ConfigInfo = CREATOR.createFromParcel(parcel);
+        if(parcel == null){
+            _ConfigInfo = new ConfigInfo();
+        }else{
+            _ConfigInfo = CREATOR.createFromParcel(parcel);
+        }
         return _ConfigInfo;
     }
 

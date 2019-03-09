@@ -62,11 +62,18 @@ public class HPApplication extends MultiDexApplication {
             ZLog.logBuildInfo(getApplicationContext(), codeLineInfo);
             ZLog.e(codeLineInfo, "UncaughtException: ", e.getMessage());
 
+
+            mHandler.post(new Runnable() {
+                @Override
+                public void run() {
+                    ToastUtil.showTextToast(getApplicationContext(), getString(R.string.exit_tip));
+                }
+            });
+
             mHandler.postDelayed(new Runnable() {
                 @Override
                 public void run() {
 
-                    ToastUtil.showTextToast(getApplicationContext(), getString(R.string.exit_tip));
                     //关闭app
                     ActivityManager.getInstance().exit();
                 }
