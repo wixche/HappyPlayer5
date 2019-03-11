@@ -5,7 +5,6 @@ import android.app.Activity;
 import android.content.Context;
 import android.os.storage.StorageManager;
 
-
 import com.zlm.hp.entity.StorageInfo;
 
 import java.io.File;

@@ -18,7 +18,6 @@ import android.widget.EditText;
 import android.widget.RelativeLayout;
 import android.widget.TextView;
 
-import com.zlm.hp.PageTransformer.ZoomOutPageTransformer;
 import com.zlm.hp.adapter.SearchLrcFragmentAdapter;
 import com.zlm.hp.constants.ConfigInfo;
 import com.zlm.hp.entity.AudioInfo;
@@ -258,8 +257,8 @@ public class SearchLrcActivity extends BaseActivity {
 
         //
         mViewPager = findViewById(R.id.viewpage);
-        mViewPager.setPageTransformer(true, new ZoomOutPageTransformer());
-        mViewPager.setOffscreenPageLimit(0);
+        mViewPager.setPageMargin((int) getResources().getDimension(R.dimen.page_margin));
+        mViewPager.setOffscreenPageLimit(4);
         mViewPager.addOnPageChangeListener(new ViewPager.OnPageChangeListener() {
             @Override
             public void onPageScrolled(int position, float positionOffset, int positionOffsetPixels) {

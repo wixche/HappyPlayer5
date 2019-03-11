@@ -32,4 +32,6 @@
     <dimen name="lrc_pop_item_hast_height">70dp</dimen>
     <dimen name="lrc_pop_item_height">50dp</dimen>
     <dimen name="lrc_pop_item_img_height">45dp</dimen>
+
+    <dimen name="page_margin">10dp</dimen>
 </resources>
