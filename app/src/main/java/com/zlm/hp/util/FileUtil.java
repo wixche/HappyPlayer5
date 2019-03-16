@@ -1,6 +1,10 @@
 package com.zlm.hp.util;
 
+import android.Manifest;
+import android.content.pm.PackageManager;
 import android.os.StatFs;
+import android.support.v4.content.ContextCompat;
+import android.support.v4.content.PermissionChecker;
 import android.text.TextUtils;
 
 import java.io.File;
@@ -59,17 +63,21 @@ public class FileUtil {
      * @throws Exception
      */
     public static byte[] readFile(String filePath) throws Exception {
-        try {
-            FileInputStream in = new FileInputStream(new File(filePath));
-            byte[] data = new byte[in.available()];
-            int i = in.read(data);
-            if (i == data.length) {
+        String permission = Manifest.permission.READ_EXTERNAL_STORAGE;
+        if (ContextCompat.checkSelfPermission(ContextUtil.getContext(), permission) == PackageManager.PERMISSION_GRANTED && PermissionChecker.checkSelfPermission(ContextUtil.getContext(), permission) == PackageManager.PERMISSION_GRANTED) {
+            try {
+                FileInputStream in = new FileInputStream(new File(filePath));
+                byte[] data = new byte[in.available()];
+                int i = in.read(data);
+                if (i == data.length) {
+                }
+                in.close();
+                return data;
+            } catch (FileNotFoundException nfe) {
+                nfe.printStackTrace();
             }
-            in.close();
-            return data;
-        } catch (FileNotFoundException nfe) {
-            return null;
         }
+        return null;
     }
 
     /**
@@ -79,10 +87,13 @@ public class FileUtil {
      * @throws Exception
      */
     public static void writeFile(String filePath, byte[] data) throws Exception {
-        FileOutputStream out = new FileOutputStream(new File(filePath));
-        out.write(data);
-        out.flush();
-        out.close();
+        String permission = Manifest.permission.WRITE_EXTERNAL_STORAGE;
+        if (ContextCompat.checkSelfPermission(ContextUtil.getContext(), permission) == PackageManager.PERMISSION_GRANTED && PermissionChecker.checkSelfPermission(ContextUtil.getContext(), permission) == PackageManager.PERMISSION_GRANTED) {
+            FileOutputStream out = new FileOutputStream(new File(filePath));
+            out.write(data);
+            out.flush();
+            out.close();
+        }
     }
 
     /**
@@ -242,7 +253,6 @@ public class FileUtil {
         BigDecimal result4 = new BigDecimal(teraBytes);
         return result4.setScale(2, BigDecimal.ROUND_HALF_UP).toPlainString() + "TB";
     }
-
 
 
 }

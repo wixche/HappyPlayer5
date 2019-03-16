@@ -1,15 +1,19 @@
 package com.zlm.hp.ui;
 
 import android.content.Context;
+import android.content.pm.PackageManager;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.HandlerThread;
 import android.os.Looper;
 import android.os.Message;
 import android.os.Process;
+import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.support.constraint.ConstraintLayout;
+import android.support.v4.app.ActivityCompat;
 import android.support.v4.content.ContextCompat;
+import android.support.v4.content.PermissionChecker;
 import android.support.v7.app.AppCompatActivity;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -24,6 +28,10 @@ import com.zlm.hp.manager.ActivityManager;
 import com.zlm.hp.util.AppBarUtil;
 import com.zlm.hp.util.ColorUtil;
 
+import java.util.ArrayList;
+import java.util.Calendar;
+import java.util.Date;
+import java.util.List;
 
 /**
  * Created by zhangliangming on 2018-08-04.
@@ -264,6 +272,148 @@ public abstract class BaseActivity extends AppCompatActivity {
      */
     protected void setRootView(ViewGroup rootView) {
         this.mRootView = rootView;
+    }
+
+    /**
+     * 权限回调任务列表
+     */
+    private List<PermissionCheckCallback> mPermissionCheckCallbacks = new ArrayList<PermissionCheckCallback>();
+
+    /**
+     * 请求权限
+     *
+     * @param permission  权限名称
+     * @param requestCode 请求码
+     * @param callback    权限结果回调
+     */
+    public void requestPermissions(int requestCode, String permission, PermissionCheckCallback callback) {
+
+        //设置请求码及callbackid
+        Calendar cal = Calendar.getInstance();
+        int hour = cal.get(Calendar.HOUR_OF_DAY);//小时
+        int minute = cal.get(Calendar.MINUTE);//分
+        int second = cal.get(Calendar.SECOND);//秒
+        callback.setCallbackId((hour + minute + second));
+        callback.setRequestCode(requestCode);
+        mPermissionCheckCallbacks.add(callback);
+
+        //请求权限
+        ActivityCompat.requestPermissions(this,
+                new String[]{permission}, callback.getCallbackId());
+    }
+
+    @Override
+    public void onRequestPermissionsResult(final int requestCode, @NonNull final String[] permissions, @NonNull int[] grantResults) {
+        //方便Fragment调用权限检测
+        super.onRequestPermissionsResult(requestCode, permissions, grantResults);
+        mWorkerHandler.post(new Runnable() {
+            @Override
+            public void run() {
+                onRequestPermissionsResult(requestCode, permissions[0]);
+            }
+        });
+    }
+
+    /**
+     * 判断权限是否已分配
+     *
+     * @param permission
+     * @return
+     */
+    public boolean checkPermission(String permission) {
+        if (ContextCompat.checkSelfPermission(mContext, permission) == PackageManager.PERMISSION_GRANTED && PermissionChecker.checkSelfPermission(mContext, permission) == PackageManager.PERMISSION_GRANTED) {
+            return true;
+        }
+        return false;
+    }
+
+    /**
+     * 权限回调
+     *
+     * @param callbackId 回调id
+     * @param permission 权限名称
+     */
+    private void onRequestPermissionsResult(int callbackId, String permission) {
+        if (mPermissionCheckCallbacks != null && mPermissionCheckCallbacks.size() > 0) {
+            for (int i = 0; i < mPermissionCheckCallbacks.size(); i++) {
+                final PermissionCheckCallback callback = mPermissionCheckCallbacks.get(i);
+                if (callback.getCallbackId() == callbackId && callback.isAlive()) {
+                    callback.setAlive(false);
+                    if (ContextCompat.checkSelfPermission(mContext, permission) == PackageManager.PERMISSION_GRANTED && PermissionChecker.checkSelfPermission(mContext, permission) == PackageManager.PERMISSION_GRANTED) {
+                        //获取权限成功
+                        mUIHandler.post(new Runnable() {
+                            @Override
+                            public void run() {
+                                callback.granted(callback.getRequestCode());
+                            }
+                        });
+                    } else {
+                        //获取权限失败
+                        mUIHandler.post(new Runnable() {
+                            @Override
+                            public void run() {
+                                callback.denied(callback.getRequestCode());
+                            }
+                        });
+                    }
+                    break;
+                }
+            }
+        }
+    }
+
+    /**
+     * 权限处理回调
+     */
+    public abstract class PermissionCheckCallback {
+
+        /**
+         * 是否存活
+         */
+        private boolean isAlive = true;
+
+        /**
+         * 请求码
+         */
+        private int requestCode;
+        /**
+         * 回调id
+         */
+        private int callbackId;
+
+        /**
+         * 获取权限
+         */
+        public abstract void granted(int requestCode);
+
+        /**
+         * 获取权限失败
+         */
+        public abstract void denied(int requestCode);
+
+        public int getCallbackId() {
+            return callbackId;
+        }
+
+        public void setCallbackId(int callbackId) {
+            this.callbackId = callbackId;
+        }
+
+        public int getRequestCode() {
+            return requestCode;
+        }
+
+        public void setRequestCode(int requestCode) {
+            this.requestCode = requestCode;
+        }
+
+        public boolean isAlive() {
+            return isAlive;
+        }
+
+        public void setAlive(boolean alive) {
+            isAlive = alive;
+        }
     }
 
 }

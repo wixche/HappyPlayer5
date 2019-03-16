@@ -25,8 +25,8 @@ public class DaoMaster extends AbstractDaoMaster {
         DownloadThreadInfoDao.createTable(db, ifNotExists);
         AudioInfoDao.createTable(db, ifNotExists);
         SingerInfoDao.createTable(db, ifNotExists);
-        VideoInfoDao.createTable(db, ifNotExists);
         SubtitleInfoDao.createTable(db, ifNotExists);
+        VideoInfoDao.createTable(db, ifNotExists);
     }
 
     /** Drops underlying database table using DAOs. */
@@ -35,8 +35,8 @@ public class DaoMaster extends AbstractDaoMaster {
         DownloadThreadInfoDao.dropTable(db, ifExists);
         AudioInfoDao.dropTable(db, ifExists);
         SingerInfoDao.dropTable(db, ifExists);
-        VideoInfoDao.dropTable(db, ifExists);
         SubtitleInfoDao.dropTable(db, ifExists);
+        VideoInfoDao.dropTable(db, ifExists);
     }
 
     /**
@@ -59,8 +59,8 @@ public class DaoMaster extends AbstractDaoMaster {
         registerDaoClass(DownloadThreadInfoDao.class);
         registerDaoClass(AudioInfoDao.class);
         registerDaoClass(SingerInfoDao.class);
-        registerDaoClass(VideoInfoDao.class);
         registerDaoClass(SubtitleInfoDao.class);
+        registerDaoClass(VideoInfoDao.class);
     }
 
     public DaoSession newSession() {

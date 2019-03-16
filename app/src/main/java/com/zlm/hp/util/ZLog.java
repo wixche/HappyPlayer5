@@ -1,7 +1,11 @@
 package com.zlm.hp.util;
 
+import android.Manifest;
 import android.content.Context;
+import android.content.pm.PackageManager;
 import android.os.Build;
+import android.support.v4.content.ContextCompat;
+import android.support.v4.content.PermissionChecker;
 import android.util.Log;
 
 import java.io.File;
@@ -186,7 +190,7 @@ public class ZLog {
         } else if (TYPE_DEBUG.equals(type)) {
             if (isDebug) {
                 Log.d(mLogTag, sb.toString());
-            }else{
+            } else {
                 //不写入日志文件
                 return;
             }
@@ -222,23 +226,26 @@ public class ZLog {
      * @param log
      */
     private static void saveLogFile(String log) {
-        synchronized (LOCK) {
-            try {
-                String fileName = LOGFILEFORMAT.format(new Date()) + NAME_EXT;
-                File logFile = new File(mLogFilePath + File.separator + fileName);
-                if (!logFile.getParentFile().exists()) {
-                    logFile.getParentFile().mkdirs();
+        String permission = Manifest.permission.WRITE_EXTERNAL_STORAGE;
+        if (ContextCompat.checkSelfPermission(ContextUtil.getContext(), permission) == PackageManager.PERMISSION_GRANTED && PermissionChecker.checkSelfPermission(ContextUtil.getContext(), permission) == PackageManager.PERMISSION_GRANTED) {
+            synchronized (LOCK) {
+                try {
+                    String fileName = LOGFILEFORMAT.format(new Date()) + NAME_EXT;
+                    File logFile = new File(mLogFilePath + File.separator + fileName);
+                    if (!logFile.getParentFile().exists()) {
+                        logFile.getParentFile().mkdirs();
+                    }
+                    boolean append = true;
+                    if (!logFile.exists()) {
+                        append = false;
+                    }
+                    FileWriter writer = new FileWriter(logFile, append);
+                    writer.append(log);
+                    writer.flush();
+                    writer.close();
+                } catch (IOException e) {
+                    e.printStackTrace();
                 }
-                boolean append = true;
-                if (!logFile.exists()) {
-                    append = false;
-                }
-                FileWriter writer = new FileWriter(logFile, append);
-                writer.append(log);
-                writer.flush();
-                writer.close();
-            } catch (IOException e) {
-                e.printStackTrace();
             }
         }
     }

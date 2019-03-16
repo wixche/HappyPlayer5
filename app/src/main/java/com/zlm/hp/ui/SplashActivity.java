@@ -109,48 +109,72 @@ public class SplashActivity extends BaseActivity {
     }
 
     /**
+     * 权限检测回调
+     */
+    private PermissionCheckCallback mCallback = new PermissionCheckCallback() {
+        @Override
+        public void granted(int requestCode) {
+            checkPermission();
+        }
+
+        @Override
+        public void denied(int requestCode) {
+            switch (requestCode) {
+                case REQUEST_CODE_READSTORAGE:
+                    alertNoStoragePermissionDialog();
+                    break;
+                case REQUEST_CODE_WRITESTORAGE:
+                    alertNoStoragePermissionDialog();
+                    break;
+            }
+        }
+    };
+
+    /**
      * 权限检测
      */
     private void checkPermission() {
         for (int i = 0; i < PERMISSIONS.length; i++) {
             String permission = PERMISSIONS[i];
-            int permissionCheck = PermissionChecker.checkSelfPermission(mContext, permission);
-            if (permissionCheck == PackageManager.PERMISSION_GRANTED) {
+//            int permissionCheck = PermissionChecker.checkSelfPermission(mContext, permission);
+////            if (permissionCheck == PackageManager.PERMISSION_GRANTED) {
+            if (checkPermission(permission)) {
                 //有权限
                 if (i == PERMISSIONS.length - 1)
                     mWorkerHandler.sendEmptyMessage(LOADTATA);
             } else {
-                ActivityCompat.requestPermissions(this,
-                        new String[]{permission}, REQUESTCODES[i]);
+                requestPermissions(REQUESTCODES[i], permission, mCallback);
+//                ActivityCompat.requestPermissions(this,
+//                        new String[]{permission}, REQUESTCODES[i]);
                 break;
             }
         }
     }
 
-    @Override
-    public void onRequestPermissionsResult(int requestCode,
-                                           String permissions[], int[] grantResults) {
-        switch (requestCode) {
-            case REQUEST_CODE_READSTORAGE:
-
-                int readPermissionCheck = PermissionChecker.checkSelfPermission(mContext, Manifest.permission.READ_EXTERNAL_STORAGE);
-                if (readPermissionCheck == PackageManager.PERMISSION_GRANTED) {
-                    checkPermission();
-                } else {
-                    alertNoStoragePermissionDialog();
-                }
-                break;
-            case REQUEST_CODE_WRITESTORAGE:
-
-                int writePermissionCheck = PermissionChecker.checkSelfPermission(mContext, Manifest.permission.WRITE_EXTERNAL_STORAGE);
-                if (writePermissionCheck == PackageManager.PERMISSION_GRANTED) {
-                    checkPermission();
-                } else {
-                    alertNoStoragePermissionDialog();
-                }
-                break;
-        }
-    }
+//    @Override
+//    public void onRequestPermissionsResult(int requestCode,
+//                                           String permissions[], int[] grantResults) {
+//        switch (requestCode) {
+//            case REQUEST_CODE_READSTORAGE:
+//
+//                int readPermissionCheck = PermissionChecker.checkSelfPermission(mContext, Manifest.permission.READ_EXTERNAL_STORAGE);
+//                if (readPermissionCheck == PackageManager.PERMISSION_GRANTED) {
+//                    checkPermission();
+//                } else {
+//                    alertNoStoragePermissionDialog();
+//                }
+//                break;
+//            case REQUEST_CODE_WRITESTORAGE:
+//
+//                int writePermissionCheck = PermissionChecker.checkSelfPermission(mContext, Manifest.permission.WRITE_EXTERNAL_STORAGE);
+//                if (writePermissionCheck == PackageManager.PERMISSION_GRANTED) {
+//                    checkPermission();
+//                } else {
+//                    alertNoStoragePermissionDialog();
+//                }
+//                break;
+//        }
+//    }
 
     private void alertNoStoragePermissionDialog() {
         //弹出窗口显示

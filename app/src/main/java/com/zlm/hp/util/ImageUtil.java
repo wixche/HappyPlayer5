@@ -1,7 +1,9 @@
 package com.zlm.hp.util;
 
+import android.Manifest;
 import android.annotation.SuppressLint;
 import android.content.Context;
+import android.content.pm.PackageManager;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.graphics.Canvas;
@@ -12,6 +14,8 @@ import android.graphics.Matrix;
 import android.graphics.Paint;
 import android.graphics.drawable.BitmapDrawable;
 import android.os.AsyncTask;
+import android.support.v4.content.ContextCompat;
+import android.support.v4.content.PermissionChecker;
 import android.util.LruCache;
 import android.view.View;
 import android.widget.ImageView;
@@ -622,15 +626,18 @@ public class ImageUtil {
      * @param quality
      */
     private static void writeBitmapToFile(String filePath, Bitmap b, int quality) {
-        try {
-            File desFile = new File(filePath);
-            FileOutputStream fos = new FileOutputStream(desFile);
-            BufferedOutputStream bos = new BufferedOutputStream(fos);
-            b.compress(Bitmap.CompressFormat.JPEG, quality, bos);
-            bos.flush();
-            bos.close();
-        } catch (IOException e) {
-            e.printStackTrace();
+        String permission = Manifest.permission.WRITE_EXTERNAL_STORAGE;
+        if (ContextCompat.checkSelfPermission(ContextUtil.getContext(), permission) == PackageManager.PERMISSION_GRANTED && PermissionChecker.checkSelfPermission(ContextUtil.getContext(), permission) == PackageManager.PERMISSION_GRANTED) {
+            try {
+                File desFile = new File(filePath);
+                FileOutputStream fos = new FileOutputStream(desFile);
+                BufferedOutputStream bos = new BufferedOutputStream(fos);
+                b.compress(Bitmap.CompressFormat.JPEG, quality, bos);
+                bos.flush();
+                bos.close();
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
         }
     }
 

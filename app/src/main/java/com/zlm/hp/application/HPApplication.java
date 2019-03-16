@@ -84,7 +84,8 @@ public class HPApplication extends MultiDexApplication {
     @Override
     public void onCreate() {
         super.onCreate();
-
+        //封装全局context
+        ContextUtil.init(getApplicationContext());
         mHandler = new Handler(Looper.getMainLooper());
 
         //全局收集
@@ -109,9 +110,6 @@ public class HPApplication extends MultiDexApplication {
             initDB();
             registerActivityLifecycleCallbacks();
         }
-
-        //封装全局context
-        ContextUtil.init(getApplicationContext());
         //封装弹出窗口context
         DialogUIUtils.init(getApplicationContext());
     }
