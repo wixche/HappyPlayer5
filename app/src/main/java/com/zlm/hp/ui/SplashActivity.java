@@ -109,28 +109,6 @@ public class SplashActivity extends BaseActivity {
     }
 
     /**
-     * 权限检测回调
-     */
-    private PermissionCheckCallback mCallback = new PermissionCheckCallback() {
-        @Override
-        public void granted(int requestCode) {
-            checkPermission();
-        }
-
-        @Override
-        public void denied(int requestCode) {
-            switch (requestCode) {
-                case REQUEST_CODE_READSTORAGE:
-                    alertNoStoragePermissionDialog();
-                    break;
-                case REQUEST_CODE_WRITESTORAGE:
-                    alertNoStoragePermissionDialog();
-                    break;
-            }
-        }
-    };
-
-    /**
      * 权限检测
      */
     private void checkPermission() {
@@ -143,7 +121,24 @@ public class SplashActivity extends BaseActivity {
                 if (i == PERMISSIONS.length - 1)
                     mWorkerHandler.sendEmptyMessage(LOADTATA);
             } else {
-                requestPermissions(REQUESTCODES[i], permission, mCallback);
+                requestPermissions(REQUESTCODES[i], permission, new PermissionCheckCallback() {
+                    @Override
+                    public void granted(int requestCode) {
+                        checkPermission();
+                    }
+
+                    @Override
+                    public void denied(int requestCode) {
+                        switch (requestCode) {
+                            case REQUEST_CODE_READSTORAGE:
+                                alertNoStoragePermissionDialog();
+                                break;
+                            case REQUEST_CODE_WRITESTORAGE:
+                                alertNoStoragePermissionDialog();
+                                break;
+                        }
+                    }
+                });
 //                ActivityCompat.requestPermissions(this,
 //                        new String[]{permission}, REQUESTCODES[i]);
                 break;
