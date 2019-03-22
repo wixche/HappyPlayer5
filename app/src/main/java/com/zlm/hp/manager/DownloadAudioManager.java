@@ -198,10 +198,21 @@ public class DownloadAudioManager {
         return _DownloadAudioManager;
     }
 
+
+    public void addTask(final AudioInfo audioInfo) {
+        //异步下载
+        mWorkerHandler.post(new Runnable() {
+            @Override
+            public void run() {
+                addDownloadTask(audioInfo);
+            }
+        });
+    }
+
     /**
      * @param audioInfo
      */
-    public void addTask(final AudioInfo audioInfo) {
+    private void addDownloadTask(AudioInfo audioInfo) {
 
         APIHttpClient apiHttpClient = HttpUtil.getHttpClient();
         ConfigInfo configInfo = ConfigInfo.obtain();
@@ -231,12 +242,7 @@ public class DownloadAudioManager {
             DownloadTaskDB.add(mContext, downloadTask);
         }
         //重新获取歌曲下载路径，防止下载地址失效
-        mWorkerHandler.post(new Runnable() {
-            @Override
-            public void run() {
-                getAudioDownloadUrl(downloadTask, audioInfo);
-            }
-        });
+        getAudioDownloadUrl(downloadTask, audioInfo);
     }
 
     /**
