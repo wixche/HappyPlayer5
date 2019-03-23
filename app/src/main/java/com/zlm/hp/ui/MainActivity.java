@@ -720,10 +720,9 @@ public class MainActivity extends BaseActivity {
 
                         return;
                     }
-
-                    if (mConfigInfo.isShowLockScreenLrc() != isChecked)
-                        mConfigInfo.setShowLockScreenLrc(isChecked).save();
                 }
+                if (mConfigInfo.isShowLockScreenLrc() != isChecked)
+                    mConfigInfo.setShowLockScreenLrc(isChecked).save();
             }
         });
     }
