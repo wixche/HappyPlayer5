@@ -14,6 +14,7 @@ import android.widget.TextView;
 
 import com.dou361.dialogui.DialogUIUtils;
 import com.dou361.dialogui.listener.DialogUIListener;
+import com.zlm.hp.constants.ConfigInfo;
 import com.zlm.hp.entity.AudioInfo;
 import com.zlm.hp.fragment.BaseFragment;
 import com.zlm.hp.lyrics.LyricsReader;
@@ -212,9 +213,11 @@ public class PreviewLrcFragment extends BaseFragment {
 
             }
         });
+        ConfigInfo configInfo = ConfigInfo.obtain();
 
         //多行歌词视图
         mManyLyricsView = mainView.findViewById(R.id.manyLyricsView);
+        mManyLyricsView.setSize(configInfo.getLrcFontSize(), configInfo.getLrcFontSize(), false);
         int paintColor = ColorUtils.parserColor("#555555");
         mManyLyricsView.setPaintColor(new int[]{paintColor, paintColor}, false);
         mManyLyricsView.setPaintLineColor(paintColor);
