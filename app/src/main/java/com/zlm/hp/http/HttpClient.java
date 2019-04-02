@@ -204,7 +204,12 @@ public class HttpClient {
                 }
             }
         }
-        String requestUrl = String.format("%s?%s", url, sb.toString());
+        String requestUrl = "";
+        if (url.contains("?")) {
+            requestUrl = String.format("%s&%s", url, sb.toString());
+        } else {
+            requestUrl = String.format("%s?%s", url, sb.toString());
+        }
         return doQuery(requestUrl, headParams, null, jump);
     }
 
